@@ -1,0 +1,40 @@
+alias ..='cd ..'
+
+alias ctop="top -o cpu"
+alias whereis="which"
+alias more='less -RFX'
+alias grep='grep --color=auto'
+alias cat='bat'
+alias ll='exa --icons --long --git --all --no-user'
+alias ls='ll'
+alias vim='nvim'
+alias vi='nvim'
+alias todo='nvim ~/Documents/todo.md'
+
+# git
+alias ga='git add'
+alias gb='git branch'
+alias gba='git branch -a'
+alias gc='git commit -v'
+alias gd='git diff'
+alias gl="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%cN>%Creset' --abbrev-commit"
+alias gp='git push'
+alias gst='git status'
+alias gu='git pull'
+alias groot="cd \$(git rev-parse --show-toplevel)"
+
+# rails
+alias be='bundle exec'
+alias rs='bundle exec rails server'
+alias rc='bundle exec rails console'
+alias rspec='bundle exec rspec'
+alias tlog='tail -f log/development.log'
+alias rrr="bundle exec rake db:drop:all db:create:all db:migrate"
+alias rr="bundle exec rake db:migrate; RAILS_ENV=test bundle exec rake db:migrate"
+alias be='bundle exec'
+
+alias dt="dev test --include-branch-commits"
+alias dr="dev style --include-branch-commits"
+alias ds="./bin/srb typecheck"
+alias da="clear; ds && dr && dt"
+alias pr="gh pr view --web"
