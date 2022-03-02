@@ -11,7 +11,7 @@
 !bat
 !bin/
 !config/
-!config/kitty
+!config/kitty/
 !config/nvim
 !gitignore
 !tmux.conf
