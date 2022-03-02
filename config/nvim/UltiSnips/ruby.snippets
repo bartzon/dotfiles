@@ -1,0 +1,20 @@
+snippet as "assert"
+assert ${1:test}, "${2:failure_message}"
+endsnippet
+
+snippet asnil "assert_nil"
+assert_nil ${1:test}
+endsnippet
+
+snippet ref "refute"
+refute ${1:test}, "${2:failure_message}"
+endsnippet
+
+snippet ase "assert_equal"
+assert_equal ${1:expected}, ${2:actual}
+endsnippet
+
+snippet TODO "Smart Todo"
+# TODO(on: date("`date -v +10d +%Y-%m-%d`"), to: "${1}")
+#  ${2}
+endsnippet

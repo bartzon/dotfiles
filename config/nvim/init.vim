@@ -36,8 +36,6 @@ set equalalways
 set nohlsearch
 
 let g:netrw_banner=0
-let g:netrw_browse_split=2
-let g:netrw_altv=1
 let g:netrw_liststyle=3
 
 syntax enable
@@ -110,9 +108,6 @@ augroup MyOverrides
   autocmd!
   autocmd BufWritePre * %s/\s\+$//e " trim whitespace
   autocmd BufWritePost ~/Documents/TODO.md silent! :!pandoc -s -o ~/Documents/todo.html --from=markdown ~/Documents/TODO.md
-
-  autocmd InsertEnter :lua vim.diagnostic.hide()
-  autocmd BufWritePost :lua vim.diagnostic.show()
 augroup END
 
 nnoremap <leader>todo :edit ~/Documents/TODO.md<CR>
@@ -145,8 +140,11 @@ source ~/.config/nvim/plugins/projectionist.vim
 source ~/.config/nvim/plugins/ultisnips.vim
 source ~/.config/nvim/plugins/zzz-vim-devicons.vim
 
+Plug 'tpope/vim-commentary'
+
 call plug#end()
 doautocmd User PlugLoaded
 
 source ~/.config/nvim/extras/dim_inactive_windows.vim
+source ~/.config/nvim/extras/relative_numbers.vim
 " source ~/.config/nvim/extras/av_using_fzf.vim

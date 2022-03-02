@@ -15,6 +15,7 @@ function nvim_lsp_setup()
       ['gd'] = "<cmd>lua vim.lsp.buf.definition()<CR>",
       ['gi'] = "<cmd>lua vim.lsp.buf.implementation()<CR>",
       ['gh'] = "<cmd>lua require'lspsaga.provider'.lsp_finder()<CR>",
+      ['gl'] = "<cmd>lua vim.lsp.buf.signature_help()<CR>",
       ['rn'] = "<cmd>lua vim.lsp.buf.rename()<CR>",
     }
 
@@ -38,11 +39,17 @@ function nvim_lsp_setup()
   end
 
   nvim_lsp.sorbet.setup{
-    on_attach = on_attach
+    on_attach = on_attach,
+    completion = {
+      autocomplete = false,
+    }
   }
 
   nvim_lsp.rubocop_lsp.setup{
-    on_attach = on_attach
+    on_attach = on_attach,
+    completion = {
+      autocomplete = false,
+    }
   }
 
   require'lspsaga'.init_lsp_saga{}
