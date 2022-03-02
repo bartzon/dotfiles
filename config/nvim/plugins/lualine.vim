@@ -4,12 +4,12 @@ lua<<EOF
 function lualine_setup()
   require('lualine').setup({
   options = {
-    theme = 'gruvbox-material',
+    theme = 'gruvbox-flat',
     always_divide_middle = true,
     },
   sections = {
-    lualine_a = {'mode'},
-    lualine_b = {'branch', 'diff'},
+    lualine_a = {''},
+    lualine_b = {'branch'},
     lualine_c = {
       {
           'filename',

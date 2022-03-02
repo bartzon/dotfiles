@@ -16,7 +16,7 @@ set smartcase
 set wildmode=longest:full,full
 set nowrap
 set list
-set listchars=tab:▸\ ,trail:·
+set listchars=tab:␉·,trail:␠,nbsp:⎵
 set mouse=a
 set scrolloff=8
 set sidescrolloff=8
@@ -34,6 +34,8 @@ set noswapfile
 set autoread
 set equalalways
 set nohlsearch
+
+set statusline=%f " show full filename
 
 let g:netrw_banner=0
 let g:netrw_liststyle=3
@@ -142,8 +144,10 @@ source ~/.config/nvim/plugins/zzz-vim-devicons.vim
 
 Plug 'tpope/vim-commentary'
 
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+
 call plug#end()
-doautocmd User PlugLoaded
+oautocmd User PlugLoaded
 
 source ~/.config/nvim/extras/dim_inactive_windows.vim
 source ~/.config/nvim/extras/relative_numbers.vim
