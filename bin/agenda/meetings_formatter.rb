@@ -25,10 +25,10 @@ class MeetingsFormatter
   end
 
   def started(m)
-    "#{m.title} #{format_ts Time.now + m.time_left} left"
+    "#{m.title} #{format_ts Time.zone.now + m.time_left} left"
   end
 
   def format_ts(ts)
-    distance_of_time_in_words(Time.now, ts, false)
+    distance_of_time_in_words(Time.zone.now, ts, false)
   end
 end

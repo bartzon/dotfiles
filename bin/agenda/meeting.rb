@@ -11,11 +11,11 @@ class Meeting
 
   def parse(timestamp)
     date, hh, mm = timestamp.split(':')
-    Time.parse("#{date} #{hh}:#{mm}:00")
+    Time.zone.parse("#{date} #{hh}:#{mm}:00")
   end
 
   def starts_in
-    starts_at - Time.now
+    starts_at - Time.zone.now
   end
 
   def all_day?
@@ -27,7 +27,7 @@ class Meeting
   end
 
   def since_started
-    Time.now - starts_at
+    Time.zone.now - starts_at
   end
 
   def duration

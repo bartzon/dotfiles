@@ -11,6 +11,8 @@ include ActionView::Helpers::DateHelper
 require './meeting'
 require './meetings_formatter'
 
+Time.zone = 'Amsterdam'
+
 TITLE_LENGTH = 50
 FILTERS = [
   -> (m) { m.ended? },

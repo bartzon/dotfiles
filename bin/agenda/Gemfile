@@ -5,6 +5,7 @@ source 'https://rubygems.org'
 ruby '2.6.8'
 
 gem 'actionview'
+gem 'activesupport'
 gem 'dotiw'
 gem 'nokogiri'
 gem 'whenever'
