@@ -17,6 +17,35 @@ end
 function nvim_cmp_setup()
   local cmp = require'cmp'
 
+  local lspkindicons = {
+    Text = "",
+    Method = "",
+    Function = "",
+    Constructor = "",
+    Field = "",
+    Variable = "",
+    Class = "ﴯ",
+    Interface = "",
+    Module = "",
+    Property = "ﰠ",
+    Unit = "",
+    Value = "",
+    Enum = "",
+    Keyword = "",
+    Snippet = "",
+    Color = "",
+    File = "",
+    Reference = "",
+    Folder = "",
+    EnumMember = "",
+    Constant = "",
+    Struct = "",
+    Event = "",
+    Operator = "",
+    TypeParameter = "",
+}
+
+
   cmp.setup({
     snippet = {
       expand = function(args)
@@ -43,11 +72,22 @@ function nvim_cmp_setup()
       end, { "i", "s" }),
 
     },
+  formatting = {
+    format = function(entry, vim_item)
+    vim_item.kind = string.format(
+    "%s %s",
+    lspkindicons[vim_item.kind],
+    vim_item.kind
+    )
+    return vim_item
+  end,
+  },
     sources = cmp.config.sources({
       { name = 'nvim_lsp' },
       { name = 'ultisnips' },
-    }, {
       { name = 'buffer' },
+      { name = 'path' },
+    }, {
     })
   })
 
