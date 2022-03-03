@@ -147,7 +147,7 @@ Plug 'tpope/vim-commentary'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
 call plug#end()
-oautocmd User PlugLoaded
+doautocmd User PlugLoaded
 
 source ~/.config/nvim/extras/dim_inactive_windows.vim
 source ~/.config/nvim/extras/relative_numbers.vim
