@@ -30,6 +30,6 @@
 [init]
   defaultBranch = main
 [commit]
-  gpgSign = true
+	gpgsign = true
 [include]
   path = ~/.gitconfig_local
