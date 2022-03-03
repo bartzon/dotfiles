@@ -8,3 +8,8 @@ pip3 install gcalendar
 cd ../bin/agenda
 bundle install
 bundle exec whenever --update-crontab
+cd -
+
+cp ./'Monaco Nerd Font Complete Mono.otf' ~/Library/Fonts
+cp ./'Monaco Nerd Font Complete.otf' ~/Library/Fonts
+
