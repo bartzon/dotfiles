@@ -25,7 +25,7 @@ FILE = '/tmp/next_calendar_meeting'
 PARSED = '/tmp/next_calendar_meeting_parsed'
 
 def fetch
-  data = `gcalendar`.force_encoding('UTF-8').delete("^\u{0000}-\u{007F}").split("\n")
+  data = `gcalendar`.force_encoding('UTF-8').split("\n")
   lines = data.join("\n")
   File.open(FILE, 'w') { |fp| fp.write(lines) }
 end
