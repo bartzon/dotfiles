@@ -171,6 +171,10 @@ defaults write com.apple.commerce AutoUpdate -bool true
 # Allow the App Store to reboot machine on macOS updates
 defaults write com.apple.commerce AutoUpdateRestartRequired -bool true
 
+# Enable audio codecs for bluetooth
+sudo defaults write bluetoothaudiod "Enable AptX codec" -bool true
+sudo defaults write bluetoothaudiod "Enable AAC codec" -bool true
+
 # Restart the Finder or kill the preferences daemon for the change to take effect:
 killall Finder
 killall Safari
