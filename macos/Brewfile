@@ -15,6 +15,7 @@ brew "reattach-to-user-namespace"
 brew "ripgrep"
 brew "ruby-install"
 brew "tmux"
+brew "asdf"
 
 cask "alfred"
 cask "bartender"

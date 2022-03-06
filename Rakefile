@@ -2,6 +2,7 @@ require 'rake'
 require 'erb'
 
 FILES = [
+  'asdfrc',
   'bat',
   'bin',
   'config',
