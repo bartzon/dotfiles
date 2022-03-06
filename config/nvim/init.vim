@@ -144,6 +144,8 @@ source ~/.config/nvim/plugins/projectionist.vim
 source ~/.config/nvim/plugins/ultisnips.vim
 source ~/.config/nvim/plugins/zzz-vim-devicons.vim
 
+Plug 'github/copilot.vim'
+
 call plug#end()
 doautocmd User PlugLoaded
 
