@@ -21,12 +21,14 @@ end
 
 def battery_status(type)
   data = `pmset -g accps | grep "#{type}" | sed '1q'`
-  num = data.match(/\d+%;/)[0].gsub(/%;/, '')
+  return {} if data == ""
+  num = data.match(/\d+%;/)[0].to_s.gsub(/%;/, '')
   charging = data =~ / charging/
   { percentage: num, charging: charging }
 end
 
 def format_status(key, data)
+  return unless data[:percentage]
   return if key == 'B' && data[:percentage] == '100'
   if data[:charging]
     "#{key}:🔋#{data[:percentage]}%"
