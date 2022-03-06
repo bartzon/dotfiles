@@ -4,7 +4,7 @@ lua<<EOF
 function lualine_setup()
   require('lualine').setup({
   options = {
-    theme = 'gruvbox-flat',
+    theme = 'gruvbox',
     always_divide_middle = true,
     },
   sections = {

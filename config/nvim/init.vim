@@ -34,7 +34,7 @@ set noswapfile
 set autoread
 set equalalways
 set nohlsearch
-
+set showmatch
 set statusline=%f " show full filename
 
 let g:netrw_banner=0
@@ -43,6 +43,7 @@ let g:netrw_liststyle=3
 syntax enable
 
 call matchadd('ColorColumn', '\%121v')
+
 
 " ---------------------------------------------------
 " Keymappings
@@ -122,29 +123,30 @@ source ~/.config/nvim/extras/auto_install_vim-plug.vim
 
 call plug#begin(data_dir . '/plugins')
 
+" source ~/.config/nvim/plugins/nvim-treesitter.vim
 source ~/.config/nvim/plugins/bufferline.vim
 source ~/.config/nvim/plugins/commentary.vim
+source ~/.config/nvim/plugins/copilot.vim
 source ~/.config/nvim/plugins/fugitive.vim
 source ~/.config/nvim/plugins/fzf.vim
 source ~/.config/nvim/plugins/gruvbox.vim
 source ~/.config/nvim/plugins/lualine.vim
+source ~/.config/nvim/plugins/matchup.vim
 source ~/.config/nvim/plugins/nvim-cmp.vim
 source ~/.config/nvim/plugins/nvim-lsp.vim
-source ~/.config/nvim/plugins/nvim-treesitter.vim
 source ~/.config/nvim/plugins/obsession.vim
+source ~/.config/nvim/plugins/projectionist.vim
 source ~/.config/nvim/plugins/splitjoin.vim
 source ~/.config/nvim/plugins/tmux-navigator.vim
+source ~/.config/nvim/plugins/ultisnips.vim
 source ~/.config/nvim/plugins/vim-coauthors.vim
 source ~/.config/nvim/plugins/vim-sorbet.vim
 source ~/.config/nvim/plugins/vim-test.vim
 source ~/.config/nvim/plugins/vim-vinegar.vim
 source ~/.config/nvim/plugins/vimux.vim
 source ~/.config/nvim/plugins/which-key.vim
-source ~/.config/nvim/plugins/projectionist.vim
-source ~/.config/nvim/plugins/ultisnips.vim
 source ~/.config/nvim/plugins/zzz-vim-devicons.vim
 
-Plug 'github/copilot.vim'
 
 call plug#end()
 doautocmd User PlugLoaded

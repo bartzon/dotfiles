@@ -1,8 +1,8 @@
-" Plug 'gruvbox-community/gruvbox'
-Plug 'eddyekofo94/gruvbox-flat.nvim'
+Plug 'gruvbox-community/gruvbox'
+" Plug 'eddyekofo94/gruvbox-flat.nvim'
 
 augroup GruvboxOverride
-  autocmd User PlugLoaded ++nested colorscheme gruvbox-flat
+  autocmd User PlugLoaded ++nested colorscheme gruvbox
 augroup end
 
 set bg=dark

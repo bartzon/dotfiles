@@ -47,8 +47,7 @@ function nvim_cmp_setup()
     Event = "",
     Operator = "",
     TypeParameter = "",
-}
-
+  }
 
   cmp.setup({
     snippet = {
@@ -83,12 +82,14 @@ function nvim_cmp_setup()
     },
   formatting = {
     format = function(entry, vim_item)
-    vim_item.kind = string.format(
-    "%s %s",
-    lspkindicons[vim_item.kind],
-    vim_item.kind
-    )
-    return vim_item
+      vim_item.kind = string.format("%s %s", lspkindicons[vim_item.kind], vim_item.kind)
+      vim_item.menu = ({
+          nvim_lsp = "[LSP]",
+          ultisnips = "[Snip]",
+          buffer = "[Buff]",
+          path = "[Path]"
+       })[entry.source.name]
+      return vim_item
   end,
   },
     sources = cmp.config.sources({
