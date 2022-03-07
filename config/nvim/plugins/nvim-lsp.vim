@@ -17,6 +17,9 @@ function nvim_lsp_setup()
       ['gh'] = "<cmd>lua require'lspsaga.provider'.lsp_finder()<CR>",
       ['gl'] = "<cmd>lua vim.lsp.buf.signature_help()<CR>",
       ['rn'] = "<cmd>lua vim.lsp.buf.rename()<CR>",
+
+      ['[d'] = "<cmd>lua vim.diagnostic.goto_prev()<CR>",
+      [']d'] = "<cmd>lua vim.diagnostic.goto_next()<CR>",
     }
 
     for lhs, rhs in pairs(mappings) do
