@@ -1,6 +1,17 @@
+#!/bin/zsh
+
+curdir=$(pwd)
+
 if [[ `uname` == "Darwin" ]]; then
   cd macos
   sh ./install.sh
+  cd $curdir
+fi
+
+if [[ `uname` == "Linux" ]]; then
+  cd linux
+  sh ./install.sh
+  cd $curdir
 fi
 
 rake install
