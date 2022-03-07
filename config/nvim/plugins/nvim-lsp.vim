@@ -53,6 +53,8 @@ function nvim_lsp_setup()
   }
 
   require'lspsaga'.init_lsp_saga{}
+
+  vim.diagnostic.config({virtual_text = false})
 end
 
 EOF

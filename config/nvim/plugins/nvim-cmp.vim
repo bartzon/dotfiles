@@ -15,10 +15,6 @@ local has_words_before = function()
 end
 
 function nvim_cmp_setup()
-  vim.g.copilot_no_tab_map = true
-  vim.g.copilot_assume_mapped = true
-  vim.g.copilot_tab_fallback = ""
-
   local cmp = require'cmp'
 
   local lspkindicons = {
@@ -50,6 +46,9 @@ function nvim_cmp_setup()
   }
 
   cmp.setup({
+    completion = {
+      autocomplete = false, -- disable auto-completion.
+    },
     snippet = {
       expand = function(args)
         vim.fn["UltiSnips#Anon"](args.body)
@@ -64,12 +63,7 @@ function nvim_cmp_setup()
         elseif has_words_before() then
           cmp.complete()
         else
-          local copilot_keys = vim.fn["copilot#Accept"]()
-          if copilot_keys ~= "" then
-            vim.api.nvim_feedkeys(copilot_keys, "i", true)
-          else
-            fallback()
-          end
+          fallback()
         end
       end, { "i", "s" }),
 
@@ -80,26 +74,28 @@ function nvim_cmp_setup()
       end, { "i", "s" }),
 
     },
-  formatting = {
-    format = function(entry, vim_item)
-      vim_item.kind = string.format("%s %s", lspkindicons[vim_item.kind], vim_item.kind)
-      vim_item.menu = ({
-          nvim_lsp = "[LSP]",
-          ultisnips = "[Snip]",
-          buffer = "[Buff]",
-          path = "[Path]"
-       })[entry.source.name]
-      return vim_item
-  end,
-  },
+    formatting = {
+      format = function(entry, vim_item)
+        vim_item.kind = string.format("%s %s", lspkindicons[vim_item.kind], vim_item.kind)
+        vim_item.menu = ({
+            copilot = "[Cop]",
+            nvim_lsp = "[LSP]",
+            ultisnips = "[Snip]",
+            buffer = "[Buf]",
+            path = "[Pat]"
+         })[entry.source.name]
+        return vim_item
+    end,
+    },
     sources = cmp.config.sources({
+      { name = 'copilot' },
       { name = 'nvim_lsp' },
       { name = 'ultisnips' },
       { name = 'buffer' },
       { name = 'path' },
-    }, {
-    })
-  })
+    }
+  )
+})
 
   -- Setup lspconfig.
   local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
@@ -109,5 +105,4 @@ EOF
 
 augroup NvimCmpSetup
   autocmd User PlugLoaded ++nested lua nvim_cmp_setup()
-  autocmd BufWritePre *.rb lua vim.lsp.buf.formatting_sync(nil, 1000)
 augroup end
