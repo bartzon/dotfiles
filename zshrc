@@ -13,3 +13,6 @@ else
   [[ -f /usr/local/share/chruby/chruby.sh ]] && source /usr/local/share/chruby/chruby.sh
   [[ -x /usr/local/bin/brew ]] && eval $(/usr/local/bin/brew shellenv)
 fi
+
+GPG_TTY=$(tty)
+export GPG_TTY

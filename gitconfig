@@ -29,7 +29,5 @@
   prune = true
 [init]
   defaultBranch = main
-[commit]
-	gpgsign = true
 [include]
   path = ~/.gitconfig_local

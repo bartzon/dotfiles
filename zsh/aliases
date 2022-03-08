@@ -10,6 +10,8 @@ alias vim='nvim'
 alias vi='nvim'
 alias todo='nvim ~/Documents/todo.md'
 
+alias ssh='kitty +kitten ssh'
+
 # git
 alias ga='git add'
 alias gb='git branch'
