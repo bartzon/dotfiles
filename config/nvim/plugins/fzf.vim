@@ -19,6 +19,8 @@ if has('nvim') && exists('&winblend') && &termguicolors
     let width = float2nr(&columns * 0.8)
     let height = float2nr(&lines * 0.6)
     let opts = { 'relative': 'editor',
+               \ 'style': 'minimal',
+               \ 'border': 'shadow',
                \ 'row': (&lines - height) / 2,
                \ 'col': (&columns - width) / 2,
                \ 'width': width,
