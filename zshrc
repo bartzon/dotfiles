@@ -16,3 +16,5 @@ fi
 
 GPG_TTY=$(tty)
 export GPG_TTY
+
+if [ "$TMUX" = "" ]; then tmux new -As0; fi
