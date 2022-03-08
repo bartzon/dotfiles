@@ -42,6 +42,7 @@ function nvim_lsp_setup()
   end
 
   nvim_lsp.sorbet.setup{
+    cmd = {'bundle', 'exec', 'srb', 'tc', '--lsp'};
     on_attach = on_attach,
     completion = {
       autocomplete = false,
