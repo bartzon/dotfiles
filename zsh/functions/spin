@@ -1,3 +1,0 @@
-zstyle ':completion:*' use-cache on
-autoload -Uz compinit && compinit
-source <(spin completion)
