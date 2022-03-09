@@ -100,26 +100,14 @@ function nvim_cmp_setup()
 
   cmp.setup.cmdline('/', {
     sources = {
-      { name = 'buffer' }
+        { name = 'buffer' }
       }
-    })
-
-  cmp.setup.cmdline(':', {
-    sources = cmp.config.sources({
-    { name = 'path' }
-    }, {
-    { name = 'cmdline' }
-    })
   })
 
   -- Setup lspconfig.
   local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 
   require('lspconfig')['sorbet'].setup {
-    capabilities = capabilities
-  }
-
-  require('lspconfig')['rubocop_lsp'].setup {
     capabilities = capabilities
   }
 end

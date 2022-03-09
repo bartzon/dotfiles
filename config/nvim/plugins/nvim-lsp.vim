@@ -56,6 +56,20 @@ function nvim_lsp_setup()
     }
   }
 
+  require'lspconfig'.sumneko_lua.setup{
+    on_attach = on_attach,
+    completion = {
+      autocomplete = false,
+    }
+  }
+
+  require'lspconfig'.vim_ls.setup{
+    on_attach = on_attach,
+    completion = {
+      autocomplete = false,
+    }
+  }
+
   require'lspsaga'.init_lsp_saga{}
 
   vim.diagnostic.config({virtual_text = false})
