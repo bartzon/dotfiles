@@ -17,6 +17,4 @@ fi
 GPG_TTY=$(tty)
 export GPG_TTY
 
-export TZ="Europe/Amsterdam"
-
 if [ "$TMUX" = "" ]; then tmux new -As0; fi
