@@ -81,9 +81,6 @@ nmap <leader>dr :VimuxRunCommand 'dev style --include-branch-commits'<CR>
 nmap <leader>ds :VimuxRunCommand './bin/srb typecheck'<CR>
 nmap <leader>da :VimuxRunCommand 'clear ; dev style --include-branch-commits && ./bin/srb typecheck && dev test --include-branch-commits'<CR>
 
-" paste with indenting, https://github.com/sickill/vim-pasta
-nnoremap <leader>p p`[v`]=
-
 nnoremap gv :only<bar>vsplit<CR>gf
 
 " Keep it centered
@@ -101,11 +98,12 @@ vnoremap K :m '<-2<CR>gv=gv
 inoremap <C-k> <esc>:m .-2<CR>==
 inoremap <C-j> <esc>:m .+1<CR>==
 
-" moving splits
-nnoremap <leader>h :wincmd h<CR>
-nnoremap <leader>j :wincmd j<CR>
-nnoremap <leader>k :wincmd k<CR>
-nnoremap <leader>l :wincmd l<CR>
+" fast switching to split
+nnoremap <leader>1 1<C-W><C-W><CR>
+nnoremap <leader>2 2<C-W><C-W><CR>
+nnoremap <leader>3 3<C-W><C-W><CR>
+nnoremap <leader>4 4<C-W><C-W><CR>
+nnoremap <leader>5 5<C-W><C-W><CR>
 
 augroup BartzonOverrides
   autocmd!
@@ -118,7 +116,6 @@ augroup END
 source ~/.config/nvim/extras/auto_install_vim-plug.vim
 
 call plug#begin(data_dir . '/plugins')
-
 
 source ~/.config/nvim/plugins/bufferline.vim
 source ~/.config/nvim/plugins/commentary.vim
@@ -137,7 +134,9 @@ source ~/.config/nvim/plugins/splitjoin.vim
 source ~/.config/nvim/plugins/tmux-navigator.vim
 source ~/.config/nvim/plugins/ultisnips.vim
 source ~/.config/nvim/plugins/vim-coauthors.vim
+source ~/.config/nvim/plugins/vim-ruby.vim
 source ~/.config/nvim/plugins/vim-sorbet.vim
+source ~/.config/nvim/plugins/vim-surround.vim
 source ~/.config/nvim/plugins/vim-test.vim
 source ~/.config/nvim/plugins/vim-vinegar.vim
 source ~/.config/nvim/plugins/vimux.vim
