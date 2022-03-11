@@ -3,6 +3,7 @@ osascript -e "tell application \"System Events\" to tell every desktop to set pi
 sh brew.sh
 sh defaults.sh
 
+python3.9 -m pip install --upgrade pip
 pip3 install gcalendar
 
 cd ../bin/agenda
