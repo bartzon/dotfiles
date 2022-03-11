@@ -1,5 +1,6 @@
 Plug 'neovim/nvim-lspconfig'
 Plug 'tami5/lspsaga.nvim'
+Plug 'weilbith/nvim-code-action-menu'
 
 lua << EOF
 function nvim_lsp_setup()
