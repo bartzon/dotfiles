@@ -84,6 +84,7 @@ defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 
 # Set a blazingly fast keyboard repeat rate
 defaults write NSGlobalDomain KeyRepeat -int 1
+defaults write NSGlobalDomain InitialKeyRepeat -int 10
 
 # Set mouse tracking speed
 defaults write NSGlobalDomain com.apple.mouse.scaling -float 1.0
