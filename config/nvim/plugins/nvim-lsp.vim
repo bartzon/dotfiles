@@ -3,6 +3,8 @@ Plug 'tami5/lspsaga.nvim'
 
 lua << EOF
 function nvim_lsp_setup()
+  vim.lsp.stop_client(vim.lsp.get_active_clients())
+
   local nvim_lsp = require'lspconfig'
 
   local nnoremap = function (lhs, rhs)
@@ -56,14 +58,7 @@ function nvim_lsp_setup()
     }
   }
 
-  require'lspconfig'.sumneko_lua.setup{
-    on_attach = on_attach,
-    completion = {
-      autocomplete = false,
-    }
-  }
-
-  require'lspconfig'.vim_ls.setup{
+  nvim_lsp.sumneko_lua.setup{
     on_attach = on_attach,
     completion = {
       autocomplete = false,
@@ -80,5 +75,3 @@ EOF
 augroup NvimLSPSetup
   autocmd User PlugLoaded ++nested lua nvim_lsp_setup()
 augroup end
-
-autocmd! CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})
