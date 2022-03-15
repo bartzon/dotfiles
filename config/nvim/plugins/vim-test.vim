@@ -11,5 +11,8 @@ nmap <silent> <leader>tr :VimuxRunCommand 'dev retest'<CR>
 nmap <silent> <leader>f :TestFile<CR>
 nmap <silent> <leader>s :TestNearest<CR>
 
-let test#strategy = "vimux"
-
+if exists('$TMUX')
+  let test#strategy = "vimux"
+else
+  let test#strategy = "dispatch"
+end
