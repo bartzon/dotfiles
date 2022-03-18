@@ -37,6 +37,9 @@ set nohlsearch
 set showmatch
 set statusline=%f " show full filename
 
+set laststatus=3
+highlight WinSeparator guibg=None
+
 let g:netrw_banner=0
 let g:netrw_liststyle=3
 
