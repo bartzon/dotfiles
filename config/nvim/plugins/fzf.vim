@@ -34,11 +34,17 @@ endif
 
 let $FZF_DEFAULT_OPTS = '--layout=reverse --info=inline'
 
-nmap <leader>f :Files<cr>
-nmap <leader>F :AllFiles<cr>
+function s:files()
+  if empty(FugitiveGitDir())
+    :Files
+  else
+    :GFiles
+  endif
+endfunction
+
 nmap <leader>b :Buffers<cr>
 nmap <leader>r :Rg<cr>
 nmap <leader>R :Rg<space>
 nmap <leader>gb :GBranches<cr>
 
-nnoremap <C-p> :Files<CR>
+nnoremap <C-p> :call <SID>files()<CR>
