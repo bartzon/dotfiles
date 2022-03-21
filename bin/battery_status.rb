@@ -4,10 +4,10 @@ require 'json'
 output = []
 
 data = JSON.parse(`system_profiler -json SPBluetoothDataType`)
-devices = data["SPBluetoothDataType"][0]["devices_list"]
+devices = data["SPBluetoothDataType"][0]["device_connected"]
 airpods = devices.find { |hash| hash.keys.first =~ /AirPods/ }.values[0]
 
-if airpods["device_connected"] == "Yes"
+if airpods
   left = airpods["device_batteryLevelLeft"].to_i
   right = airpods["device_batteryLevelLeft"].to_i
   avg = ((left + right) / 2.0).to_i
