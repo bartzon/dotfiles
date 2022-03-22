@@ -110,8 +110,13 @@ nnoremap <leader>5 5<C-W><C-W><CR>
 
 augroup BartzonOverrides
   autocmd!
+
   autocmd BufWritePre * %s/\s\+$//e " trim whitespace
+
   autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})
+
+  autocmd BufRead,BufNewFile *.md setlocal textwidth=80
+  autocmd BufRead,BufNewFile gitconfig.local set filetype=gitconfig
 augroup END
 
 " ---------------------------------------------------
