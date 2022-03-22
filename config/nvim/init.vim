@@ -36,6 +36,7 @@ set equalalways
 set nohlsearch
 set showmatch
 set statusline=%f " show full filename
+set numberwidth=5
 
 set laststatus=3
 highlight WinSeparator guibg=None
