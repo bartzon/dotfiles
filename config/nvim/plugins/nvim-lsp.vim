@@ -1,6 +1,8 @@
 Plug 'neovim/nvim-lspconfig'
 Plug 'tami5/lspsaga.nvim'
 Plug 'weilbith/nvim-code-action-menu'
+Plug 'j-hui/fidget.nvim'
+Plug 'stevearc/aerial.nvim'
 
 lua << EOF
 function nvim_lsp_setup()
@@ -12,7 +14,7 @@ function nvim_lsp_setup()
     vim.api.nvim_buf_set_keymap(0, 'n', lhs, rhs, {noremap = true, silent = true})
   end
 
-  local on_attach = function ()
+  local on_attach = function (client, bufnr)
     local mappings = {
       ['K'] = "<cmd>lua require('lspsaga.hover').render_hover_doc()<CR>",
       ['gd'] = "<cmd>lua vim.lsp.buf.definition()<CR>",
@@ -28,6 +30,8 @@ function nvim_lsp_setup()
     for lhs, rhs in pairs(mappings) do
       nnoremap(lhs, rhs)
     end
+
+    require("aerial").on_attach(client, bufnr)
   end
 
   local configs = require 'lspconfig.configs'
@@ -67,6 +71,8 @@ function nvim_lsp_setup()
   }
 
   require'lspsaga'.init_lsp_saga{}
+
+  require"fidget".setup{}
 
   vim.diagnostic.config({virtual_text = false})
 end
