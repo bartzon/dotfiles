@@ -165,9 +165,11 @@ source ~/.config/nvim/plugins/vimux.vim
 source ~/.config/nvim/plugins/which-key.vim
 source ~/.config/nvim/plugins/indent-blankline.vim
 source ~/.config/nvim/plugins/open-browser.vim
+source ~/.config/nvim/plugins/nvim-gps.vim
 source ~/.config/nvim/plugins/zzz-vim-devicons.vim
 
 Plug 'tpope/vim-dispatch'
+
 call plug#end()
 doautocmd User PlugLoaded
 
