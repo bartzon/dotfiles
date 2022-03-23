@@ -153,7 +153,6 @@ source ~/.config/nvim/plugins/vim-surround.vim
 source ~/.config/nvim/plugins/vim-test.vim
 source ~/.config/nvim/plugins/vim-vinegar.vim
 source ~/.config/nvim/plugins/vimux.vim
-source ~/.config/nvim/plugins/mkdir.vim
 source ~/.config/nvim/plugins/which-key.vim
 source ~/.config/nvim/plugins/zzz-vim-devicons.vim
 
