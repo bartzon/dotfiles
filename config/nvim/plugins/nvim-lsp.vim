@@ -3,6 +3,7 @@ Plug 'tami5/lspsaga.nvim'
 Plug 'weilbith/nvim-code-action-menu'
 Plug 'j-hui/fidget.nvim'
 Plug 'stevearc/aerial.nvim'
+Plug 'ray-x/lsp_signature.nvim'
 
 lua << EOF
 function nvim_lsp_setup()
@@ -32,6 +33,12 @@ function nvim_lsp_setup()
     end
 
     require("aerial").on_attach(client, bufnr)
+    require "lsp_signature".on_attach({
+      bind = true, -- This is mandatory, otherwise border config won't get registered.
+      handler_opts = {
+        border = "rounded"
+      }
+    }, bufnr)
   end
 
   local configs = require 'lspconfig.configs'
