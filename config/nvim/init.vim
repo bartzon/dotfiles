@@ -114,9 +114,13 @@ augroup BartzonOverrides
   autocmd BufWritePre * %s/\s\+$//e " trim whitespace
 
   autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})
+augroup END
 
-  autocmd BufRead,BufNewFile *.md setlocal textwidth=80
-  autocmd BufRead,BufNewFile gitconfig.local set filetype=gitconfig
+augroup NvimTerminal
+  autocmd!
+  autocmd TermOpen term://* startinsert |
+        \ setlocal nonumber norelativenumber signcolumn=no |
+  autocmd BufWinEnter,WinEnter term://* startinsert
 augroup END
 
 " ---------------------------------------------------
