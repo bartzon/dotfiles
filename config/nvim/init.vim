@@ -67,6 +67,7 @@ nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-h> <C-w>h
 nnoremap <C-l> <C-w>l
+nnoremap <leader>= <C-w>=
 
 " Map H/L to move to the beginning/end of a line
 nnoremap H ^
@@ -87,9 +88,14 @@ nmap <leader>da :VimuxRunCommand 'clear ; dev style --include-branch-commits && 
 nnoremap gv :only<bar>vsplit<CR>gf
 
 " Keep it centered
-nnoremap n nzzzv
-nnoremap N Nzzzv
-nnoremap J mzJ`z
+nnoremap {  {zz
+nnoremap }  }zz
+nnoremap ]c ]czz
+nnoremap [c [czz
+nnoremap [j <C-o>zz
+nnoremap ]j <C-i>zz
+nnoremap ]s ]szz
+nnoremap [s [szz
 
 " undo breakpoints
 inoremap , ,<c-g>u
@@ -108,15 +114,22 @@ nnoremap <leader>3 3<C-W><C-W><CR>
 nnoremap <leader>4 4<C-W><C-W><CR>
 nnoremap <leader>5 5<C-W><C-W><CR>
 
+" Clone current paragraph
+nnoremap cp yap<S-}>p
+
 augroup BartzonOverrides
   autocmd!
 
   autocmd BufWritePre * %s/\s\+$//e " trim whitespace
 
   autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})
+augroup END
 
-  autocmd BufRead,BufNewFile *.md setlocal textwidth=80
-  autocmd BufRead,BufNewFile gitconfig.local set filetype=gitconfig
+augroup NvimTerminal
+  autocmd!
+  autocmd TermOpen term://* startinsert |
+        \ setlocal nonumber norelativenumber signcolumn=no |
+  autocmd BufWinEnter,WinEnter term://* startinsert
 augroup END
 
 " ---------------------------------------------------
@@ -149,11 +162,14 @@ source ~/.config/nvim/plugins/vim-surround.vim
 source ~/.config/nvim/plugins/vim-test.vim
 source ~/.config/nvim/plugins/vim-vinegar.vim
 source ~/.config/nvim/plugins/vimux.vim
-source ~/.config/nvim/plugins/mkdir.vim
 source ~/.config/nvim/plugins/which-key.vim
+source ~/.config/nvim/plugins/indent-blankline.vim
+source ~/.config/nvim/plugins/open-browser.vim
+source ~/.config/nvim/plugins/nvim-gps.vim
 source ~/.config/nvim/plugins/zzz-vim-devicons.vim
 
 Plug 'tpope/vim-dispatch'
+
 call plug#end()
 doautocmd User PlugLoaded
 
