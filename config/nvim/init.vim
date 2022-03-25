@@ -139,13 +139,12 @@ source ~/.config/nvim/extras/auto_install_vim-plug.vim
 
 call plug#begin(data_dir . '/plugins')
 
-source ~/.config/nvim/plugins/bufferline.vim
 source ~/.config/nvim/plugins/commentary.vim
 source ~/.config/nvim/plugins/copilot.vim
 source ~/.config/nvim/plugins/fugitive.vim
 source ~/.config/nvim/plugins/fzf.vim
 source ~/.config/nvim/plugins/gruvbox.vim
-source ~/.config/nvim/plugins/lualine.vim
+ source ~/.config/nvim/plugins/lualine.vim
 source ~/.config/nvim/plugins/matchup.vim
 source ~/.config/nvim/plugins/nvim-cmp.vim
 source ~/.config/nvim/plugins/nvim-lsp.vim
