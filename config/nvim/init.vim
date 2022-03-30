@@ -46,6 +46,15 @@ let g:netrw_liststyle=3
 
 syntax enable
 
+if $SPIN == 1
+  let g:clipboard = {
+        \ 'name': 'pbcopy',
+        \ 'copy': {'+': 'pbcopy', '*': 'pbcopy'},
+        \ 'paste': {'+': 'pbpaste', '*': 'pbpaste'},
+        \ 'cache_enabled': 1
+  }
+end
+
 call matchadd('ColorColumn', '\%121v')
 
 " ---------------------------------------------------
@@ -144,7 +153,7 @@ source ~/.config/nvim/plugins/copilot.vim
 source ~/.config/nvim/plugins/fugitive.vim
 source ~/.config/nvim/plugins/fzf.vim
 source ~/.config/nvim/plugins/gruvbox.vim
- source ~/.config/nvim/plugins/lualine.vim
+source ~/.config/nvim/plugins/lualine.vim
 source ~/.config/nvim/plugins/matchup.vim
 source ~/.config/nvim/plugins/nvim-cmp.vim
 source ~/.config/nvim/plugins/nvim-lsp.vim
