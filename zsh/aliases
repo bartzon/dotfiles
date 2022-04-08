@@ -9,6 +9,7 @@ alias ll='exa --icons --long --all --no-user'
 alias vim='nvim'
 alias vi='nvim'
 alias todo='nvim ~/Documents/todo.md'
+alias v='vim $(fzf --height=25)'
 
 alias ssh='kitty +kitten ssh'
 
