@@ -1,0 +1,52 @@
+#!/usr/bin/env ruby
+
+require 'optionparser'
+
+NOTES_ROOT = File.expand_path("~/Documents/notes/")
+
+def titleize(str)
+  str.gsub!(/_/, ' ')
+  str.capitalize!  # capitalize the first word in case it is part of the no words array
+  words_no_cap = ["and", "or", "the", "over", "to", "the", "a", "but"]
+  phrase = str.split(" ").map {|word|
+    if words_no_cap.include?(word)
+      word
+    else
+      word.capitalize
+    end
+  }.join(" ") # I replaced the "end" in "end.join(" ") with "}" because it wasn't working in Ruby 2.1.1
+  phrase  # returns the phrase with all the excluded words
+end
+
+options = {}
+printers = Array.new
+OptionParser.new do |opts|
+  opts.banner = "Usage: notes [options] [path]"
+  opts.on("-n", "--new NAME", Array, "Create a new note") do |name|
+    options[:name] = name
+  end
+
+  opts.on("-l", "--list", "List all notes") do
+    options[:list] = true
+  end
+end.parse!
+
+if options[:name]
+  name = options[:name].first
+  fname = `date +%Y-%m-%d`.strip + "-" + name + ".md"
+  full_fname = File.join(NOTES_ROOT, fname)
+  `touch #{full_fname}`
+  File.open(full_fname, 'a') do |f|
+    f.write(`date +'%A, %d %B %Y`)
+    f.write("\n")
+    f.write("# #{titleize name}\n")
+    f.write("\n")
+    f.write("\n")
+  end
+  exec "nvim '#{full_fname}'"
+end
+
+if options[:list]
+  file = `find #{NOTES_ROOT} -iname '*.md' -o -name '*.txt' | fzf-tmux`
+  exec "nvim #{file}"
+end
