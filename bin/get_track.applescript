@@ -4,9 +4,9 @@ tell application "Spotify"
 
 	if (player state of application "Spotify" is playing) then
 		set s to "▶ "
+    return s & a & " - " & t
 	else
 		set s to ""
+    return
 	end if
-
-	return s & a & " - " & t
 end tell
