@@ -4,8 +4,9 @@ require 'json'
 output = []
 
 data = JSON.parse(`system_profiler -json SPBluetoothDataType`)
-devices = data["SPBluetoothDataType"][0]["device_connected"]
-airpods = devices.find { |hash| hash.keys.first =~ /AirPods/ }.values[0]
+devices = data["SPBluetoothDataType"][0]["device_connected"] || []
+found = devices.find { |hash| hash.keys.first =~ /AirPods/ }
+airpods = found && found.values[0]
 
 if airpods
   left = airpods["device_batteryLevelLeft"].to_i
@@ -37,6 +38,17 @@ def format_status(key, data)
   end
 end
 
+phone_info = %x[ideviceinfo -u `idevice_id --list` --domain com.apple.mobile.battery].split("\n")
+if phone_info
+  phone_bat = phone_info.find { |str| str =~ /BatteryCurrentCapacity/ }
+  if phone_bat
+    pct = phone_bat.split(":")[1].strip.to_i
+
+    charging = phone_info.any? { |str| str =~ /BatteryIsCharging: true/ }
+    output << format_status("iP", { percentage: pct, charging: charging })
+  end
+end
+
 mapping = { 'B' => 'InternalBattery', 'M' => 'Mouse', 'K' => 'Keyboard' }
 mapping.each do |key, attr|
   bat_data = battery_status(attr)
@@ -44,4 +56,4 @@ mapping.each do |key, attr|
 end
 
 output.compact!
-puts "#{output.join(" | ")}"
+puts "#{output.join(" | ")}" if output.any?
