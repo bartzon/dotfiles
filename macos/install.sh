@@ -19,3 +19,7 @@ asdf install ruby 3.1.1
 asdf global ruby 3.1.1
 
 npm install -g vim-language-server
+
+# Install font
+brew tap epk/epk
+brew install --cask font-sf-mono-nerd-font

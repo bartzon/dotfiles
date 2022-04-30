@@ -153,12 +153,15 @@ source ~/.config/nvim/plugins/copilot.vim
 source ~/.config/nvim/plugins/fugitive.vim
 source ~/.config/nvim/plugins/fzf.vim
 source ~/.config/nvim/plugins/gruvbox.vim
+source ~/.config/nvim/plugins/indent-blankline.vim
 source ~/.config/nvim/plugins/lualine.vim
 source ~/.config/nvim/plugins/matchup.vim
 source ~/.config/nvim/plugins/nvim-cmp.vim
+source ~/.config/nvim/plugins/nvim-gps.vim
 source ~/.config/nvim/plugins/nvim-lsp.vim
 source ~/.config/nvim/plugins/nvim-treesitter.vim
 source ~/.config/nvim/plugins/obsession.vim
+source ~/.config/nvim/plugins/open-browser.vim
 source ~/.config/nvim/plugins/projectionist.vim
 source ~/.config/nvim/plugins/splitjoin.vim
 source ~/.config/nvim/plugins/tmux-navigator.vim
@@ -171,16 +174,12 @@ source ~/.config/nvim/plugins/vim-test.vim
 source ~/.config/nvim/plugins/vim-vinegar.vim
 source ~/.config/nvim/plugins/vimux.vim
 source ~/.config/nvim/plugins/which-key.vim
-source ~/.config/nvim/plugins/indent-blankline.vim
-source ~/.config/nvim/plugins/open-browser.vim
-source ~/.config/nvim/plugins/nvim-gps.vim
 source ~/.config/nvim/plugins/zzz-vim-devicons.vim
-
 Plug 'tpope/vim-dispatch'
 
 call plug#end()
 doautocmd User PlugLoaded
 
-source ~/.config/nvim/extras/dim_inactive_windows.vim
+" source ~/.config/nvim/extras/dim_inactive_windows.vim
 source ~/.config/nvim/extras/relative_numbers.vim
 " source ~/.config/nvim/extras/av_using_fzf.vim
