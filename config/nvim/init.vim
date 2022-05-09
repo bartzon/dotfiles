@@ -57,6 +57,10 @@ end
 
 call matchadd('ColorColumn', '\%121v')
 
+" use rg, and use quickfix format
+set grepprg=rg\ --vimgrep
+set grepformat^=%f:%l:%c:%m
+
 " ---------------------------------------------------
 " Keymappings
 " ---------------------------------------------------
@@ -156,7 +160,7 @@ source ~/.config/nvim/plugins/gruvbox.vim
 source ~/.config/nvim/plugins/indent-blankline.vim
 source ~/.config/nvim/plugins/lualine.vim
 source ~/.config/nvim/plugins/matchup.vim
-source ~/.config/nvim/plugins/nvim-cmp.vim
+source ~/.config/nvim/plugins/cmp.vim
 source ~/.config/nvim/plugins/nvim-gps.vim
 source ~/.config/nvim/plugins/nvim-lsp.vim
 source ~/.config/nvim/plugins/nvim-treesitter.vim

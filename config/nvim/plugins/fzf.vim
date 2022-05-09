@@ -46,4 +46,4 @@ nmap <leader>r :Rg<cr>
 nmap <leader>R :Rg<space>
 nmap <leader>gb :GBranches<cr>
 
-nnoremap <C-p> :call <SID>files()<CR>
+nnoremap <C-p> :call <ID>files()<CR>
