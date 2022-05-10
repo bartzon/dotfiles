@@ -11,7 +11,7 @@ function lualine_setup()
     },
     sections = {
       lualine_a = {
-        { gps.get_location, cond = gps.is_available },
+        { gps.get_location },
       },
       lualine_b = {'branch'},
       lualine_c = {

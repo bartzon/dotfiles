@@ -130,21 +130,6 @@ nnoremap <leader>5 5<C-W><C-W><CR>
 " Clone current paragraph
 nnoremap cp yap<S-}>p
 
-augroup BartzonOverrides
-  autocmd!
-
-  autocmd BufWritePre * %s/\s\+$//e " trim whitespace
-
-  autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})
-augroup END
-
-augroup NvimTerminal
-  autocmd!
-  autocmd TermOpen term://* startinsert |
-        \ setlocal nonumber norelativenumber signcolumn=no |
-  autocmd BufWinEnter,WinEnter term://* startinsert
-augroup END
-
 " ---------------------------------------------------
 " Plugins
 " ---------------------------------------------------
