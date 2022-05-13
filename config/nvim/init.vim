@@ -165,6 +165,7 @@ source ~/.config/nvim/plugins/vimux.vim
 source ~/.config/nvim/plugins/which-key.vim
 source ~/.config/nvim/plugins/zzz-vim-devicons.vim
 Plug 'tpope/vim-dispatch'
+Plug 'shopify/spin-hud'
 
 call plug#end()
 doautocmd User PlugLoaded
