@@ -2,6 +2,7 @@ fpath=(~/.zsh/functions $fpath)
 
 setopt prompt_subst
 autoload -U ~/.zsh/functions/*(:t)
+source ~/.zsh/functions/zsh-functions
 
 umask 002
 
@@ -12,9 +13,8 @@ vcs_info
 }
 zstyle ':vcs_info:git:*' check-for-changes true
 
-export PS1='%~ '
+export PS1='%n%~ '
 export RPS1='$vcs_info_msg_0_'
-
 export EDITOR=nvim
 
 # nice colors on a black bg
@@ -25,3 +25,8 @@ bindkey -v
 bindkey '^R' history-incremental-search-backward
 
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
+
+zsh_add_plugin "zsh-users/zsh-autosuggestions"
+zsh_add_plugin "zsh-users/zsh-syntax-highlighting"
+zsh_add_plugin "hlissner/zsh-autopair"
+
