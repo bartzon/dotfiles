@@ -1,4 +1,5 @@
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'omnisyle/nvim-hidesig'
 
 lua<<EOF
 function setup_treesitter()
@@ -25,6 +26,11 @@ function setup_treesitter()
     autotag = { enable = true, disable = { 'markdown' } },
     context_commentstring = { enable = true, enable_autocmd = false },
     rainbow = { enable = true, extended_mode = true, max_file_lines = 1000 },
+    hidesig = {
+      enable = true,
+      opacity = 0.75, -- opacity for sig definitions
+      delay = 200,    -- update delay on CursorMoved and InsertLeave
+    }
   }
 end
 EOF
