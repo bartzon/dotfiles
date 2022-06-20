@@ -158,6 +158,7 @@ source ~/.config/nvim/plugins/ultisnips.vim
 source ~/.config/nvim/plugins/vim-coauthors.vim
 source ~/.config/nvim/plugins/vim-matchup.vim
 source ~/.config/nvim/plugins/vim-ruby.vim
+source ~/.config/nvim/plugins/nvim-pqf.vim
 source ~/.config/nvim/plugins/vim-sorbet.vim
 source ~/.config/nvim/plugins/vim-surround.vim
 source ~/.config/nvim/plugins/vim-test.vim
@@ -168,6 +169,7 @@ source ~/.config/nvim/plugins/which-key.vim
 source ~/.config/nvim/plugins/zzz-vim-devicons.vim
 Plug 'tpope/vim-dispatch'
 Plug 'shopify/spin-hud'
+Plug 'https://gitlab.com/yorickpeterse/nvim-pqf.git'
 
 call plug#end()
 doautocmd User PlugLoaded
