@@ -19,6 +19,7 @@ FILTERS = [
   -> (m) { m.all_day? },
   -> (m) { m.title.include?('OOO') },
   -> (m) { m.title =~ /out of office/i },
+  -> (m) { m.title =~ /On Call/ },
   -> (m) { m.starts_in > 8.hours }
 ]
 FILE = '/tmp/next_calendar_meeting'
