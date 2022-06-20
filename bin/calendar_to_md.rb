@@ -2,7 +2,6 @@
 
 require 'time'
 
-JOURNAL_FOLDER = File.expand_path('~/Documents/Logseq/journals/')
 
 FILTERS = [
   -> (m) { m.title =~ /out of office/i },
@@ -56,6 +55,8 @@ class EventParser
 end
 
 class JournalWriter
+  JOURNAL_FOLDER = File.expand_path('~/vimwiki/diary/')
+
   def self.write(events, date: Date.today)
     new(date: date).write(events)
   end
@@ -65,12 +66,15 @@ class JournalWriter
   end
 
   def write(events, folder: JOURNAL_FOLDER)
-    file = @date.strftime('%Y_%m_%d') + '.md'
+    file = @date.strftime('%Y-%m-%d') + '.wiki'
     @filename = File.join(folder, file)
 
     return if File.exists?(@filename)
 
     fp = File.open(@filename, 'w')
+
+    fp.write("# #{Time.now.strftime('%A, %B %d, %Y')}")
+    fp.write("\n\n")
 
     events.each do |ev|
       str = event_to_md(ev)
@@ -91,10 +95,8 @@ class JournalWriter
     [
       "## #{ev.title}",
       "\t- ### #{ev.start.strftime('%H:%M')} - #{ev.stop.strftime('%H:%M')}",
-      "\t- #shopify #meeting ##{tag_name}",
-      "\t- ",
-      "- ",
-      "- ",
+      "\t- :#{tag_name}: :meeting: :shopify:",
+      "\n",
     ].join("\n")
   end
 end

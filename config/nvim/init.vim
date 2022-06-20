@@ -21,8 +21,7 @@ set mouse=a
 set scrolloff=8
 set sidescrolloff=8
 set nojoinspaces
-set splitbelow
-set splitright
+set splitbelow splitright
 set clipboard=unnamedplus
 set confirm
 set exrc
@@ -37,6 +36,8 @@ set nohlsearch
 set showmatch
 set statusline=%f " show full filename
 set numberwidth=5
+set spell
+set ruler
 
 set laststatus=3
 highlight WinSeparator guibg=None
