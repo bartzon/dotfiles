@@ -148,17 +148,19 @@ source ~/.config/nvim/plugins/lualine.vim
 source ~/.config/nvim/plugins/matchup.vim
 source ~/.config/nvim/plugins/nvim-gps.vim
 source ~/.config/nvim/plugins/nvim-lsp.vim
+source ~/.config/nvim/plugins/nvim-pqf.vim
 source ~/.config/nvim/plugins/nvim-treesitter.vim
 source ~/.config/nvim/plugins/obsession.vim
 source ~/.config/nvim/plugins/open-browser.vim
 source ~/.config/nvim/plugins/projectionist.vim
+source ~/.config/nvim/plugins/spin-hud.vim
 source ~/.config/nvim/plugins/splitjoin.vim
 source ~/.config/nvim/plugins/tmux-navigator.vim
 source ~/.config/nvim/plugins/ultisnips.vim
 source ~/.config/nvim/plugins/vim-coauthors.vim
+source ~/.config/nvim/plugins/vim-dispatch.vim
 source ~/.config/nvim/plugins/vim-matchup.vim
 source ~/.config/nvim/plugins/vim-ruby.vim
-source ~/.config/nvim/plugins/nvim-pqf.vim
 source ~/.config/nvim/plugins/vim-sorbet.vim
 source ~/.config/nvim/plugins/vim-surround.vim
 source ~/.config/nvim/plugins/vim-test.vim
@@ -167,9 +169,6 @@ source ~/.config/nvim/plugins/vimux.vim
 source ~/.config/nvim/plugins/vimwiki.vim
 source ~/.config/nvim/plugins/which-key.vim
 source ~/.config/nvim/plugins/zzz-vim-devicons.vim
-Plug 'tpope/vim-dispatch'
-Plug 'shopify/spin-hud'
-Plug 'https://gitlab.com/yorickpeterse/nvim-pqf.git'
 
 call plug#end()
 doautocmd User PlugLoaded
