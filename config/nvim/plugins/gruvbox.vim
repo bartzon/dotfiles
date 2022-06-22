@@ -1,4 +1,4 @@
-Plug 'sainnhe/gruvbox-material'
+Plug 'morhetz/gruvbox'
 
 set bg=dark
 let g:gruvbox_material_palette = 'original'
@@ -10,5 +10,5 @@ let g:gruvbox_material_statusline_style = 'original'
 let g:gruvbox_material_better_performance = 1
 
 augroup GruvboxOverride
-  autocmd User PlugLoaded ++nested colorscheme gruvbox-material
+  autocmd User PlugLoaded ++nested colorscheme gruvbox
 augroup end

@@ -19,7 +19,6 @@ function lualine_setup()
             'filename',
             file_status = true,
             path = 1,
-            shorting_target = 40,
       }
     },
     lualine_x = {'fileformat', 'filetype'},
