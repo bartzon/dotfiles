@@ -11,16 +11,18 @@ function lualine_setup()
     },
     sections = {
       lualine_a = {
-        { gps.get_location },
+        'branch'
       },
-      lualine_b = {'branch'},
-      lualine_c = {
+      lualine_b = {
         {
             'filename',
             file_status = true,
             path = 1,
-      }
-    },
+        }
+      },
+      lualine_c = {
+        { gps.get_location },
+      },
     lualine_x = {'fileformat', 'filetype'},
     lualine_y = {'progress'},
     lualine_z = {'diagnostics'}
