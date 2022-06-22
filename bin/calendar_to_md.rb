@@ -7,7 +7,8 @@ FILTERS = [
   -> (m) { m.title =~ /out of office/i },
   -> (m) { m.title =~ /OOO/i },
   -> (m) { m.all_day? },
-  -> (m) { !m.today? }
+  -> (m) { !m.today? },
+  -> (m) { m.title =~ /lunch/i }
 ]
 
 class Event
