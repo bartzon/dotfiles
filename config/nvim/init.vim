@@ -62,6 +62,9 @@ call matchadd('ColorColumn', '\%121v')
 set grepprg=rg\ --vimgrep
 set grepformat^=%f:%l:%c:%m
 
+" Position the (global) quickfix window at the very bottom of the window
+autocmd filetype qf wincmd J
+
 " ---------------------------------------------------
 " Keymappings
 " ---------------------------------------------------
