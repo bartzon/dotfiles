@@ -36,7 +36,6 @@ set nohlsearch
 set showmatch
 set statusline=%f " show full filename
 set numberwidth=5
-set spell
 set ruler
 
 set laststatus=3
