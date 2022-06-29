@@ -19,6 +19,7 @@ brew "ripgrep"
 brew "ruby-install"
 brew "tmux"
 brew "watchman"
+brew "ykman"
 
 cask "bartender"
 cask "betterdummy"
