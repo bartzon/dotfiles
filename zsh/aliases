@@ -16,6 +16,14 @@ if type "dust" > /dev/null; then
   alias du="dust"
 fi
 
+if type "bat" > /dev/null; then
+  alias cat='bat --style=numbers'
+fi
+
+if type "batcat" > /dev/null; then
+  alias cat='batcat --style=numbers'
+fi
+
 # git
 alias ga='git add'
 alias gb='git branch'

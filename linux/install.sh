@@ -1,7 +1,5 @@
 if ! command -v batcat &> /dev/null; then
   sudo apt-get install -y bat
-  alias cat='batcat --style=numbers'
-  echo "alias cat='batcat --style=numbers'" >> ~/.zsh/aliases
 fi
 
 if ! command -v exa &> /dev/null; then
