@@ -20,5 +20,3 @@ GPG_TTY=$(tty)
 export GPG_TTY
 
 if [ "$TMUX" = "" ]; then tmux new -As0; fi
-
-[ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
