@@ -23,6 +23,9 @@ function nvim_lsp_setup()
     cmd = {'bundle', 'exec', 'srb', 'tc', '--lsp'};
   }
 
+local opts = { noremap=true, silent=true }
+vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
+
   nvim_lsp.rubocop_lsp.setup{}
 
   nvim_lsp.sumneko_lua.setup{}

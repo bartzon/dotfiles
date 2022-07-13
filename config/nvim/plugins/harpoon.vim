@@ -14,5 +14,9 @@ function setup_harpoon()
 end
 EOF
 
+augroup IndentOverride
+  autocmd User PlugLoaded ++nested lua setup_harpoon()
+augroup end
+
 nnoremap <leader>hl :lua require("harpoon.ui").toggle_quick_menu()<CR>
 nnoremap <leader>ha :lua require("harpoon.mark").add_file()<CR>
