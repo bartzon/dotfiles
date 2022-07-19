@@ -160,6 +160,7 @@ source ~/.config/nvim/plugins/projectionist.vim
 source ~/.config/nvim/plugins/spin-hud.vim
 source ~/.config/nvim/plugins/splitjoin.vim
 source ~/.config/nvim/plugins/tmux-navigator.vim
+source ~/.config/nvim/plugins/trouble.vim
 source ~/.config/nvim/plugins/ultisnips.vim
 source ~/.config/nvim/plugins/vim-coauthors.vim
 source ~/.config/nvim/plugins/vim-dispatch.vim
@@ -173,6 +174,10 @@ source ~/.config/nvim/plugins/vimux.vim
 source ~/.config/nvim/plugins/vimwiki.vim
 source ~/.config/nvim/plugins/which-key.vim
 source ~/.config/nvim/plugins/zzz-vim-devicons.vim
+
+Plug 'lukas-reineke/indent-blankline.nvim'
+
+
 call plug#end()
 doautocmd User PlugLoaded
 
