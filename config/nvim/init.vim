@@ -46,15 +46,6 @@ let g:netrw_liststyle=3
 
 syntax enable
 
-if $SPIN == 1
-  let g:clipboard = {
-        \ 'name': 'pbcopy',
-        \ 'copy': {'+': 'pbcopy', '*': 'pbcopy'},
-        \ 'paste': {'+': 'pbpaste', '*': 'pbpaste'},
-        \ 'cache_enabled': 1
-  }
-end
-
 call matchadd('ColorColumn', '\%121v')
 
 " use rg, and use quickfix format

@@ -6,7 +6,7 @@ function lualine_setup()
 
   require('lualine').setup({
     options = {
-      theme = 'gruvbox',
+      theme = 'gruvbox-material',
       always_divide_middle = true,
     },
     sections = {
