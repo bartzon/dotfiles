@@ -10,7 +10,7 @@ function nvim_lsp_setup()
   if not configs.rubocop_lsp then
    configs.rubocop_lsp = {
      default_config = {
-       cmd = {'bundle', 'exec', 'rubocop-lsp'};
+       cmd = {'bundle', 'exec', 'ruby-lsp'};
        filetypes = {'ruby'};
        root_dir = function(fname)
          return nvim_lsp.util.find_git_ancestor(fname)
@@ -32,8 +32,6 @@ vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
   nvim_lsp.sumneko_lua.setup{}
 
   require'lspsaga'.init_lsp_saga{}
-
-  vim.diagnostic.config({virtual_text = false})
 end
 
 EOF
