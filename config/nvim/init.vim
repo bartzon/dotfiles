@@ -167,7 +167,7 @@ source ~/.config/nvim/plugins/which-key.vim
 source ~/.config/nvim/plugins/zzz-vim-devicons.vim
 
 Plug 'lukas-reineke/indent-blankline.nvim'
-
+Plug 'antoinemadec/FixCursorHold.nvim'
 
 call plug#end()
 doautocmd User PlugLoaded
