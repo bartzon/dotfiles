@@ -2,6 +2,7 @@
 /*
 /*/
 !/.gitignore
+zsh/plugins
 
 # Except
 !install.sh
