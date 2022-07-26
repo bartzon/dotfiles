@@ -34,6 +34,7 @@ endif
 
 let $FZF_DEFAULT_OPTS = '--layout=reverse --info=inline'
 
+nmap <leader>b :Buffers<cr>
 nmap <leader>r :Rg<cr>
 nmap <leader>R :Rg<space>
 nmap <leader>gb :GBranches<cr>
