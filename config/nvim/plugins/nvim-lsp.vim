@@ -1,6 +1,8 @@
 Plug 'neovim/nvim-lspconfig'
 Plug 'tami5/lspsaga.nvim'
 Plug 'folke/lsp-colors.nvim'
+Plug 'https://git.sr.ht/~whynothugo/lsp_lines.nvim'
+Plug 'lukas-reineke/lsp-format.nvim'
 
 lua << EOF
 function nvim_lsp_setup()
@@ -24,14 +26,22 @@ function nvim_lsp_setup()
     cmd = {'bundle', 'exec', 'srb', 'tc', '--lsp'};
   }
 
-local opts = { noremap=true, silent=true }
-vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
+  local opts = { noremap=true, silent=true }
+  vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
 
   nvim_lsp.rubocop_lsp.setup{}
 
   nvim_lsp.sumneko_lua.setup{}
 
   require'lspsaga'.init_lsp_saga{}
+
+  require("lsp_lines").setup()
+
+  vim.diagnostic.config({
+    virtual_text = false,
+  })
+
+  require("lsp-format").setup {}
 end
 
 EOF
@@ -44,8 +54,7 @@ nnoremap <silent> K :Lspsaga hover_doc<CR>
 nnoremap <silent> gs :Lspsaga signature_help<CR>
 nnoremap <silent> gd :lua vim.lsp.buf.definition()<CR>
 nnoremap <silent> gh :Lspsaga lsp_finder<CR>
-nnoremap <silent>gr :Lspsaga rename<CR>
-nnoremap <silent><leader>ca :Lspsaga code_action<CR>
-vnoremap <silent><leader>ca :<C-U>Lspsaga range_code_action<CR>
+nnoremap <silent> gr :Lspsaga rename<CR>
+nnoremap <silent> ca :Lspsaga code_action<CR>
 nnoremap <silent> [d :Lspsaga diagnostic_jump_next<CR>
 nnoremap <silent> ]d :Lspsaga diagnostic_jump_prev<CR>ig
