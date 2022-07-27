@@ -1,7 +1,6 @@
 Plug 'neovim/nvim-lspconfig'
 Plug 'tami5/lspsaga.nvim'
 Plug 'folke/lsp-colors.nvim'
-Plug 'lukas-reineke/lsp-format.nvim'
 
 lua << EOF
 function nvim_lsp_setup()
@@ -30,11 +29,7 @@ function nvim_lsp_setup()
 
   nvim_lsp.ruby_lsp.setup{}
 
-  nvim_lsp.sumneko_lua.setup{}
-
   require'lspsaga'.init_lsp_saga{}
-
-  require("lsp-format").setup {}
 end
 
 EOF
