@@ -1,7 +1,6 @@
 Plug 'neovim/nvim-lspconfig'
 Plug 'tami5/lspsaga.nvim'
 Plug 'folke/lsp-colors.nvim'
-Plug 'https://git.sr.ht/~whynothugo/lsp_lines.nvim'
 Plug 'lukas-reineke/lsp-format.nvim'
 
 lua << EOF
@@ -9,8 +8,8 @@ function nvim_lsp_setup()
   local nvim_lsp = require'lspconfig'
 
   local configs = require 'lspconfig.configs'
-  if not configs.rubocop_lsp then
-   configs.rubocop_lsp = {
+  if not configs.ruby_lsp then
+   configs.ruby_lsp = {
      default_config = {
        cmd = {'bundle', 'exec', 'ruby-lsp'};
        filetypes = {'ruby'};
@@ -29,17 +28,11 @@ function nvim_lsp_setup()
   local opts = { noremap=true, silent=true }
   vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
 
-  nvim_lsp.rubocop_lsp.setup{}
+  nvim_lsp.ruby_lsp.setup{}
 
   nvim_lsp.sumneko_lua.setup{}
 
   require'lspsaga'.init_lsp_saga{}
-
-  require("lsp_lines").setup()
-
-  vim.diagnostic.config({
-    virtual_text = false,
-  })
 
   require("lsp-format").setup {}
 end
