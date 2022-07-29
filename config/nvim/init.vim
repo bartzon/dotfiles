@@ -141,7 +141,6 @@ source ~/.config/nvim/plugins/harpoon.vim
 source ~/.config/nvim/plugins/indent-blankline.vim
 source ~/.config/nvim/plugins/lualine.vim
 source ~/.config/nvim/plugins/matchup.vim
-source ~/.config/nvim/plugins/nvim-gps.vim
 source ~/.config/nvim/plugins/nvim-lsp.vim
 source ~/.config/nvim/plugins/nvim-pqf.vim
 source ~/.config/nvim/plugins/nvim-treesitter.vim

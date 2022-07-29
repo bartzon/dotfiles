@@ -2,8 +2,6 @@ Plug 'nvim-lualine/lualine.nvim'
 
 lua<<EOF
 function lualine_setup()
-  local gps = require("nvim-gps")
-
   require('lualine').setup({
     options = {
       theme = 'gruvbox-material',
@@ -21,7 +19,7 @@ function lualine_setup()
         }
       },
       lualine_c = {
-        { gps.get_location },
+        { },
       },
     lualine_x = {'fileformat', 'filetype'},
     lualine_y = {'progress'},
