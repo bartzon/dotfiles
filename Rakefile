@@ -10,7 +10,8 @@ FILES = [
   'gitconfig',
   'tmux.conf',
   'zsh',
-  'zshrc'
+  'zshrc',
+  'fzf.zsh',
 ]
 
 desc "install the dot files into user's home directory"
