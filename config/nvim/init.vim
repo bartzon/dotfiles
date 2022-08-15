@@ -88,6 +88,7 @@ nmap <leader>cm a<C-v>u2713<esc>
 nmap <leader>pr :silent !dev open pr<CR>
 
 nmap <leader>dt :VimuxRunCommand 'dev test --include-branch-commits'<CR>
+nmap <leader>dtt :VimuxRunCommand 'dev test'<CR>
 nmap <leader>dr :VimuxRunCommand 'dev style --include-branch-commits'<CR>
 nmap <leader>ds :VimuxRunCommand './bin/srb typecheck'<CR>
 nmap <leader>da :VimuxRunCommand 'clear ; dev style --include-branch-commits && ./bin/srb typecheck && dev test --include-branch-commits'<CR>
