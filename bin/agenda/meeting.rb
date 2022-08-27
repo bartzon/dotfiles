@@ -5,13 +5,15 @@ class Meeting
     timestamps, title = line.split("\t")
     @starts_at, @ends_at = timestamps.split(' - ').map { |t| parse(t) }
 
-    @title = title.strip
+    @title = title.to_s.strip
     @title = @title[0..TITLE_LENGTH] + "…" if @title.length > TITLE_LENGTH
   end
 
   def parse(timestamp)
     date, hh, mm = timestamp.split(':')
     Time.zone.parse("#{date} #{hh}:#{mm}:00")
+  rescue ArgumentError
+    100.days.ago
   end
 
   def starts_in
@@ -23,6 +25,8 @@ class Meeting
   end
 
   def ended?
+    return false unless ends_at
+
     ends_at < Time.now
   end
 
