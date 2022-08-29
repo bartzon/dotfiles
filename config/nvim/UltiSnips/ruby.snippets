@@ -18,3 +18,19 @@ snippet TODO "Smart Todo"
 # TODO(on: date("`date -v +10d +%Y-%m-%d`"), to: "${1}")
 #  ${2}
 endsnippet
+
+snippet prop "property"
+property :${1:name}, accepts: ${2:type}
+
+sig { returns($2}) }
+attr_reader :$1
+
+endsnippet
+
+snippet prop! "property!"
+property! :${1:name}, accepts: ${2:type}
+
+sig { returns($2) }
+attr_reader :$1
+
+endsnippet

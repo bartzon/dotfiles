@@ -45,6 +45,8 @@ function nvim_cmp_setup()
     TypeParameter = "",
   }
 
+local cmp_ultisnips_mappings = require("cmp_nvim_ultisnips.mappings")
+
   cmp.setup({
     completion = {
       autocomplete = false, -- disable auto-completion.
@@ -60,18 +62,22 @@ function nvim_cmp_setup()
       ["<Tab>"] = cmp.mapping(function(fallback)
         if cmp.visible() then
           cmp.select_next_item()
+        elseif vim.fn["UltiSnips#CanJumpForwards"]() == 1 then
+          cmp_ultisnips_mappings.expand_or_jump_forwards(fallback)
         elseif has_words_before() then
-          cmp.complete()
+           cmp.complete()
         else
-          fallback()
         end
       end, { "i", "s" }),
 
       ["<S-Tab>"] = cmp.mapping(function()
         if cmp.visible() then
           cmp.select_prev_item()
+        else
+          cmp_ultisnips_mappings.jump_backwards(fallback)
         end
       end, { "i", "s" }),
+
 
     },
     formatting = {
@@ -88,10 +94,16 @@ function nvim_cmp_setup()
     end,
     },
     sources = cmp.config.sources({
-      { name = 'copilot' },
       { name = 'nvim_lsp' },
       { name = 'ultisnips' },
+      { name = 'copilot' },
       { name = 'path' },
+      { name = "buffer" },
+      { name = "nvim_lua" },
+      { name = "treesitter" },
+      { name = "spell" },
+      { name = "calc" },
+      { name = "emoji" },
     }, {
       { name = 'buffer' },
       })
@@ -120,3 +132,5 @@ EOF
 augroup NvimCmpSetup
   autocmd User PlugLoaded ++nested lua nvim_cmp_setup()
 augroup end
+autocmd BufWritePost *.snippets :CmpUltisnipsReloadSnippets
+
