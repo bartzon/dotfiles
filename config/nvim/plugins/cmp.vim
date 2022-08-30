@@ -3,6 +3,7 @@ Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/cmp-cmdline'
 Plug 'hrsh7th/nvim-cmp'
+Plug 'hrsh7th/cmp-nvim-lsp-signature-help'
 
 Plug 'quangnguyen30192/cmp-nvim-ultisnips'
 
@@ -104,10 +105,9 @@ local cmp_ultisnips_mappings = require("cmp_nvim_ultisnips.mappings")
       { name = "spell" },
       { name = "calc" },
       { name = "emoji" },
-    }, {
-      { name = 'buffer' },
-      })
-  }
+      { name = 'nvim_lsp_signature_help' },
+    })
+    }
   )
 
   cmp.setup.cmdline('/', {
