@@ -37,9 +37,20 @@ template = [
   "end",
 ]
 
+test_template = [
+  "# frozen_string_literal: true",
+  "# typed: true",
+  "",
+  "require \"test_helper\"",
+  "",
+  "class {camelcase|capitalize|colons}Test < ActiveSupport::Test",
+  "  setup do",
+  "  end",
+  "end",
+]
+
 components.each do |component|
   component = component.join("/")
-  warn component
 
   result["components/#{component}/app/*.rb"] = {
     "alternate": [
@@ -63,13 +74,14 @@ components.each do |component|
       "components/#{component}/app/{}.rb",
     ],
     "type": "test",
-    "template": "",
+    "template": test_template,
   }
   result["components/#{component}/test/*_test.rb"] = {
     "alternate": "components/#{component}/app/{}.rb",
     "type": "test",
-    "template": "",
+    "template": test_template,
   }
 end
 
-puts result.to_json
+# puts result.to_json
+puts JSON.pretty_generate(result)
