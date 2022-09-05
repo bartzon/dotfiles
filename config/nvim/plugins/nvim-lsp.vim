@@ -38,6 +38,12 @@ function nvim_lsp_setup()
     width = 50, -- width of the list when position is left or right
     mode = "docment_diagnostics", -- "workspace_diagnostics", "document_diagnostics", "quickfix", "lsp_references", "loclist"
   }
+
+  vim.lsp.handlers['textDocument/signatureHelp']  = vim.lsp.with(vim.lsp.handlers['signature_help'], {
+     border = 'single',
+     close_events = { "CursorMoved", "BufHidden" },
+  })
+  vim.keymap.set('i', '<c-s>', vim.lsp.buf.signature_help)
 end
 EOF
 
