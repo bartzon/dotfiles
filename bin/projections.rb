@@ -30,20 +30,20 @@ components = Dir.glob('**/app')
 end
 
 template = [
-  "# frozen_string_literal: true",
   "# typed: true",
+  "# frozen_string_literal: true",
   "",
   "class {camelcase|capitalize|colons}",
   "end",
 ]
 
 test_template = [
-  "# frozen_string_literal: true",
   "# typed: true",
+  "# frozen_string_literal: true",
   "",
   "require \"test_helper\"",
   "",
-  "class {camelcase|capitalize|colons}Test < ActiveSupport::Test",
+  "class {camelcase|capitalize|colons}Test < ActiveSupport::TestCase",
   "  setup do",
   "  end",
   "end",
