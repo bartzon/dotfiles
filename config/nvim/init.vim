@@ -167,6 +167,8 @@ source ~/.config/nvim/plugins/zzz-vim-devicons.vim
 
 Plug 'lukas-reineke/indent-blankline.nvim'
 Plug 'antoinemadec/FixCursorHold.nvim'
+Plug 'Shopify/shadowenv.vim'
+
 
 call plug#end()
 doautocmd User PlugLoaded
