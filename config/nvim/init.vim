@@ -163,12 +163,12 @@ source ~/.config/nvim/plugins/vim-vinegar.vim
 source ~/.config/nvim/plugins/vimux.vim
 source ~/.config/nvim/plugins/vimwiki.vim
 source ~/.config/nvim/plugins/which-key.vim
+source ~/.config/nvim/plugins/windows.vim
 source ~/.config/nvim/plugins/zzz-vim-devicons.vim
 
 Plug 'lukas-reineke/indent-blankline.nvim'
 Plug 'antoinemadec/FixCursorHold.nvim'
 Plug 'Shopify/shadowenv.vim'
-
 
 call plug#end()
 doautocmd User PlugLoaded
