@@ -150,7 +150,6 @@ source ~/.config/nvim/plugins/projectionist.vim
 source ~/.config/nvim/plugins/spin-hud.vim
 source ~/.config/nvim/plugins/splitjoin.vim
 source ~/.config/nvim/plugins/tmux-navigator.vim
-source ~/.config/nvim/plugins/trouble.vim
 source ~/.config/nvim/plugins/ultisnips.vim
 source ~/.config/nvim/plugins/vim-coauthors.vim
 source ~/.config/nvim/plugins/vim-dispatch.vim
