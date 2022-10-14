@@ -34,3 +34,7 @@ sig { returns($2) }
 attr_reader :$1
 
 endsnippet
+
+snippet asr "assert_raises"
+assert_raises(${1:StandardError}${2:, "Message"}) { ${3:block} }
+endsnippet
