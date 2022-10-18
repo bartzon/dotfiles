@@ -21,6 +21,7 @@ brew "ripgrep"
 brew "ruby-install"
 brew "shadowenv"
 brew "tmux"
+brew "vale"
 brew "watchman"
 brew "ykman"
 

@@ -12,6 +12,7 @@ FILES = [
   'zsh',
   'zshrc',
   'fzf.zsh',
+  'vale.ini',
 ]
 
 desc "install the dot files into user's home directory"

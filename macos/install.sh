@@ -26,3 +26,5 @@ brew install --cask font-sf-mono-nerd-font
 
 # Disable ccccccvcbkkifucfvhlefntrjvkhkkugdulhnfgvgdgu
 ykman config usb --disable OTP
+
+vale sync
