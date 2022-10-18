@@ -11,6 +11,8 @@ function setup_nvim_lint()
       require("lint").try_lint()
       end,
     })
+    local rubocop = require('lint.linters.rubocop')
+    rubocop.cmd = './bin/rubocop'
 end
 EOF
 
