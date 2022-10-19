@@ -7,7 +7,7 @@ function setup_treesitter()
   require'nvim-treesitter.configs'.setup {
     ensure_installed = { "ruby", "lua", "javascript", "vim", "yaml", "tsx" },
     highlight = {
-      enable = true,
+      enable = false,
     },
     autopairs = { enable = true },
     autotag = { enable = true, disable = { 'markdown' } },
