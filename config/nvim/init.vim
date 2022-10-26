@@ -135,15 +135,11 @@ call plug#begin(data_dir . '/plugins')
 source ~/.config/nvim/plugins/cmp.vim
 source ~/.config/nvim/plugins/commentary.vim
 source ~/.config/nvim/plugins/copilot.vim
-source ~/.config/nvim/plugins/fugitive.vim
 source ~/.config/nvim/plugins/fzf.vim
 source ~/.config/nvim/plugins/gruvbox.vim
 source ~/.config/nvim/plugins/indent-blankline.vim
 source ~/.config/nvim/plugins/lualine.vim
-source ~/.config/nvim/plugins/matchup.vim
-source ~/.config/nvim/plugins/nvim-lint.vim
 source ~/.config/nvim/plugins/nvim-lsp.vim
-source ~/.config/nvim/plugins/nvim-pqf.vim
 source ~/.config/nvim/plugins/nvim-treesitter.vim
 source ~/.config/nvim/plugins/obsession.vim
 source ~/.config/nvim/plugins/open-browser.vim
@@ -161,9 +157,7 @@ source ~/.config/nvim/plugins/vim-surround.vim
 source ~/.config/nvim/plugins/vim-test.vim
 source ~/.config/nvim/plugins/vim-vinegar.vim
 source ~/.config/nvim/plugins/vimux.vim
-source ~/.config/nvim/plugins/vimwiki.vim
 source ~/.config/nvim/plugins/which-key.vim
-source ~/.config/nvim/plugins/windows.vim
 source ~/.config/nvim/plugins/zzz-vim-devicons.vim
 
 Plug 'lukas-reineke/indent-blankline.nvim'
