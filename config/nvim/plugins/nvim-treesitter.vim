@@ -1,6 +1,7 @@
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'nvim-treesitter/nvim-treesitter-textobjects'
 Plug 'omnisyle/nvim-hidesig'
+Plug 'nvim-treesitter/nvim-treesitter-context'
 
 lua<<EOF
 function setup_treesitter()
@@ -38,6 +39,7 @@ function setup_treesitter()
       },
     },
   }
+  require'treesitter-context'.setup{}
 end
 EOF
 
