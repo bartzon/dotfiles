@@ -21,18 +21,10 @@ endsnippet
 
 snippet prop "property"
 property :${1:name}, accepts: ${2:type}
-
-sig { returns($2}) }
-attr_reader :$1
-
 endsnippet
 
 snippet prop! "property!"
 property! :${1:name}, accepts: ${2:type}
-
-sig { returns($2) }
-attr_reader :$1
-
 endsnippet
 
 snippet asr "assert_raises"
