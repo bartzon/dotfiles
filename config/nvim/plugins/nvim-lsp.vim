@@ -36,7 +36,7 @@ function nvim_lsp_setup()
     position = "bottom", -- position of the list can be: bottom, top, left, right
     height = 10, -- height of the trouble list when position is top or bottom
     width = 50, -- width of the list when position is left or right
-    mode = "docment_diagnostics", -- "workspace_diagnostics", "document_diagnostics", "quickfix", "lsp_references", "loclist"
+    mode = "document_diagnostics", -- "workspace_diagnostics", "document_diagnostics", "quickfix", "lsp_references", "loclist"
   }
 
   vim.lsp.handlers['textDocument/signatureHelp']  = vim.lsp.with(vim.lsp.handlers['signature_help'], {
@@ -59,3 +59,5 @@ nnoremap <silent> gr :Lspsaga rename<CR>
 nnoremap <silent> ca :Lspsaga code_action<CR>
 nnoremap <silent> [d :Lspsaga diagnostic_jump_next<CR>
 nnoremap <silent> ]d :Lspsaga diagnostic_jump_prev<CR>ig
+
+nnoremap <leader>tt :TroubleToggle<CR>
