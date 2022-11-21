@@ -150,6 +150,7 @@ source ~/.config/nvim/plugins/tmux-navigator.vim
 source ~/.config/nvim/plugins/ultisnips.vim
 source ~/.config/nvim/plugins/vim-coauthors.vim
 source ~/.config/nvim/plugins/vim-dispatch.vim
+source ~/.config/nvim/plugins/vim-fugitive.vim
 source ~/.config/nvim/plugins/vim-matchup.vim
 source ~/.config/nvim/plugins/vim-ruby.vim
 source ~/.config/nvim/plugins/vim-sorbet.vim
