@@ -32,7 +32,6 @@ set nobackup
 set noswapfile
 set autoread
 set equalalways
-set nohlsearch
 set showmatch
 set statusline=%f " show full filename
 set numberwidth=5
@@ -63,11 +62,12 @@ nmap <leader>vr :source ~/.config/nvim/init.vim<cr>
 
 command! -bang -nargs=* RgExact
   \ call fzf#vim#grep(
-  \   'rg -F --glob "*.rb" --column --line-number --no-heading --color=always --smart-case -- '.shellescape(<q-args>), 1,
+  \   'rg -F --glob "*.rb" --glob "!*.rbi" --column --line-number --no-heading --color=always --smart-case -- '.shellescape(<q-args>), 1,
   \   fzf#vim#with_preview(), <bang>0)
 
 nmap <Leader>sw :execute 'RgExact ' . expand('<cword>') <Cr>
 nmap <Leader>sW :execute 'RgExact ' . expand('<cWORD>') <Cr>
+nmap <Leader>se :execute 'RgExact '<Cr>
 
 " Easier navigation between split windows
 nnoremap <C-j> <C-w>j
@@ -171,3 +171,4 @@ doautocmd User PlugLoaded
 " source ~/.config/nvim/extras/dim_inactive_windows.vim
 source ~/.config/nvim/extras/relative_numbers.vim
 " source ~/.config/nvim/extras/av_using_fzf.vim
+
