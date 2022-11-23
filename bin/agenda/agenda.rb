@@ -10,18 +10,21 @@ include ActionView::Helpers::DateHelper
 
 require './meeting'
 require './meetings_formatter'
+require './filter'
 
 Time.zone = 'Amsterdam'
 
 TITLE_LENGTH = 50
 FILTERS = [
-  -> (m) { m.ended? },
-  -> (m) { m.all_day? },
-  -> (m) { m.title.include?('OOO') },
-  -> (m) { m.title =~ /out of office/i },
-  -> (m) { m.title =~ /On Call/ },
-  -> (m) { m.starts_in > 8.hours }
+  Filter.new(-> (m) { m.ended? }, "Ended?"),
+  Filter.new(-> (m) { m.all_day? }, "All day?"),
+  Filter.new(-> (m) { m.title.include?('OOO') }, "OOO?"),
+  Filter.new(-> (m) { m.title =~ /out of office/i }, "out of office?"),
+  Filter.new(-> (m) { m.title =~ /On Call/ }, "On Call"),
+  Filter.new(-> (m) { m.starts_at > 8.hours.from_now }, "Starts at > 8 hours"),
+  Filter.new(-> (m) { m.ends_at > 8.hours.from_now }, "Ends at > 8 hours"),
 ]
+
 FILE = '/tmp/next_calendar_meeting'
 PARSED = '/tmp/next_calendar_meeting_parsed'
 

@@ -17,7 +17,8 @@ class Meeting
   end
 
   def starts_in
-    starts_at - Time.zone.now
+    p (starts_at - Time.zone.now)
+    (starts_at - Time.zone.now).hours
   end
 
   def all_day?
@@ -44,5 +45,9 @@ class Meeting
 
   def percentage
     (since_started / duration) * 100.0
+  end
+
+  def to_s
+    "<#{@title} #{@starts_at}:#{@ends_at}>"
   end
 end
