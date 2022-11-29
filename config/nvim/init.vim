@@ -136,6 +136,7 @@ source ~/.config/nvim/plugins/cmp.vim
 source ~/.config/nvim/plugins/commentary.vim
 source ~/.config/nvim/plugins/copilot.vim
 source ~/.config/nvim/plugins/fzf.vim
+source ~/.config/nvim/plugins/genghis.vim
 source ~/.config/nvim/plugins/gruvbox.vim
 source ~/.config/nvim/plugins/indent-blankline.vim
 source ~/.config/nvim/plugins/lualine.vim
