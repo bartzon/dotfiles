@@ -139,6 +139,7 @@ source ~/.config/nvim/plugins/fzf.vim
 source ~/.config/nvim/plugins/genghis.vim
 source ~/.config/nvim/plugins/gruvbox.vim
 source ~/.config/nvim/plugins/indent-blankline.vim
+source ~/.config/nvim/plugins/legendary.vim
 source ~/.config/nvim/plugins/lualine.vim
 source ~/.config/nvim/plugins/nvim-lsp.vim
 source ~/.config/nvim/plugins/nvim-treesitter.vim
@@ -147,6 +148,7 @@ source ~/.config/nvim/plugins/open-browser.vim
 source ~/.config/nvim/plugins/projectionist.vim
 source ~/.config/nvim/plugins/spin-hud.vim
 source ~/.config/nvim/plugins/splitjoin.vim
+source ~/.config/nvim/plugins/telescope.vim
 source ~/.config/nvim/plugins/tmux-navigator.vim
 source ~/.config/nvim/plugins/ultisnips.vim
 source ~/.config/nvim/plugins/vim-coauthors.vim

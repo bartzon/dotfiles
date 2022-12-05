@@ -46,5 +46,3 @@ EOF
 augroup TreesitterSetup
   autocmd User PlugLoaded ++nested lua setup_treesitter()
 augroup end
-
-
