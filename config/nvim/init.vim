@@ -174,4 +174,3 @@ doautocmd User PlugLoaded
 " source ~/.config/nvim/extras/dim_inactive_windows.vim
 source ~/.config/nvim/extras/relative_numbers.vim
 " source ~/.config/nvim/extras/av_using_fzf.vim
-
