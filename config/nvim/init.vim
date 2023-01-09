@@ -87,11 +87,11 @@ nmap <leader>cm a<C-v>u2713<esc>
 
 nmap <leader>pr :silent !dev open pr<CR>
 
-nmap <leader>dt :VimuxRunCommand 'dev test --include-branch-commits'<CR>
+nmap <leader>dt :VimuxRunCommand 'dev test'<CR>
 nmap <leader>dtt :VimuxRunCommand 'dev test'<CR>
-nmap <leader>dr :VimuxRunCommand 'dev style --include-branch-commits'<CR>
+nmap <leader>dr :VimuxRunCommand 'dev style'<CR>
 nmap <leader>ds :VimuxRunCommand './bin/srb typecheck'<CR>
-nmap <leader>da :VimuxRunCommand 'clear ; dev style --include-branch-commits && ./bin/srb typecheck && dev test --include-branch-commits'<CR>
+nmap <leader>da :VimuxRunCommand 'clear ; dev style && ./bin/srb typecheck && dev test'<CR>
 
 nnoremap gv :only<bar>vsplit<CR>gf
 
@@ -125,6 +125,8 @@ nnoremap <leader>5 5<C-W><C-W><CR>
 " Clone current paragraph
 nnoremap cp yap<S-}>p
 
+nnoremap gs :lua require("ts-node-action").node_action()<CR>
+
 " ---------------------------------------------------
 " Plugins
 " ---------------------------------------------------
@@ -147,7 +149,6 @@ source ~/.config/nvim/plugins/obsession.vim
 source ~/.config/nvim/plugins/open-browser.vim
 source ~/.config/nvim/plugins/projectionist.vim
 source ~/.config/nvim/plugins/spin-hud.vim
-source ~/.config/nvim/plugins/splitjoin.vim
 source ~/.config/nvim/plugins/telescope.vim
 source ~/.config/nvim/plugins/tmux-navigator.vim
 source ~/.config/nvim/plugins/ultisnips.vim
@@ -167,6 +168,7 @@ source ~/.config/nvim/plugins/zzz-vim-devicons.vim
 Plug 'lukas-reineke/indent-blankline.nvim'
 Plug 'antoinemadec/FixCursorHold.nvim'
 Plug 'Shopify/shadowenv.vim'
+Plug 'CKolkey/ts-node-action'
 
 call plug#end()
 doautocmd User PlugLoaded
