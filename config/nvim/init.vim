@@ -125,7 +125,7 @@ nnoremap <leader>5 5<C-W><C-W><CR>
 " Clone current paragraph
 nnoremap cp yap<S-}>p
 
-nnoremap gs :lua require("ts-node-action").node_action()<CR>
+nnoremap <silent> gs :lua require("ts-node-action").node_action()<CR>
 
 " ---------------------------------------------------
 " Plugins
@@ -176,3 +176,5 @@ doautocmd User PlugLoaded
 " source ~/.config/nvim/extras/dim_inactive_windows.vim
 source ~/.config/nvim/extras/relative_numbers.vim
 " source ~/.config/nvim/extras/av_using_fzf.vim
+source ~/.config/nvim/extras/maximize_toggle.vim
+
