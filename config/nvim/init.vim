@@ -93,8 +93,6 @@ nmap <leader>dr :VimuxRunCommand 'dev style'<CR>
 nmap <leader>ds :VimuxRunCommand './bin/srb typecheck'<CR>
 nmap <leader>da :VimuxRunCommand 'clear ; dev style && ./bin/srb typecheck && dev test'<CR>
 
-nnoremap gv :only<bar>vsplit<CR>gf
-
 " Keep it centered
 nnoremap {  {zz
 nnoremap }  }zz

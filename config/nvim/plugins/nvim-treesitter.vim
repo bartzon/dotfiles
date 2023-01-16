@@ -38,6 +38,14 @@ function setup_treesitter()
         include_surrounding_whitespace = true,
       },
     },
+    incremental_selection = {
+      enable = true,
+      keymaps = {
+        init_selection = "<CR>",
+        node_incremental = "<Up>",
+        node_decremental = "<Down>",
+      },
+    },
   }
   require'treesitter-context'.setup{}
 end
