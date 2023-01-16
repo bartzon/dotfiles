@@ -51,9 +51,6 @@ call matchadd('ColorColumn', '\%121v')
 set grepprg=rg\ --vimgrep
 set grepformat^=%f:%l:%c:%m
 
-" Position the (global) quickfix window at the very bottom of the window
-autocmd filetype qf wincmd J
-
 " ---------------------------------------------------
 " Keymappings
 " ---------------------------------------------------
@@ -175,4 +172,4 @@ doautocmd User PlugLoaded
 source ~/.config/nvim/extras/relative_numbers.vim
 " source ~/.config/nvim/extras/av_using_fzf.vim
 source ~/.config/nvim/extras/maximize_toggle.vim
-
+source ~/.config/nvim/extras/autocmds.vim
