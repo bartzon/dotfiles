@@ -250,13 +250,6 @@ augroup NvimLSPSetup
 augroup end
 
 nnoremap <silent> gh :Lspsaga lsp_finder<CR>
-
-" nnoremap <silent> K :Lspsaga hover_doc<CR>
-" nnoremap <silent> gs :Lspsaga signature_help<CR>
-" nnoremap <silent> gd :lua vim.lsp.buf.definition()<CR>
-" nnoremap <silent> gr :Lspsaga rename<CR>
-" nnoremap <silent> ca :Lspsaga code_action<CR>
-" nnoremap <silent> [d :Lspsaga diagnostic_jump_next<CR>
-" nnoremap <silent> ]d :Lspsaga diagnostic_jump_prev<CR>ig
+nnoremap <silent> ca :Lspsaga code_action<CR>
 
 nnoremap <leader>tt :TroubleToggle<CR>
