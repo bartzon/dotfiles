@@ -210,47 +210,39 @@ function nvim_lsp_setup()
   end
 end
 
-function old_nvim_lsp_setup()
-  local nvim_lsp = require'lspconfig'
+local function goto_definition(split_cmd)
+  local util = vim.lsp.util
+  local log = require("vim.lsp.log")
+  local api = vim.api
 
-  local configs = require 'lspconfig.configs'
-  if not configs.ruby_lsp then
-   configs.ruby_lsp = {
-     default_config = {
-       cmd = {'bundle', 'exec', 'ruby-lsp'};
-       filetypes = {'ruby'};
-       root_dir = function(fname)
-         return nvim_lsp.util.find_git_ancestor(fname)
-       end;
-       settings = {};
-     };
-   }
+  -- note, this handler style is for neovim 0.5.1/0.6, if on 0.5, call with function(_, method, result)
+  local handler = function(_, result, ctx)
+    if result == nil or vim.tbl_isempty(result) then
+      local _ = log.info() and log.info(ctx.method, "No location found")
+      return nil
+    end
+
+    if split_cmd then
+      vim.cmd(split_cmd)
+    end
+
+    if vim.tbl_islist(result) then
+      util.jump_to_location(result[1])
+
+      if #result > 1 then
+        util.set_qflist(util.locations_to_items(result))
+        api.nvim_command("copen")
+        api.nvim_command("wincmd p")
+      end
+    else
+      util.jump_to_location(result)
+    end
   end
 
-  nvim_lsp.sorbet.setup{
-    cmd = {'bundle', 'exec', 'srb', 'tc', '--lsp'};
-  }
-
-  local opts = { noremap=true, silent=true }
-  vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
-
-  nvim_lsp.ruby_lsp.setup{}
-
-  require'lspsaga'.init_lsp_saga{}
-
-  require("trouble").setup {
-    position = "bottom", -- position of the list can be: bottom, top, left, right
-    height = 10, -- height of the trouble list when position is top or bottom
-    width = 50, -- width of the list when position is left or right
-    mode = "document_diagnostics", -- "workspace_diagnostics", "document_diagnostics", "quickfix", "lsp_references", "loclist"
-  }
-
-  vim.lsp.handlers['textDocument/signatureHelp']  = vim.lsp.with(vim.lsp.handlers['signature_help'], {
-     border = 'single',
-     close_events = { "CursorMoved", "BufHidden" },
-  })
-  vim.keymap.set('i', '<c-s>', vim.lsp.buf.signature_help)
+  return handler
 end
+
+vim.lsp.handlers["textDocument/definition"] = goto_definition('split')
 EOF
 
 augroup NvimLSPSetup
