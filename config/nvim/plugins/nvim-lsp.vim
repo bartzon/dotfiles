@@ -252,4 +252,7 @@ augroup end
 nnoremap <silent> gh :Lspsaga lsp_finder<CR>
 nnoremap <silent> ca :Lspsaga code_action<CR>
 
+nnoremap <silent> ]d :lua vim.diagnostic.goto_next()<CR>
+nnoremap <silent> [d :lua vim.diagnostic.goto_prev()<CR>
+
 nnoremap <leader>tt :TroubleToggle<CR>
