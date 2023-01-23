@@ -4,6 +4,8 @@ class Meeting
   def initialize(line)
     timestamps, title = line.split("\t")
     @starts_at, @ends_at = timestamps.split(' - ').map { |t| parse(t) }
+    @starts_at ||= 0
+    @ends_at ||= 0
 
     @title = title.to_s.strip
     @title = @title[0..TITLE_LENGTH] + "…" if @title.length > TITLE_LENGTH
@@ -17,7 +19,6 @@ class Meeting
   end
 
   def starts_in
-    p (starts_at - Time.zone.now)
     (starts_at - Time.zone.now).hours
   end
 
