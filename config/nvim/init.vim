@@ -84,11 +84,10 @@ nmap <leader>cm a<C-v>u2713<esc>
 
 nmap <leader>pr :silent !dev open pr<CR>
 
-nmap <leader>dt :VimuxRunCommand 'dev test'<CR>
-nmap <leader>dtt :VimuxRunCommand 'dev test'<CR>
-nmap <leader>dr :VimuxRunCommand 'dev style'<CR>
-nmap <leader>ds :VimuxRunCommand './bin/srb typecheck'<CR>
-nmap <leader>da :VimuxRunCommand 'clear ; dev style && ./bin/srb typecheck && dev test'<CR>
+nmap <leader>dt :VimuxRunCommand 'dt'<CR>
+nmap <leader>dr :VimuxRunCommand 'dr'<CR>
+nmap <leader>ds :VimuxRunCommand 'ds'<CR>
+nmap <leader>da :VimuxRunCommand 'da'<CR>
 
 " Keep it centered
 nnoremap {  {zz
