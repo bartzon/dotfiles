@@ -6,13 +6,14 @@ FILES = [
   'bat',
   'bin',
   'config',
-  'gitignore',
+  'fzf.zsh',
   'gitconfig',
+  'gitignore',
+  'hammerspoon',
   'tmux.conf',
+  'vale.ini',
   'zsh',
   'zshrc',
-  'fzf.zsh',
-  'vale.ini',
 ]
 
 desc "install the dot files into user's home directory"
