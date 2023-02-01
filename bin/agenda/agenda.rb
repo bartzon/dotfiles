@@ -5,7 +5,6 @@ require 'time'
 require 'dotiw'
 
 require 'action_view'
-require 'action_view/helpers'
 include ActionView::Helpers::DateHelper
 
 require './meeting'
