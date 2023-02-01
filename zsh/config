@@ -13,7 +13,7 @@ vcs_info
 }
 zstyle ':vcs_info:git:*' check-for-changes true
 
-export PS1='%n%~ '
+export PS1='[$(hostname)] %n%~ '
 export RPS1='$vcs_info_msg_0_'
 export EDITOR=nvim
 
@@ -35,3 +35,4 @@ load-local-conf() {
   source ~/.zsh/functions/dev_aliases.zsh
 }
 add-zsh-hook chpwd load-local-conf
+source ~/.zsh/functions/dev_aliases.zsh
