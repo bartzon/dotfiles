@@ -82,12 +82,12 @@ nnoremap <silent> <leader>cp :let @+ = expand("%")<CR>
 
 nmap <leader>cm a<C-v>u2713<esc>
 
-nmap <leader>pr :silent !dev open pr<CR>
+nmap <leader>pr :!dev open pr<CR>
 
-nmap <leader>dt :VimuxRunCommand 'dt'<CR>
-nmap <leader>dr :VimuxRunCommand 'dr'<CR>
-nmap <leader>ds :VimuxRunCommand 'ds'<CR>
-nmap <leader>da :VimuxRunCommand 'da'<CR>
+nmap <silent> <leader>dt :VimuxRunCommand 'dt'<CR>
+nmap <silent> <leader>dr :VimuxRunCommand 'dr'<CR>
+nmap <silent> <leader>ds :VimuxRunCommand 'ds'<CR>
+nmap <silent> <leader>da :VimuxRunCommand 'da'<CR>
 
 " Keep it centered
 nnoremap {  {zz

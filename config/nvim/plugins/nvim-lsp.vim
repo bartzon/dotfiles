@@ -78,6 +78,7 @@ function nvim_lsp_setup()
       null_ls.builtins.formatting.gofmt,
       null_ls.builtins.formatting.goimports,
       null_ls.builtins.formatting.rustfmt,
+      null_ls.builtins.formatting.rubocop,
     },
 
     on_attach = function(client, bufnr)
