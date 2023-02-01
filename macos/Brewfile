@@ -27,7 +27,7 @@ brew "ykman"
 
 cask "bartender"
 cask "betterdummy"
-cask "hammerspoon'
+cask "hammerspoon"
 cask "monitorcontrol"
 cask "raycast"
 cask "slack"
