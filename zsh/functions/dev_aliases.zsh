@@ -14,7 +14,7 @@ case $pwd_list[-1] in
     ;;
   "shipify")
     alias dt="dev test --include-branch-commits"
-    alias dr="dev style --include-branch-commits"
+    alias dr="dev style"
     alias ds="./bin/style typecheck"
     ;;
   "atlas")
