@@ -113,21 +113,13 @@ function nvim_lsp_setup()
   end
 
   local servers = {
-    'bashls',
-    'gopls',
     'graphql',
-    'rust_analyzer',
     'shopify_ruby_lsp',
-    'solargraph',
-    'sorbet',
-    'sumneko_lua',
-    'tailwindcss',
-    'tsserver',
     'vimls',
   }
 
   local defaults = {
-    capabilities = cmp_lsp.default_capabilities(),
+    capabilities = require('cmp_nvim_lsp').default_capabilities(),
     on_attach = on_attach,
   }
 
@@ -181,28 +173,6 @@ function nvim_lsp_setup()
 
     sorbet = {
       root_dir = lspconfig.util.root_pattern('sorbet'),
-    },
-
-    sumneko_lua = {
-      settings = {
-        Lua = {
-          diagnostics = {
-            globals = { 'vim' },
-          },
-
-          telemetry = {
-            enable = false,
-          },
-
-          workspace = {
-            library = vim.api.nvim_get_runtime_file('', true),
-          },
-        }
-      },
-    },
-
-    tailwindcss = {
-      autostart = false,
     },
   }
 

@@ -119,6 +119,11 @@ nnoremap <leader>5 5<C-W><C-W><CR>
 " Clone current paragraph
 nnoremap cp yap<S-}>p
 
+" tabs
+nnoremap <silent> <leader>tn :tabnext<CR>
+nnoremap <silent> <leader>tp :tabprev<CR>
+
+
 nnoremap <silent> gs :lua require("ts-node-action").node_action()<CR>
 
 " ---------------------------------------------------

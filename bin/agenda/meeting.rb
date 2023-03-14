@@ -8,7 +8,7 @@ class Meeting
     @ends_at ||= 0
 
     @title = title.to_s.strip
-    @title = @title[0..TITLE_LENGTH] + "…" if @title.length > TITLE_LENGTH
+    @title = @title[0..TITLE_LENGTH] + '…' if @title.length > TITLE_LENGTH
   end
 
   def parse(timestamp)
