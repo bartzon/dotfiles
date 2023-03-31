@@ -24,6 +24,8 @@ if type "batcat" > /dev/null; then
   alias cat='batcat --style=numbers'
 fi
 
+alias tldrf='tldr --list | fzf --preview "tldr {1} --color=always" --preview-window=right,70% | xargs tldr'
+
 # git
 alias ga='git add'
 alias gb='git branch'
