@@ -1,1 +1,0 @@
-Plug 'pbrisbin/vim-mkdir'
