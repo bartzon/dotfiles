@@ -16,13 +16,12 @@ vim.opt.sidescrolloff = 5
 vim.opt.splitbelow = true
 vim.opt.splitright = true
 
+vim.opt.cmdheight = 0
 vim.opt.laststatus = 3
+vim.opt.numberwidth = 5
 
 vim.g.netwr_banner = 0
 vim.g.netrw_liststyle = 3
-
-vim.o.timeout = true
-vim.o.timeoutlen = 500
 
 vim.opt.list = true
 
@@ -32,5 +31,3 @@ vim.opt.swapfile = false
 vim.opt.autoread = true
 
 vim.opt.listchars = "tab:␉·,trail:␠,nbsp:⎵"
-
-vim.opt.numberwidth = 5

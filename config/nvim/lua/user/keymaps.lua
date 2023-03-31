@@ -1,10 +1,10 @@
 local bind = vim.keymap.set
 
-bind('n', '<leader>1', '1<C-W><C-W><CR>', { desc = "Move to first pane" })
-bind('n', '<leader>2', '2<C-W><C-W><CR>', { desc = "Move to second pane" })
-bind('n', '<leader>3', '3<C-W><C-W><CR>', { desc = "Move to third pane" })
-bind('n', '<leader>4', '4<C-W><C-W><CR>', { desc = "Move to fourth pane" })
-bind('n', '<leader>5', '5<C-W><C-W><CR>', { desc = "Move to fifth pane" })
+for i = 1, 6 do
+  local lhs = '<leader>' .. i
+  local rhs = i .. '<C-W>w'
+  bind('n', lhs, rhs, { desc = "Move to window " .. i })
+end
 
 bind('n', '<C-j>', '<C-w>j', { desc = "Move to down pane" })
 bind('n', '<C-k>', '<C-w>k', { desc = "Move to up pane" })

@@ -18,11 +18,16 @@ function Plugin.config()
         }
       },
       lualine_c = {
-        { },
+        {},
       },
       lualine_x = {'fileformat', 'filetype'},
       lualine_y = {'progress'},
       lualine_z = {'diagnostics'}
+    },
+    extensions = {
+      'trouble',
+      'fzf',
+      'lazy',
     }
   })
 end

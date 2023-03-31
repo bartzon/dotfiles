@@ -1,4 +1,3 @@
-local env = require('user.env')
 local lazy = {}
 
 function lazy.install(path)
@@ -26,7 +25,6 @@ end
 lazy.path = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 lazy.opts = {
   ui = {
-    icons = env.lazy_icons,
     border = 'rounded',
   },
   install = {
