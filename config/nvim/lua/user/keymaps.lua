@@ -37,7 +37,7 @@ bind('n', 'go',  'lsp.type_definition', { desc = 'LSP Type definition' })
 bind('n', 'gr',  '<cmd>Telescope lsp_references', { desc = 'LSP References' })
 bind('n', 'gs',  'lsp.signature_help', { desc = 'LSP Signature help' })
 bind('n', 'gl',  'vim.diagnostic.open_float', { desc = 'Diagnostics Float' })
-bind('n', 'gq', '<cmd>LspFormat<cr>', { desc = 'Format using LSP' })
+bind('n', 'gq', '<cmd>LspZeroFormat<cr>', { desc = 'Format using LSP' })
 
 bind('n', 'tn', ':tabnext<CR>', { desc = "Next tab" })
 bind('n', 'tp', ':tabprev<CR>', { desc = "Previous tab" })
