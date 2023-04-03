@@ -1,3 +1,11 @@
+local function close_floating()
+  for _, win in pairs(vim.api.nvim_list_wins()) do
+    if vim.api.nvim_win_get_config(win).relative == "win" then
+      vim.api.nvim_win_close(win, false)
+    end
+  end
+end
+
 local bind = vim.keymap.set
 
 for i = 1, 6 do
@@ -43,3 +51,9 @@ bind('n', 'tn', ':tabnext<CR>', { desc = "Next tab" })
 bind('n', 'tp', ':tabprev<CR>', { desc = "Previous tab" })
 bind('n', 'tt', ':tabnew<CR>', { desc = "New tab" })
 bind('n', 'tc', ':tabclose<CR>', { desc = "Close tab" })
+
+
+bind('n', '<esc>', function()
+  close_floating()
+  vim.cmd(":noh")
+end, { silent = true, desc = "Remove Search Highlighting, Dismiss Popups" })

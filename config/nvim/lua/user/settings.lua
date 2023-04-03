@@ -1,33 +1,39 @@
-vim.opt.expandtab = true
-vim.opt.smartcase = true
-vim.opt.ignorecase = true
+local o = vim.opt
 
-vim.opt.shiftwidth = 2
-vim.opt.tabstop = 2
+o.expandtab = true
+o.smartcase = true
+o.ignorecase = true
 
-vim.opt.relativenumber = true
-vim.opt.number = true
+o.shiftwidth = 2
+o.softtabstop = 2
+o.tabstop = 2
 
-vim.opt.termguicolors = true
+o.relativenumber = true
+o.number = true
+o.showmode = false
 
-vim.opt.scrolloff = 5
-vim.opt.sidescrolloff = 5
+o.termguicolors = true
 
-vim.opt.splitbelow = true
-vim.opt.splitright = true
+o.scrolloff = 5
+o.sidescrolloff = 5
 
-vim.opt.cmdheight = 0
-vim.opt.laststatus = 3
-vim.opt.numberwidth = 5
+o.splitbelow = true
+o.splitright = true
+
+o.cmdheight = 0
+o.laststatus = 3
+o.numberwidth = 5
 
 vim.g.netwr_banner = 0
 vim.g.netrw_liststyle = 3
 
-vim.opt.list = true
+o.list = true
 
-vim.opt.undofile = true
-vim.opt.backup = false
-vim.opt.swapfile = false
-vim.opt.autoread = true
+o.undofile = true
+o.backup = false
+o.swapfile = false
+o.autoread = true
 
-vim.opt.listchars = "tab:␉·,trail:␠,nbsp:⎵"
+o.equalalways = true
+
+o.listchars = "tab:␉·,trail:␠,nbsp:⎵"

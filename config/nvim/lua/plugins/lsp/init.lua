@@ -39,7 +39,9 @@ function Plugin.config()
 end
 
 function Plugin.init()
-  require'lspconfig'.sorbet.setup{}
+  require'lspconfig'.sorbet.setup({
+    cmd = { './bin/srb', 'tc', '--lsp' }
+  })
 end
 
 function user.diagnostics()
@@ -169,6 +171,17 @@ function user.lsp_attach()
 
   bind('n', '<leader>fd', telescope.lsp_document_symbols, opts)
   bind('n', '<leader>fq', telescope.lsp_workspace_symbols, opts)
+end
+
+local signs = {
+  Error = "",
+  Warn = "",
+  Hint = "",
+  Info = "",
+}
+for type, icon in pairs(signs) do
+  local hl = "DiagnosticSign" .. type
+  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = nil })
 end
 
 return Plugin
