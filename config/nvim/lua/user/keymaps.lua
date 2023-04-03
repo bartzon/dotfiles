@@ -1,11 +1,3 @@
-local function close_floating()
-  for _, win in pairs(vim.api.nvim_list_wins()) do
-    if vim.api.nvim_win_get_config(win).relative == "win" then
-      vim.api.nvim_win_close(win, false)
-    end
-  end
-end
-
 local bind = vim.keymap.set
 
 for i = 1, 6 do
@@ -42,7 +34,7 @@ bind('n', 'gd',  '<cmd>Telescope lsp_definitions<CR>', { desc = "LSP definitions
 bind('n', 'gD',  'lsp.declaration', { desc = 'LSP declarations' })
 bind('n', 'gi',  '<cmd>Telescope lsp_implementation', { desc = 'LSP Implementation' })
 bind('n', 'go',  'lsp.type_definition', { desc = 'LSP Type definition' })
-bind('n', 'gr',  '<cmd>Telescope lsp_references', { desc = 'LSP References' })
+bind('n', 'gr',  '<cmd>Telescope lsp_references<CR>', { desc = 'LSP References' })
 bind('n', 'gs',  'lsp.signature_help', { desc = 'LSP Signature help' })
 bind('n', 'gl',  'vim.diagnostic.open_float', { desc = 'Diagnostics Float' })
 bind('n', 'gq', '<cmd>LspZeroFormat<cr>', { desc = 'Format using LSP' })
@@ -52,8 +44,11 @@ bind('n', 'tp', ':tabprev<CR>', { desc = "Previous tab" })
 bind('n', 'tt', ':tabnew<CR>', { desc = "New tab" })
 bind('n', 'tc', ':tabclose<CR>', { desc = "Close tab" })
 
-
 bind('n', '<esc>', function()
-  close_floating()
+  for _, win in pairs(vim.api.nvim_list_wins()) do
+    if vim.api.nvim_win_get_config(win).relative == "win" then
+      vim.api.nvim_win_close(win, false)
+    end
+  end
   vim.cmd(":noh")
 end, { silent = true, desc = "Remove Search Highlighting, Dismiss Popups" })

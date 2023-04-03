@@ -1,6 +1,24 @@
 local Plugin = {'neovim/nvim-lspconfig'}
 local user = {}
 
+local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
+function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
+  opts = opts or {}
+  opts.border = "rounded"
+  return orig_util_open_floating_preview(contents, syntax, opts, ...)
+end
+
+local signs = {
+  Error = "",
+  Warn = "",
+  Hint = "",
+  Info = "",
+}
+for type, icon in pairs(signs) do
+  local hl = "DiagnosticSign" .. type
+  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = nil })
+end
+
 Plugin.dependencies = {
   {'j-hui/fidget.nvim'},
   {'williamboman/mason.nvim'},
@@ -171,17 +189,6 @@ function user.lsp_attach()
 
   bind('n', '<leader>fd', telescope.lsp_document_symbols, opts)
   bind('n', '<leader>fq', telescope.lsp_workspace_symbols, opts)
-end
-
-local signs = {
-  Error = "",
-  Warn = "",
-  Hint = "",
-  Info = "",
-}
-for type, icon in pairs(signs) do
-  local hl = "DiagnosticSign" .. type
-  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = nil })
 end
 
 return Plugin
