@@ -14,6 +14,15 @@ Plugin.opts = {
   autopairs = {
     enable = true
   },
+  move = {
+    enable = true,
+    goto_next_start = {
+      ["]m"] = "@function.outer",
+    },
+    goto_previous_start = {
+      ["[m"] = "@function.outer",
+    }
+  },
   rainbow = {
     enable = true,
     extended_mode = true,

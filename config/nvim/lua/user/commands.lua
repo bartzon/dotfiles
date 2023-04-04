@@ -20,3 +20,18 @@ autocmd('BufLeave,FocusLost,InsertEnter,WinLeave', {
   group = augroup,
   command = 'set nornu'
 })
+
+autocmd('VimResized', {
+  desc = 'Resize panes after host resize',
+  group = augroup,
+  command = 'wincmd = '
+})
+
+vim.cmd[[function! IndentWithI()
+    if len(getline('.')) == 0
+        return "\"_cc"
+    else
+        return "i"
+    endif
+endfunction
+nnoremap <expr> i IndentWithI()]]

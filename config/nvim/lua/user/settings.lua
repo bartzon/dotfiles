@@ -1,5 +1,6 @@
 local o = vim.opt
 
+o.wrap = false
 o.expandtab = true
 o.smartcase = true
 o.ignorecase = true
@@ -35,5 +36,9 @@ o.swapfile = false
 o.autoread = true
 
 o.equalalways = true
+
+o.pumblend = 15
+o.winblend = 15
+o.updatetime = 100
 
 o.listchars = "tab:␉·,trail:␠,nbsp:⎵"

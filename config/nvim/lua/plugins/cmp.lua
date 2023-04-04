@@ -2,6 +2,34 @@
 local Plugin = {'hrsh7th/nvim-cmp'}
 local user = {autocomplete = true}
 
+	local lsp_symbols = {
+  Text          = "   (Text) ",
+  Method        = "   (Method)",
+  Function      = "   (Function)",
+  Constructor   = "   (Constructor)",
+  Field         = " ﴲ  (Field)",
+  Variable      = "   (Variable)",
+  Class         = "   (Class)",
+  Interface     = "   (Interface)",
+  Module        = "   (Module)",
+  Property      = " 襁 (Property)",
+  Unit          = "   (Unit)",
+  Value         = "   (Value)",
+  Enum          = " 練 (Enum)",
+  Keyword       = "   (Keyword)",
+  Snippet       = "   (Snippet)",
+  Color         = "   (Color)",
+  File          = "   (File)",
+  Reference     = "   (Reference)",
+  Folder        = "   (Folder)",
+  EnumMember    = "   (EnumMember)",
+  Constant      = "   (Constant)",
+  Struct        = "   (Struct)",
+  Event         = "   (Event)",
+  Operator      = "   (Operator)",
+  TypeParameter = "   (TypeParameter)"
+}
+
 Plugin.dependencies = {
   -- Sources
   {'hrsh7th/cmp-buffer'},
@@ -59,17 +87,24 @@ function Plugin.config()
     formatting = {
       fields = {'menu', 'abbr', 'kind'},
       format = function(entry, item)
-        local menu_icon = {
-          nvim_lsp = 'λ',
-          luasnip = '⋗',
-          buffer = 'Ω',
-          path = '🖫',
-          nvim_lua = 'Π',
-        }
-
-        item.menu = menu_icon[entry.source.name]
+        item.kind = lsp_symbols[item.kind] .. " " .. item.kind
+        -- set a name for each source
+        item.menu = ({
+          spell = "[Spell]",
+          buffer = "[Buffer]",
+          calc = "[Calc]",
+          emoji = "[Emoji]",
+          nvim_lsp = "[LSP]",
+          path = "[Path]",
+          look = "[Look]",
+          treesitter = "[treesitter]",
+          luasnip = "[LuaSnip]",
+          nvim_lua = "[Lua]",
+          latex_symbols = "[Latex]",
+          cmp_tabnine = "[Tab9]"
+        })[entry.source.name]
         return item
-      end,
+      end
     },
     mapping = {
       ['<Up>'] = cmp.mapping.select_prev_item(select_opts),
