@@ -24,12 +24,9 @@ end
 
 lazy.path = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 lazy.opts = {
-  ui = {
-    border = 'rounded',
-  },
   install = {
     missing = true,
-    colorscheme = {'nightly'}
+    colorscheme = { 'nightly' }
   },
   change_detection = {
     enabled = true,
@@ -38,5 +35,5 @@ lazy.opts = {
 }
 
 lazy.setup({
-  {import = 'plugins'}
+  { import = 'plugins' }
 })

@@ -1,4 +1,4 @@
-local Plugin = {'zbirenbaum/copilot.lua'}
+local Plugin = { 'zbirenbaum/copilot.lua' }
 
 Plugin.cmd = 'Copilot'
 
@@ -16,7 +16,7 @@ Plugin.opts = {
       open = "<M-CR>"
     },
     layout = {
-      position = "bottom", -- | top | left | right
+      position = "bottom",
       ratio = 0.4
     },
   },
