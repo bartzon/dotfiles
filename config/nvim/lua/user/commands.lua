@@ -1,11 +1,11 @@
 local autocmd = vim.api.nvim_create_autocmd
-local augroup = vim.api.nvim_create_augroup('init_cmds', {clear = true})
+local augroup = vim.api.nvim_create_augroup('init_cmds', { clear = true })
 
 autocmd('TextYankPost', {
   desc = 'highlight text after is copied',
   group = augroup,
   callback = function()
-    vim.highlight.on_yank({higroup = 'Visual', timeout = 80})
+    vim.highlight.on_yank({ higroup = 'Visual', timeout = 80 })
   end
 })
 
@@ -26,12 +26,3 @@ autocmd('VimResized', {
   group = augroup,
   command = 'wincmd = '
 })
-
-vim.cmd[[function! IndentWithI()
-    if len(getline('.')) == 0
-        return "\"_cc"
-    else
-        return "i"
-    endif
-endfunction
-nnoremap <expr> i IndentWithI()]]

@@ -39,15 +39,19 @@ bind('n', 'gD', 'lsp.declaration', { desc = 'LSP declarations' })
 bind('n', 'gi', '<cmd>Telescope lsp_implementation', { desc = 'LSP Implementation' })
 bind('n', 'go', 'lsp.type_definition', { desc = 'LSP Type definition' })
 bind('n', 'gr', ':Telescope lsp_references<CR>', { desc = 'LSP References' })
-bind('n', 'gs', 'lsp.signature_help', { desc = 'LSP Signature help' })
+bind('n', 'gs', ':lsp.signature_help', { desc = 'LSP Signature help' })
 bind('n', 'gl', 'vim.diagnostic.open_float', { desc = 'Diagnostics Float' })
 bind('n', 'gq', ':LspZeroFormat<cr>', { desc = 'Format using LSP' })
 bind("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", { noremap = true, desc = 'Rename with LSP' })
+bind("n", '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', { noremap = true, desc = 'Previous diagnostic' })
+bind("n", ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', { noremap = true, desc = 'Next diagnostic' })
 
 bind('n', 'tn', ':tabnext<CR>', { desc = "Next tab" })
 bind('n', 'tp', ':tabprev<CR>', { desc = "Previous tab" })
 bind('n', 'tt', ':tabnew<CR>', { desc = "New tab" })
 bind('n', 'tc', ':tabclose<CR>', { desc = "Close tab" })
+
+bind('n', '<leader>tt', ':TroubleClose<CR>', { desc = "Close Trouble pane" })
 
 bind('n', 'sw', '<cmd>Telescope grep_string<CR>', { desc = 'Search word under cursor' })
 
