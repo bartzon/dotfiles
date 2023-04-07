@@ -1,8 +1,8 @@
 -- Autocompletion
-local Plugin = {'hrsh7th/nvim-cmp'}
-local user = {autocomplete = true}
+local Plugin = { 'hrsh7th/nvim-cmp' }
+local user = { autocomplete = true }
 
-	local lsp_symbols = {
+local lsp_symbols = {
   Text          = "   (Text) ",
   Method        = "   (Method)",
   Function      = "   (Function)",
@@ -32,26 +32,28 @@ local user = {autocomplete = true}
 
 Plugin.dependencies = {
   -- Sources
-  {'hrsh7th/cmp-buffer'},
-  {'hrsh7th/cmp-path'},
-  {'saadparwaiz1/cmp_luasnip'},
-  {'hrsh7th/cmp-nvim-lsp'},
-  {'hrsh7th/cmp-nvim-lua'},
+  { 'hrsh7th/cmp-buffer' },
+  { 'hrsh7th/cmp-path' },
+  { 'saadparwaiz1/cmp_luasnip' },
+  { 'hrsh7th/cmp-nvim-lsp' },
+  { 'hrsh7th/cmp-nvim-lua' },
 
   -- Snippets
-  {'L3MON4D3/LuaSnip'},
+  { 'L3MON4D3/LuaSnip' },
 }
 
 Plugin.event = 'InsertEnter'
 
 function Plugin.config()
-  user.augroup = vim.api.nvim_create_augroup('compe_cmds', {clear = true})
+  require('lsp-zero.cmp').extend()
+
+  user.augroup = vim.api.nvim_create_augroup('compe_cmds', { clear = true })
   vim.api.nvim_create_user_command('UserCmpEnable', user.enable_cmd, {})
 
   local cmp = require('cmp')
   local luasnip = require('luasnip')
 
-  local select_opts = {behavior = cmp.SelectBehavior.Select}
+  local select_opts = { behavior = cmp.SelectBehavior.Select }
   local cmp_enable = cmp.get_config().enabled
 
   user.config = {
@@ -71,10 +73,10 @@ function Plugin.config()
       end,
     },
     sources = {
-      {name = 'path'},
-      {name = 'nvim_lsp', keyword_length = 3},
-      {name = 'buffer', keyword_length = 3},
-      {name = 'luasnip', keyword_length = 2},
+      { name = 'path' },
+      { name = 'nvim_lsp', keyword_length = 3 },
+      { name = 'buffer',   keyword_length = 3 },
+      { name = 'luasnip',  keyword_length = 2 },
     },
     window = {
       documentation = {
@@ -85,7 +87,7 @@ function Plugin.config()
       }
     },
     formatting = {
-      fields = {'menu', 'abbr', 'kind'},
+      fields = { 'menu', 'abbr', 'kind' },
       format = function(entry, item)
         item.kind = lsp_symbols[item.kind] .. " " .. item.kind
         -- set a name for each source
@@ -109,13 +111,10 @@ function Plugin.config()
     mapping = {
       ['<Up>'] = cmp.mapping.select_prev_item(select_opts),
       ['<Down>'] = cmp.mapping.select_next_item(select_opts),
-
       ['<M-k>'] = cmp.mapping.select_prev_item(select_opts),
       ['<M-j>'] = cmp.mapping.select_next_item(select_opts),
-
       ['<C-d>'] = cmp.mapping.scroll_docs(5),
       ['<C-u>'] = cmp.mapping.scroll_docs(-5),
-
       ['<M-u>'] = cmp.mapping(function()
         if cmp.visible() then
           cmp.abort()
@@ -125,12 +124,11 @@ function Plugin.config()
           user.set_autocomplete(true)
         end
       end),
-
       ['<Tab>'] = cmp.mapping(function(fallback)
         user.set_autocomplete(true)
 
         if cmp.visible() then
-          cmp.confirm({select = true})
+          cmp.confirm({ select = true })
         elseif luasnip.jumpable(1) then
           luasnip.jump(1)
         elseif user.check_back_space() then
@@ -138,9 +136,8 @@ function Plugin.config()
         else
           cmp.complete()
         end
-      end, {'i', 's'}),
-
-      ['<S-Tab>'] = cmp.mapping(function() luasnip.jump(-1) end, {'i', 's'}),
+      end, { 'i', 's' }),
+      ['<S-Tab>'] = cmp.mapping(function() luasnip.jump(-1) end, { 'i', 's' }),
     }
   }
 
@@ -161,7 +158,7 @@ function user.set_autocomplete(new_value)
       'i',
       '<Space>',
       '<cmd>UserCmpEnable<CR><Space>',
-      {noremap = true}
+      { noremap = true }
     )
 
     -- restore when leaving insert mode
@@ -194,4 +191,3 @@ function user.enable_cmd()
 end
 
 return Plugin
-

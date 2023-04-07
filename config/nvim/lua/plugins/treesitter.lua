@@ -1,15 +1,15 @@
-local Plugin = {'nvim-treesitter/nvim-treesitter'}
+local Plugin = { 'nvim-treesitter/nvim-treesitter' }
 Plugin.pin = true
 
 Plugin.dependencies = {
-  {'nvim-treesitter/nvim-treesitter-textobjects', pin = true},
-  {'omnisyle/nvim-hidesig'},
-  {'nvim-treesitter/nvim-treesitter-context'},
+  { 'nvim-treesitter/nvim-treesitter-textobjects', pin = true },
+  { 'omnisyle/nvim-hidesig' },
+  { 'nvim-treesitter/nvim-treesitter-context' },
 }
 
 Plugin.opts = {
   highlight = {
-    enable = true,
+    enable = false,
   },
   autopairs = {
     enable = true

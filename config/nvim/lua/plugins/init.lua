@@ -4,18 +4,18 @@ local Plugins = {
     lazy = false,
     priority = 1000,
   },
-  {'bartzon/vim-fzf-coauthorship'},
-  {'rmagatti/auto-session'},
-  {'tpope/vim-commentary'},
-  {'tpope/vim-projectionist'},
+  { 'bartzon/vim-fzf-coauthorship' },
+  { 'rmagatti/auto-session' },
+  { 'tpope/vim-commentary' },
+  { 'tpope/vim-projectionist' },
   {
     'tpope/vim-fugitive',
     dependencies = {
       'tpope/vim-rhubarb',
     }
   },
-  {'tpope/vim-vinegar'},
-  {'nvim-tree/nvim-web-devicons'},
+  { 'tpope/vim-vinegar' },
+  { 'nvim-tree/nvim-web-devicons' },
 }
 
 return Plugins
