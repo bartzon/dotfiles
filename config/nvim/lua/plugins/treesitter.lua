@@ -5,6 +5,7 @@ Plugin.dependencies = {
   { 'nvim-treesitter/nvim-treesitter-textobjects', pin = true },
   { 'omnisyle/nvim-hidesig' },
   { 'nvim-treesitter/nvim-treesitter-context' },
+  { 'andymass/vim-matchup' },
 }
 
 Plugin.opts = {
@@ -13,6 +14,9 @@ Plugin.opts = {
   },
   autopairs = {
     enable = true
+  },
+  matchup = {
+    enable = true,
   },
   move = {
     enable = true,
