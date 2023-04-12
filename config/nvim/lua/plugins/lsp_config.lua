@@ -23,10 +23,21 @@ function Plugin.config()
     lsp.default_keymaps({ buffer = bufnr })
   end)
 
-  -- (Optional) Configure lua language server for neovim
   require('lspconfig').lua_ls.setup(lsp.nvim_lua_ls())
 
   lsp.setup()
 end
+
+vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
+  border = "none",
+})
+
+vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
+  border = "none",
+})
+
+vim.diagnostic.config({
+  virtual_text = true
+})
 
 return Plugin

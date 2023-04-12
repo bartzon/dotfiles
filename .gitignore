@@ -4,6 +4,8 @@
 !/.gitignore
 zsh/plugins
 
+config/*
+
 # Except
 !install.sh
 !macos/
@@ -11,13 +13,11 @@ zsh/plugins
 !Rakefile
 !bat
 !bin/
-!config/
 !config/kitty/
-!config/nvim
+!config/nvim/**
 !gitignore
 !tmux.conf
 !zsh/
 !zshrc
 !gitconfig
 
-config/*

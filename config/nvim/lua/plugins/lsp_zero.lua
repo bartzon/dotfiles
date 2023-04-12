@@ -26,7 +26,6 @@ function Plugin.config()
     servers = {
       ['lua_ls'] = { 'lua' },
       ['rust_analyzer'] = { 'rust' },
-      ['ruby'] = { 'rubocop' },
     }
   })
 
