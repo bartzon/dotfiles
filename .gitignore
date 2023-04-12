@@ -3,6 +3,7 @@
 /*/
 !/.gitignore
 zsh/plugins
+Session.vim
 
 config/*
 
