@@ -5,7 +5,7 @@ alias whereis="which"
 alias more='less -RFX'
 alias grep='grep --color=auto'
 alias cat='bat'
-alias ll='exa --icons --long --all --no-user'
+alias ls='lsd'
 alias vim='nvim'
 alias vi='nvim'
 alias todo='nvim ~/Documents/todo.md'
