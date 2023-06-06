@@ -6,6 +6,19 @@ for i = 1, 6 do
   bind('n', lhs, rhs, { desc = "Move to window " .. i })
 end
 
+function vim.getVisualSelection()
+  vim.cmd('noau normal! "vy"')
+  local text = vim.fn.getreg('v')
+  vim.fn.setreg('v', {})
+
+  text = string.gsub(text, "\n", "")
+  if #text > 0 then
+    return text
+  else
+    return ''
+  end
+end
+
 bind('n', '<C-j>', '<C-w>j', { desc = "Move to down pane" })
 bind('n', '<C-k>', '<C-w>k', { desc = "Move to up pane" })
 bind('n', '<C-h>', '<C-w>h', { desc = "Move to left pane" })
@@ -33,6 +46,11 @@ bind('n', '<leader>fb', ':Telescope buffers<CR>', { desc = "Telescope find in bu
 bind('n', '<leader>fd', 'telescope.lsp_document_symbols', { desc = 'LSP Document symbols' })
 bind('n', '<leader>fq', 'telescope.lsp_workspace_symbols', { desc = 'LSP Workspace symbols' })
 bind('n', '<leader>fm', ':Telescope bookmarks<CR>', { desc = 'Fuzzy find bookmarks' })
+bind("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", { noremap = true, desc = 'Rename using LSP' })
+bind('v', '<leader>fg', function()
+  local text = vim.getVisualSelection()
+  require('telescope.builtin').live_grep({ default_text = text })
+end, { noremap = true, desc = 'Telescope live grep selection' })
 
 bind('n', 'gd', ':Telescope lsp_definitions<CR>', { desc = "LSP definitions" })
 bind('n', 'gD', 'lsp.declaration', { desc = 'LSP declarations' })

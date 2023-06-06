@@ -21,6 +21,9 @@ case $pwd_list[-1] in
     alias dt="dev test"
     alias dr="dev style"
     ;;
+  "business-platform")
+    alias ds="true"
+    ;;
   *)
     unalias dt
     unalias dr

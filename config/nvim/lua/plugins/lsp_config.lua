@@ -19,6 +19,13 @@ Plugin.dependencies = {
 function Plugin.config()
   local lsp = require('lsp-zero')
 
+  lsp.ensure_installed({
+    -- Replace these with whatever servers you want to install
+    'sorbet',
+    'ruby-lsp',
+    'rubocop'
+  })
+
   lsp.on_attach(function(_, bufnr)
     lsp.default_keymaps({ buffer = bufnr })
   end)

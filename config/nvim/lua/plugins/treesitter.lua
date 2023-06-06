@@ -1,8 +1,7 @@
 local Plugin = { 'nvim-treesitter/nvim-treesitter' }
-Plugin.pin = true
 
 Plugin.dependencies = {
-  { 'nvim-treesitter/nvim-treesitter-textobjects', pin = true },
+  { 'nvim-treesitter/nvim-treesitter-textobjects' },
   { 'omnisyle/nvim-hidesig' },
   { 'nvim-treesitter/nvim-treesitter-context' },
   { 'andymass/vim-matchup' },

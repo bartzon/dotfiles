@@ -26,10 +26,14 @@ function Plugin.config()
     servers = {
       ['lua_ls'] = { 'lua' },
       ['rust_analyzer'] = { 'rust' },
+      ['ruby_ls'] = { 'rubocop' }
     }
   })
 
   lsp.setup()
+
+  require('lspconfig').sorbet.setup({})
+  require('lspconfig').ruby_ls.setup({})
 end
 
 return Plugin
