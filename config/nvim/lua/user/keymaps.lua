@@ -31,6 +31,8 @@ bind('v', 'K', ":m '<-2<CR>gv=gv", { desc = "Move line down" })
 bind('n', '<leader>w', ":w<CR>", { desc = "Write file", silent = true })
 bind('n', '<leader>pr', ":!dev open pr<CR>", { desc = "Open PR", silent = true })
 
+bind('n', '<leader>cp', ':let @+=@%<CR>', { desc = 'Copy current file path to clipboard', silent = true })
+
 bind('n', '<leader>dt', ":VimuxRunCommand 'dt'<CR>", { desc = "dev test" })
 bind('n', '<leader>dr', ":VimuxRunCommand 'dr'<CR>", { desc = "dev style" })
 bind('n', '<leader>ds', ":VimuxRunCommand 'ds'<CR>", { desc = "srb typecheck" })

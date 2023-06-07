@@ -1,6 +1,9 @@
 local Plugin = { 'jose-elias-alvarez/null-ls.nvim' }
 
-Plugin.dependencies = { { 'nvim-lua/plenary.nvim' } }
+Plugin.dependencies = {
+  { 'nvim-lua/plenary.nvim' },
+  { 'MunifTanjim/prettier.nvim' },
+}
 
 Plugin.cmd = 'NullLsp'
 
@@ -61,6 +64,26 @@ function Plugin.config()
   }
 
   null_ls.setup(config)
+
+  local prettier = require("prettier")
+
+  prettier.setup({
+    bin = 'prettier', -- or `'prettierd'` (v0.23.3+)
+    filetypes = {
+      "css",
+      "graphql",
+      "html",
+      "javascript",
+      "javascriptreact",
+      "json",
+      "less",
+      "markdown",
+      "scss",
+      "typescript",
+      "typescriptreact",
+      "yaml",
+    },
+  })
 end
 
 return Plugin

@@ -26,7 +26,8 @@ function Plugin.config()
     servers = {
       ['lua_ls'] = { 'lua' },
       ['rust_analyzer'] = { 'rust' },
-      ['ruby_ls'] = { 'rubocop' }
+      ['ruby_ls'] = { 'rubocop' },
+      ['tsserver'] = { 'prettier' },
     }
   })
 
@@ -34,6 +35,7 @@ function Plugin.config()
 
   require('lspconfig').sorbet.setup({})
   require('lspconfig').ruby_ls.setup({})
+  require('lspconfig').tsserver.setup({})
 end
 
 return Plugin
