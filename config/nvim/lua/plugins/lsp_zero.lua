@@ -35,7 +35,6 @@ function Plugin.config()
 
   require('lspconfig').sorbet.setup({})
   require('lspconfig').ruby_ls.setup({})
-  require('lspconfig').tsserver.setup({})
 end
 
 return Plugin

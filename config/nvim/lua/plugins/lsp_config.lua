@@ -14,6 +14,7 @@ Plugin.dependencies = {
       pcall(vim.cmd, 'MasonUpdate')
     end,
   },
+  { 'jose-elias-alvarez/typescript.nvim' },
 }
 
 function Plugin.config()
@@ -23,7 +24,8 @@ function Plugin.config()
     -- Replace these with whatever servers you want to install
     'sorbet',
     'ruby-lsp',
-    'rubocop'
+    'rubocop',
+    'tsserver',
   })
 
   lsp.on_attach(function(_, bufnr)
@@ -31,6 +33,13 @@ function Plugin.config()
   end)
 
   require('lspconfig').lua_ls.setup(lsp.nvim_lua_ls())
+  require('typescript').setup({
+    disable_commands = false, -- prevent the plugin from creating Vim commands
+    debug = false,            -- enable debug logging for commands
+    go_to_source_definition = {
+      fallback = true,        -- fall back to standard LSP definition on failure
+    },
+  })
 
   lsp.setup()
 end
