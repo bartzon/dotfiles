@@ -35,9 +35,6 @@
 [include]
   path = ~/.gitconfig_local
   path = ~/.gitconfig.spin
-[credential]
-	helper = 
-	helper = store --file /opt/dev/var/private/git_credential_store
 [core]
   pager = delta
 [interactive]

@@ -1,0 +1,7 @@
+[user]
+	signingkey = 3C5912307D616469
+	email = bart.zonneveld@shopify.com
+[include]
+  path = /Users/bartzonneveld/.config/dev/gitconfig
+[credential]
+	helper = store --file /opt/dev/var/private/git_credential_store
