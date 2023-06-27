@@ -21,7 +21,6 @@ function Plugin.config()
   local lsp = require('lsp-zero')
 
   lsp.ensure_installed({
-    -- Replace these with whatever servers you want to install
     'sorbet',
     'ruby-lsp',
     'rubocop',

@@ -22,3 +22,4 @@ config/*
 !zshrc
 !gitconfig
 
+config/nvim/lazy-lock.json

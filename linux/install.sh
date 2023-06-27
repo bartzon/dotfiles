@@ -1,3 +1,5 @@
+#!/bin/zsh
+
 if ! command -v batcat &> /dev/null; then
   sudo apt-get install -y bat
   alias bat="/usr/bin/batcat"

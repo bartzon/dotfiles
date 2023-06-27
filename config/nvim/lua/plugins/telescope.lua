@@ -1,14 +1,19 @@
-local Plugin = {'nvim-telescope/telescope.nvim'}
+local Plugin = { 'nvim-telescope/telescope.nvim' }
 
 Plugin.dependencies = {
-  {'nvim-lua/plenary.nvim'},
-  {'nvim-telescope/telescope-fzy-native.nvim'},
-  {'dhruvmanila/browser-bookmarks.nvim'},
+  { 'nvim-lua/plenary.nvim' },
+  { 'nvim-telescope/telescope-fzy-native.nvim' },
+  { 'dhruvmanila/browser-bookmarks.nvim' },
 }
 
 Plugin.cmd = 'Telescope'
 
 Plugin.opts = {
+  defaults = {
+    file_ignore_patterns = {
+      "sorbet"
+    }
+  },
   extensions = {
     fzf = {
       fuzzy = true,
