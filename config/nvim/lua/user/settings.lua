@@ -16,7 +16,7 @@ local function get_clipboard()
       cache_enabled = 1,
     }
   else
-    return nil
+    return 'unnamedplus'
   end
 end
 

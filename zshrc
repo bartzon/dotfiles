@@ -15,6 +15,7 @@ else
 fi
 
 PATH=~/.bin:$PATH
+PATH=~/.bin:$PATH:`npm config get prefix`/bin
 
 GPG_TTY=$(tty)
 export GPG_TTY
