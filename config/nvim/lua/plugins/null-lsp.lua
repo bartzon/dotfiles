@@ -60,6 +60,7 @@ function Plugin.config()
     end,
     sources = {
       null_ls.builtins.formatting.rubocop,
+      null_ls.builtins.formatting.eslint_d,
     }
   }
 
@@ -79,8 +80,6 @@ function Plugin.config()
       "less",
       "markdown",
       "scss",
-      "typescript",
-      "typescriptreact",
       "yaml",
     },
   })
