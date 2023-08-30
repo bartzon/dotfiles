@@ -3,8 +3,8 @@ local Plugin = { 'folke/trouble.nvim' }
 Plugin.cmd = { 'TroubleToggle', 'Trouble' }
 
 Plugin.opts = {
-  position = 'right',
-  mode = 'document_diagnostics',
+  position = 'bottom',
+  mode = 'workspace_diagnostics',
   auto_open = true,
   auto_close = true,
   use_diagnostic_signs = true,

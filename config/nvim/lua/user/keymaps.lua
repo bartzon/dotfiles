@@ -71,8 +71,6 @@ bind('n', 'tp', ':tabprev<CR>', { desc = "Previous tab" })
 bind('n', 'tt', ':tabnew<CR>', { desc = "New tab" })
 bind('n', 'tc', ':tabclose<CR>', { desc = "Close tab" })
 
-bind('n', '<leader>tt', ':TroubleClose<CR>', { desc = "Close Trouble pane" })
-
 bind('n', 'sw', '<cmd>Telescope grep_string<CR>', { desc = 'Search word under cursor' })
 
 bind('n', '<leader>bc', ':close<CR>', { desc = 'Close buffer' })
