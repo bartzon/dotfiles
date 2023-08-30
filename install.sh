@@ -14,6 +14,10 @@ if [[ `uname` == "Linux" ]]; then
   cd $curdir
 fi
 
+# install neovim providers
+gem install neovim
+npm install -g neovim
+
 rake install
 
 python3 -m pip install --user --upgrade pynvim

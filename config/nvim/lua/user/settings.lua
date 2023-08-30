@@ -1,27 +1,6 @@
 local o = vim.opt
 local g = vim.g
 
-local function get_clipboard()
-  if vim.env.SPIN == "1" then
-    return {
-      name = "pbcopy",
-      copy = {
-        ["+"] = "pbcopy",
-        ["*"] = "pbcopy",
-      },
-      paste = {
-        ["+"] = "pbpaste",
-        ["*"] = "pbpaste",
-      },
-      cache_enabled = 1,
-    }
-  else
-    return 'unnamedplus'
-  end
-end
-
-g.clipboard = get_clipboard
-
 o.wrap = false
 o.expandtab = true
 o.smartcase = true
@@ -71,3 +50,6 @@ o.listchars = "tab:␉·,trail:␠,nbsp:⎵"
 
 g.netwr_banner = 0
 g.netrw_liststyle = 3
+
+o.foldmethod = "expr"
+o.foldexpr = "nvim_treesitter#foldexpr()"
