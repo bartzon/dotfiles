@@ -50,6 +50,3 @@ o.listchars = "tab:␉·,trail:␠,nbsp:⎵"
 
 g.netwr_banner = 0
 g.netrw_liststyle = 3
-
-o.foldmethod = "expr"
-o.foldexpr = "nvim_treesitter#foldexpr()"

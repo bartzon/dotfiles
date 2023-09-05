@@ -22,6 +22,6 @@ if ! command -v delta &> /dev/null; then
   rm -f git-delta_0.16.5_amd64.deb
 fi
 
-if ! command - typescript-language-server &> /dev/null; then
+if ! command -v typescript-language-server &> /dev/null; then
   npm install -g typescript typescript-language-server
 fi
