@@ -56,6 +56,35 @@ function Plugin.config()
   local select_opts = { behavior = cmp.SelectBehavior.Select }
   local cmp_enable = cmp.get_config().enabled
 
+  cmp.setup.cmdline({ "/", "?" }, {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = {
+      { name = "nvim_lsp" },
+      { name = "nvim_lsp_document_symbol" },
+      { name = "dictionary" },
+      { name = "buffer" },
+    },
+  })
+
+  cmp.setup.cmdline(":", {
+    completion = {
+      autocomplete = { "InsertEnter" },
+    },
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = cmp.config.sources({
+      { name = "cmdline" },
+      {
+        name = "path",
+        options = {
+          trailing_slash = true,
+          label_trailing_slash = true
+        }
+      },
+      { name = "dictionary" },
+      { name = "buffer" },
+    }),
+  })
+
   user.config = {
     enabled = function()
       if user.autocomplete then
