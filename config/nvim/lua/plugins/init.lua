@@ -5,7 +5,7 @@ local Plugins = {
     priority = 1000,
   },
   { 'bartzon/vim-fzf-coauthorship' },
-  { 'rmagatti/auto-session' },
+  { 'tpope/vim-obsession' },
   { 'tpope/vim-commentary' },
   { 'tpope/vim-projectionist' },
   {
