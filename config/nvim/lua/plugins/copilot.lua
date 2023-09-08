@@ -2,8 +2,6 @@ local Plugin = { 'zbirenbaum/copilot.lua' }
 
 Plugin.cmd = 'Copilot'
 
-Plugin.event = "InsertEnter"
-
 Plugin.opts = {
   panel = {
     enabled = true,
