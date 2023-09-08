@@ -39,7 +39,13 @@ bind('n', '<leader>ds', ":VimuxRunCommand 'ds'<CR>", { desc = "srb typecheck" })
 bind('n', '<leader>da', ":VimuxRunCommand 'da'<CR>", { desc = "dev all" })
 bind('n', '<leader>tf', ":TestFile<CR>", { desc = "Test File" })
 bind('n', '<leader>tn', ":TestNearest<CR>", { desc = "Test Nearest" })
-bind('n', '<leader>ts', ":TestNearest<CR>", { desc = "Test Nearest" })
+
+bind('n', '<leader>tp', ':silent !echo % >> .pinned_tests.txt<CR>', { desc = "Pin file to test suite", silent = true })
+bind('n', '<leader>tu', ":silent !sed -i '' '\\@%@d' .pinned_tests.txt<CR>",
+  { desc = "Unpin file from test suite", silent = true })
+bind('n', '<leader>tl', ':silent vspl .pinned_tests.txt<CR>', { desc = "List test suite", silent = true })
+bind('n', '<leader>ts', ":VimuxRunCommand 'dev test $(< .pinned_tests.txt | uniq)'<CR>",
+  { desc = "Run test suite", silent = true })
 
 bind('n', '<leader><leader>', ':Telescope find_files<CR>', { desc = "Telescope find files" })
 bind('n', '<leader>sw', ':Telescope live_grep<CR>', { desc = "Telescope live grep" })

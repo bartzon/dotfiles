@@ -5,3 +5,4 @@ tags.*
 Session.vim
 .projections.json
 .vimrc
+.pinned_tests.txt
