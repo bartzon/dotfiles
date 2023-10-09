@@ -1,6 +1,6 @@
-local Plugin = {'nvim-lualine/lualine.nvim'}
+local Plugin = { 'nvim-lualine/lualine.nvim' }
 
-Plugin.dependencies = {{'arkav/lualine-lsp-progress'}}
+Plugin.dependencies = { { 'linrongbin16/lsp-progress.nvim' } }
 
 local function window()
   return vim.api.nvim_win_get_number(0)
@@ -33,7 +33,7 @@ function Plugin.config()
           "diagnostics",
           sources = { "nvim_lsp", "nvim_diagnostic" }
         },
-        { 'lsp_progress' },
+        { "require('lsp-progress').progress()" },
       },
       lualine_x = {
         { "searchcount" },
@@ -51,6 +51,13 @@ function Plugin.config()
       'fzf',
       'lazy',
     },
+  })
+
+  -- listen lsp-progress event and refresh lualine
+  vim.api.nvim_create_augroup("lualine_augroup", { clear = true })
+  vim.api.nvim_create_autocmd("User LspProgressStatusUpdated", {
+    group = "lualine_augroup",
+    callback = require("lualine").refresh,
   })
 end
 

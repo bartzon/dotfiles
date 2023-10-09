@@ -4,7 +4,6 @@ local Plugins = {
     lazy = false,
     priority = 1000,
   },
-  { 'bartzon/vim-fzf-coauthorship' },
   { 'tpope/vim-obsession' },
   { 'tpope/vim-commentary' },
   { 'tpope/vim-projectionist' },

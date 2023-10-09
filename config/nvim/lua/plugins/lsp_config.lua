@@ -40,6 +40,9 @@ function Plugin.config()
     },
   })
 
+  require('lspconfig').sorbet.setup {}
+  require('lspconfig').rubocop.setup {}
+
   lsp.setup()
 end
 
