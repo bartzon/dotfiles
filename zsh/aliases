@@ -55,3 +55,5 @@ alias dr="dev style --include-branch-commits"
 alias ds="./bin/srb typecheck"
 alias da="clear; ds && dr && dt"
 alias pr="if [[ -a dev ]]; then; dev open pr; else; gh pr view --web ; fi"
+
+alias restart-warp="sudo launchctl kickstart -k system/com.cloudflare.1dot1dot1dot1.macos.warp.daemon"
