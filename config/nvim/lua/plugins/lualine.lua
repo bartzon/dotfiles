@@ -1,7 +1,5 @@
 local Plugin = { 'nvim-lualine/lualine.nvim' }
 
-Plugin.dependencies = { { 'linrongbin16/lsp-progress.nvim' } }
-
 local function window()
   return vim.api.nvim_win_get_number(0)
 end
@@ -33,7 +31,7 @@ function Plugin.config()
           "diagnostics",
           sources = { "nvim_lsp", "nvim_diagnostic" }
         },
-        { "require('lsp-progress').progress()" },
+        {},
       },
       lualine_x = {
         { "searchcount" },

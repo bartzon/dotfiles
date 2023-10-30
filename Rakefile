@@ -11,6 +11,7 @@ FILES = [
   'gitignore',
   'hammerspoon',
   'tmux.conf',
+  'tuple',
   'vale.ini',
   'zsh',
   'zshrc',

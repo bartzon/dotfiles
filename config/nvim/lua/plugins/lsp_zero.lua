@@ -36,6 +36,7 @@ function Plugin.config()
   require('lspconfig').sorbet.setup({})
   require('lspconfig').ruby_ls.setup({})
   require('lspconfig').tsserver.setup({})
+  require('lspconfig').kotlin_language_server.setup({})
 end
 
 return Plugin

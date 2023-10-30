@@ -25,6 +25,7 @@ function Plugin.config()
     'ruby-lsp',
     'rubocop',
     'tsserver',
+    'kotlin',
   })
 
   lsp.on_attach(function(_, bufnr)
@@ -42,6 +43,7 @@ function Plugin.config()
 
   require('lspconfig').sorbet.setup {}
   require('lspconfig').rubocop.setup {}
+  require('lspconfig').kotlin.setup {}
 
   lsp.setup()
 end
