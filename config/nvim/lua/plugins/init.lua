@@ -13,7 +13,6 @@ local Plugins = {
       'tpope/vim-rhubarb',
     }
   },
-  { 'tpope/vim-vinegar' },
   { 'nvim-tree/nvim-web-devicons' },
 }
 

@@ -24,6 +24,11 @@ case $pwd_list[-1] in
   "business-platform")
     alias ds="true"
     ;;
+  "pos-channel")
+    alias dt="dev test"
+    alias dr="dev style"
+    alias ds="./bin/srb typecheck"
+    ;;
   *)
     unalias dt
     unalias dr

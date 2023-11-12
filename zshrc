@@ -23,3 +23,6 @@ export GPG_TTY
 if [ "$TMUX" = "" ]; then tmux new -As0; fi
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# cloudplatform: add Shopify clusters to your local kubernetes config
+export KUBECONFIG=${KUBECONFIG:+$KUBECONFIG:}/Users/bartzonneveld/.kube/config:/Users/bartzonneveld/.kube/config.shopify.cloudplatform
