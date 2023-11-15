@@ -25,3 +25,8 @@ fi
 if ! command -v typescript-language-server &> /dev/null; then
   npm install -g typescript typescript-language-server
 fi
+
+if ! command -v fd-find &> /dev/null; then
+  sudo apt-get install -y fd-find
+  ln -s $(which fdfind) ~/.local/bin/fd
+fi
