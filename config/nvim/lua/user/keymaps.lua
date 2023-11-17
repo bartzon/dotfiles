@@ -19,6 +19,8 @@ function vim.getVisualSelection()
   end
 end
 
+bind('n', '<leader>r', ':so ~/.config/nvim/init.lua<CR>', { desc = "Reload config" })
+
 bind('n', '<C-j>', '<C-w>j', { desc = "Move to down pane" })
 bind('n', '<C-k>', '<C-w>k', { desc = "Move to up pane" })
 bind('n', '<C-h>', '<C-w>h', { desc = "Move to left pane" })
