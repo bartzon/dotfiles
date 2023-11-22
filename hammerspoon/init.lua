@@ -18,10 +18,12 @@ camera:setPropertyWatcherCallback(function(camera, property, scope, element)
         local meeting_url = "http://mini.local:51828/?accessoryId=bart_meeting&state=true"
         hs.http.doRequest(meeting_url, "GET")
         print("Camera on, request sent")
+        has.alert.show("Camera on")
     else
         local meeting_url = "http://mini.local:51828/?accessoryId=bart_meeting&state=false"
         hs.http.doRequest(meeting_url, "GET")
         print("Camera off, request sent")
+        has.alert.show("Camera off")
     end
 end)
 camera:startPropertyWatcher()
