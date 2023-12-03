@@ -18,6 +18,8 @@ fi
 gem install neovim
 npm install -g neovim
 
+git submodule update --init --recursive
+
 rake install
 
 python3 -m pip install --user --upgrade pynvim
