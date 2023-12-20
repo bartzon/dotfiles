@@ -29,6 +29,10 @@ case $pwd_list[-1] in
     alias dr="dev style"
     alias ds="./bin/srb typecheck"
     ;;
+  "services-db")
+    alias dr="dev style --include-branch-commits"
+    alias ds="./bin/typecheck"
+    ;;
   *)
     unalias dt
     unalias dr

@@ -50,3 +50,5 @@ o.listchars = "tab:␉·,trail:␠,nbsp:⎵"
 
 g.netwr_banner = 0
 g.netrw_liststyle = 3
+
+o.mousescroll = "ver:1,hor:0"
