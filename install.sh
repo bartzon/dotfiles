@@ -21,8 +21,7 @@ npm install -g neovim
 git submodule update --init --recursive
 
 rake install
+vale sync
 
 python3 -m pip install --user --upgrade pynvim
-
-rm -rf ~/.tmux/plugins/tpm && git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
