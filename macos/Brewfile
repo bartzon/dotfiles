@@ -3,6 +3,7 @@ tap "homebrew/cask"
 tap "homebrew/core"
 
 brew "asdf"
+brew "bash"
 brew "bat"
 brew "dust"
 brew "fzf"
