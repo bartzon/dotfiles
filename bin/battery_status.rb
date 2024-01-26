@@ -31,10 +31,22 @@ end
 def format_status(key, data)
   return unless data[:percentage]
   return if key == 'B' && data[:percentage] == '100'
+
+  color = case data[:percentage].to_i
+          when 30..50
+             "#[fg=#A3BE8C]"
+           when 10..30
+             "#[fg=#d08770]"
+           when 0..10
+             "#[fg=#bf616a,bold]"
+           else
+             ""
+  end
+
   if data[:charging]
-    "#{key}:🔋#{data[:percentage]}%"
+    "#{color}#{key}:🔋#{data[:percentage]}%"
   else
-    "#{key}:#{data[:percentage]}%"
+    "#{color}#{key}:#{data[:percentage]}%"
   end
 end
 
@@ -56,4 +68,9 @@ mapping.each do |key, attr|
 end
 
 output.compact!
-puts "#{output.join(" | ")}" if output.any?
+return "" unless output.any?
+
+output = output.join(" | ")
+output += "#[fg=white,bg=black]"
+
+puts output
