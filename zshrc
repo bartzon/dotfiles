@@ -16,6 +16,7 @@ fi
 
 PATH=~/.bin:$PATH
 PATH=~/.bin:$PATH:`npm config get prefix`/bin
+PATH="/opt/homebrew/opt/ruby/bin:$PATH"
 
 GPG_TTY=$(tty)
 export GPG_TTY
