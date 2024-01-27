@@ -42,6 +42,9 @@ bind('n', '<leader>da', ":VimuxRunCommand 'da'<CR>", { desc = "dev all" })
 bind('n', '<leader>tf', ":TestFile<CR>", { desc = "Test File" })
 bind('n', '<leader>ts', ":TestNearest<CR>", { desc = "Test Nearest" })
 
+
+bind('n', 'gt', '<cmd>tab split | lua vim.lsp.buf.definition()<CR>', {})
+
 bind('n', '<leader>tp', ':silent !echo % >> .pinned_tests.txt<CR>', { desc = "Pin file to test suite", silent = true })
 bind('n', '<leader>tu', ":silent !sed -i '' '\\@%@d' .pinned_tests.txt<CR>",
   { desc = "Unpin file from test suite", silent = true })
