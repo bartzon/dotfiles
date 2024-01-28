@@ -42,8 +42,7 @@ bind('n', '<leader>da', ":VimuxRunCommand 'da'<CR>", { desc = "dev all" })
 bind('n', '<leader>tf', ":TestFile<CR>", { desc = "Test File" })
 bind('n', '<leader>ts', ":TestNearest<CR>", { desc = "Test Nearest" })
 
-
-bind('n', 'gt', '<cmd>tab split | lua vim.lsp.buf.definition()<CR>', {})
+bind('n', 'gt', ':vsplit | lua vim.lsp.buf.definition()<CR>', {})
 
 bind('n', '<leader>tp', ':silent !echo % >> .pinned_tests.txt<CR>', { desc = "Pin file to test suite", silent = true })
 bind('n', '<leader>tu', ":silent !sed -i '' '\\@%@d' .pinned_tests.txt<CR>",
@@ -80,8 +79,6 @@ bind('n', 'tn', ':tabnext<CR>', { desc = "Next tab" })
 bind('n', 'tp', ':tabprev<CR>', { desc = "Previous tab" })
 bind('n', 'tt', ':tabnew<CR>', { desc = "New tab" })
 bind('n', 'tc', ':tabclose<CR>', { desc = "Close tab" })
-
-bind('n', 'sw', '<cmd>Telescope grep_string<CR>', { desc = 'Search word under cursor' })
 
 bind('n', '<leader>bc', ':close<CR>', { desc = 'Close buffer' })
 bind('n', '<leader>bd', ':bdelete<CR>', { desc = 'Delete buffer' })

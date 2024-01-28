@@ -26,18 +26,3 @@ autocmd('VimResized', {
   group = augroup,
   command = 'wincmd = '
 })
-
-autocmd('CursorHold', {
-  buffer = bufnr,
-  callback = function()
-    local opts = {
-      focusable = true,
-      close_events = { 'BufLeave', 'CursorMoved', 'InsertEnter', 'FocusLost' },
-      source = 'always',
-      prefix = ' ',
-      scope = 'cursor',
-      border = 'none',
-    }
-    vim.diagnostic.open_float(nil, opts)
-  end
-})
