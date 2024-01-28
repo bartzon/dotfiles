@@ -15,6 +15,7 @@ Plugin.dependencies = {
     end,
   },
   { 'jose-elias-alvarez/typescript.nvim' },
+  { 'folke/neodev.nvim' },
 }
 
 -- textDocument/diagnostic support until 0.10.0 is released
@@ -61,32 +62,39 @@ local function setup_diagnostics(client, buffer)
 end
 
 function Plugin.config()
-  local lsp = require('lsp-zero')
+  local lsp = require('lspconfig')
 
-  require('lspconfig').lua_ls.setup(lsp.nvim_lua_ls())
   require('typescript').setup {}
-  require('lspconfig').sorbet.setup {}
-  require('lspconfig').kotlin.setup {}
-  require('lspconfig').ruby_ls.setup({
+  require("neodev").setup({})
+
+  require('mason').setup()
+  require("mason-lspconfig").setup {
+    ensure_installed = {
+      'ruby_ls',
+      'sorbet',
+      'rubocop',
+      'lua_ls',
+    },
+  }
+
+  lsp.sorbet.setup {}
+  lsp.ruby_ls.setup({
     on_attach = function(client, buffer)
       setup_diagnostics(client, buffer)
     end,
   })
-
-  lsp.setup()
+  lsp.lua_ls.setup {}
 end
 
 vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
   border = "none",
 })
-
 vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
   border = "none",
 })
-
 vim.diagnostic.config({
   virtual_text = true,
   focusable = false,
 })
 
-return {}
+return Plugin

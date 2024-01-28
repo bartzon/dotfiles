@@ -43,13 +43,12 @@ bind('n', '<leader>tf', ":TestFile<CR>", { desc = "Test File" })
 bind('n', '<leader>ts', ":TestNearest<CR>", { desc = "Test Nearest" })
 
 bind('n', 'gt', ':vsplit | lua vim.lsp.buf.definition()<CR>', {})
+bind('n', 'gT', ':tabnew | lua vim.lsp.buf.definition()<CR>', {})
 
 bind('n', '<leader>tp', ':silent !echo % >> .pinned_tests.txt<CR>', { desc = "Pin file to test suite", silent = true })
-bind('n', '<leader>tu', ":silent !sed -i '' '\\@%@d' .pinned_tests.txt<CR>",
-  { desc = "Unpin file from test suite", silent = true })
+bind('n', '<leader>tu', ":silent !sed -i '' '\\@%@d' .pinned_tests.txt<CR>", { desc = "Unpin file from test suite", silent = true })
 bind('n', '<leader>tl', ':silent vspl .pinned_tests.txt<CR>', { desc = "List test suite", silent = true })
-bind('n', '<leader>tS', ":VimuxRunCommand 'dev test $(< .pinned_tests.txt | uniq)'<CR>",
-  { desc = "Run test suite", silent = true })
+bind('n', '<leader>tS', ":VimuxRunCommand 'dev test $(< .pinned_tests.txt | uniq)'<CR>", { desc = "Run test suite", silent = true })
 
 bind('n', '<leader><leader>', ':Telescope find_files<CR>', { desc = "Telescope find files" })
 bind('n', '<leader>sw', ':Telescope live_grep<CR>', { desc = "Telescope live grep" })
@@ -74,6 +73,7 @@ bind('n', "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", { noremap = true, d
 bind('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', { noremap = true, desc = 'Previous diagnostic' })
 bind('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', { noremap = true, desc = 'Next diagnostic' })
 bind('n', 'ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', { noremap = true, desc = 'Code actions' })
+bind('n', 'K', vim.lsp.buf.hover, { noremap = true, desc = 'Show definition' })
 
 bind('n', 'tn', ':tabnext<CR>', { desc = "Next tab" })
 bind('n', 'tp', ':tabprev<CR>', { desc = "Previous tab" })

@@ -41,7 +41,6 @@ function Plugin.config()
       },
       lualine_z = {
         { 'location' },
-        { 'progress' },
       }
     },
     extensions = {
@@ -50,13 +49,7 @@ function Plugin.config()
       'lazy',
     },
   })
-
-  -- listen lsp-progress event and refresh lualine
-  vim.api.nvim_create_augroup("lualine_augroup", { clear = true })
-  vim.api.nvim_create_autocmd({ 'User' }, {
-    group = "lualine_augroup",
-    callback = require("lualine").refresh,
-  })
 end
+
 
 return Plugin

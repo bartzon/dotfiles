@@ -43,8 +43,6 @@ Plugin.dependencies = {
 Plugin.event = 'InsertEnter'
 
 function Plugin.config()
-  require('lsp-zero.cmp').extend()
-
   user.augroup = vim.api.nvim_create_augroup('compe_cmds', { clear = true })
   vim.api.nvim_create_user_command('UserCmpEnable', user.enable_cmd, {})
 
