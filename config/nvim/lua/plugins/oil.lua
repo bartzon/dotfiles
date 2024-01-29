@@ -17,9 +17,9 @@ function Plugin.config()
     keymaps = {
       ["g?"] = "actions.show_help",
       ["<CR>"] = "actions.select",
-      ["<C-v>"] = "actions.select_vsplit",
-      ["<C-s>"] = "actions.select_split",
-      ["<C-t>"] = "actions.select_tab",
+      ["v"] = "actions.select_vsplit",
+      ["s"] = "actions.select_split",
+      ["t"] = "actions.select_tab",
       ["<C-p>"] = "actions.preview",
       ["<C-c>"] = "actions.close",
       ["<C-l>"] = "actions.refresh",

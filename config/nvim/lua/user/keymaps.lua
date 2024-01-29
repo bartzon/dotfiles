@@ -21,6 +21,11 @@ end
 
 bind('n', '<leader>r', ':so ~/.config/nvim/init.lua<CR>', { desc = "Reload config" })
 
+bind('n', 'goog', '<Plug>(openbrowser-smart-search)', { desc = "Search using Google" })
+bind('v', 'goog', '<Plug>(openbrowser-smart-search)', { desc = "Search using Google" })
+
+bind('n', '<leader>vo', ':VimuxOpenRunner<CR>', { desc = "Open Vimux window" })
+
 bind('n', '<C-j>', '<C-w>j', { desc = "Move to down pane" })
 bind('n', '<C-k>', '<C-w>k', { desc = "Move to up pane" })
 bind('n', '<C-h>', '<C-w>h', { desc = "Move to left pane" })
@@ -46,30 +51,26 @@ bind('n', 'gt', ':vsplit | lua vim.lsp.buf.definition()<CR>', {})
 bind('n', 'gT', ':tabnew | lua vim.lsp.buf.definition()<CR>', {})
 
 bind('n', '<leader>tp', ':silent !echo % >> .pinned_tests.txt<CR>', { desc = "Pin file to test suite", silent = true })
-bind('n', '<leader>tu', ":silent !sed -i '' '\\@%@d' .pinned_tests.txt<CR>", { desc = "Unpin file from test suite", silent = true })
+bind('n', '<leader>tu', ":silent !sed -i '' '\\@%@d' .pinned_tests.txt<CR>",
+  { desc = "Unpin file from test suite", silent = true })
 bind('n', '<leader>tl', ':silent vspl .pinned_tests.txt<CR>', { desc = "List test suite", silent = true })
-bind('n', '<leader>tS', ":VimuxRunCommand 'dev test $(< .pinned_tests.txt | uniq)'<CR>", { desc = "Run test suite", silent = true })
+bind('n', '<leader>tS', ":VimuxRunCommand 'dev test $(< .pinned_tests.txt | uniq)'<CR>",
+  { desc = "Run test suite", silent = true })
 
 bind('n', '<leader><leader>', ':Telescope find_files<CR>', { desc = "Telescope find files" })
 bind('n', '<leader>sw', ':Telescope live_grep<CR>', { desc = "Telescope live grep" })
 bind('n', '<leader>ff', ':Telescope find_files<CR>', { desc = "Telescope find files" })
 bind('n', '<leader>fb', ':Telescope buffers<CR>', { desc = "Telescope find in buffers" })
-bind('n', '<leader>fd', 'telescope.lsp_document_symbols', { desc = 'LSP Document symbols' })
-bind('n', '<leader>fq', 'telescope.lsp_workspace_symbols', { desc = 'LSP Workspace symbols' })
-bind('n', '<leader>fm', ':Telescope bookmarks<CR>', { desc = 'Fuzzy find bookmarks' })
 bind('v', '<leader>sw', function()
   local text = vim.getVisualSelection()
   require('telescope.builtin').live_grep({ default_text = text })
 end, { noremap = true, desc = 'Telescope live grep selection' })
+
 bind('n', 'gd', ':Telescope lsp_definitions<CR>', { desc = "LSP definitions" })
-bind('n', 'gD', 'lsp.declaration', { desc = 'LSP declarations' })
-bind('n', 'gi', '<cmd>Telescope lsp_implementation', { desc = 'LSP Implementation' })
-bind('n', 'go', 'lsp.type_definition', { desc = 'LSP Type definition' })
 bind('n', 'gr', ':Telescope lsp_references<CR>', { desc = 'LSP References' })
-bind('n', 'gs', ':lsp.signature_help', { desc = 'LSP Signature help' })
 bind('n', 'gl', '<cmd>lua vim.diagnostic.open_float()<CR>', { desc = 'Diagnostics Float' })
-bind('n', 'gq', ':LspZeroFormat<cr>', { desc = 'Format using LSP' })
 bind('n', "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", { noremap = true, desc = 'Rename with LSP' })
+
 bind('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', { noremap = true, desc = 'Previous diagnostic' })
 bind('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', { noremap = true, desc = 'Next diagnostic' })
 bind('n', 'ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', { noremap = true, desc = 'Code actions' })

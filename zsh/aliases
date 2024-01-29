@@ -11,6 +11,8 @@ alias vi='nvim'
 alias todo='nvim ~/Documents/todo.md'
 alias v='vim $(fzf --height=25)'
 
+alias icat="kitten icat"
+
 if type "dust" > /dev/null; then
   alias du="dust"
 fi

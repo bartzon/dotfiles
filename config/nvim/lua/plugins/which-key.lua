@@ -1,9 +1,12 @@
-local Plugin = {'folke/which-key.nvim'}
+local Plugin = { 'folke/which-key.nvim' }
 
-function Plugin.config()
+Plugin.event = "VeryLazy"
+
+function Plugin.init()
   vim.o.timeout = true
-  vim.o.timeoutlen = 500
-  require("which-key").setup({})
+  vim.o.timeoutlen = 300
 end
+
+Plugin.opts = {}
 
 return Plugin

@@ -4,5 +4,3 @@ require('user.plugins')
 require('user.settings')
 require('user.commands')
 require('user.keymaps')
-
-vim.cmd('colorscheme gruvbox-material')

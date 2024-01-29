@@ -29,9 +29,8 @@ function Plugin.config()
       lualine_c = {
         {
           "diagnostics",
-          sources = { "nvim_lsp", "nvim_diagnostic" }
+          sources = { "nvim_lsp" }
         },
-        {},
       },
       lualine_x = {
         { "searchcount" },
@@ -50,6 +49,5 @@ function Plugin.config()
     },
   })
 end
-
 
 return Plugin

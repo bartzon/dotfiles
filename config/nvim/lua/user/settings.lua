@@ -40,15 +40,20 @@ o.winblend = 15
 o.updatetime = 100
 
 o.cursorline = true
-o.cursorlineopt = "number"
+o.cursorlineopt = 'number'
 
 o.showmatch = true
 
 o.smartindent = true
 
-o.listchars = "tab:␉·,trail:␠,nbsp:⎵"
+o.listchars = 'tab:␉·,trail:␠,nbsp:⎵'
 
-g.netwr_banner = 0
-g.netrw_liststyle = 3
+o.mousescroll = 'ver:1,hor:0'
 
-o.mousescroll = "ver:1,hor:0"
+o.signcolumn = 'yes'
+
+o.completeopt = 'menu'
+
+o.background = 'dark'
+g.gruvbox_material_better_performance = 1
+vim.cmd('colorscheme gruvbox-material')

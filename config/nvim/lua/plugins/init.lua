@@ -4,14 +4,14 @@ local Plugins = {
     lazy = false,
     priority = 1000,
   },
-  -- { 'tpope/vim-obsession' },
+  { 'lukas-reineke/indent-blankline.nvim', main = 'ibl', opts = {} },
   { 'tpope/vim-commentary' },
   { 'tpope/vim-projectionist' },
+  { 'tpope/vim-rails' },
+  { 'tyru/open-browser.vim' },
   {
     'tpope/vim-fugitive',
-    dependencies = {
-      'tpope/vim-rhubarb',
-    }
+    dependencies = { 'tpope/vim-rhubarb' }
   },
   { 'nvim-tree/nvim-web-devicons' },
 }

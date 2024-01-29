@@ -2,7 +2,7 @@ local Plugin = { 'nvim-treesitter/nvim-treesitter' }
 
 Plugin.dependencies = {
   { 'nvim-treesitter/nvim-treesitter-textobjects' },
-  { 'omnisyle/nvim-hidesig' },
+  { 'sle-c/nvim-hidesig' },
   { 'nvim-treesitter/nvim-treesitter-context' },
   { 'andymass/vim-matchup' },
 }
@@ -11,6 +11,7 @@ Plugin.opts = {
   highlight = {
     enable = false,
   },
+  auto_install = true,
   autopairs = {
     enable = true
   },
