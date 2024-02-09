@@ -8,7 +8,7 @@ end
 
 function vim.getVisualSelection()
   vim.cmd('noau normal! "vy"')
-  local text = vim.fn.getreg('v')
+  local text = vim.fn.getreg('v') or ""
   vim.fn.setreg('v', {})
 
   text = string.gsub(text, "\n", "")
@@ -24,7 +24,7 @@ bind('n', '<leader>r', ':so ~/.config/nvim/init.lua<CR>', { desc = "Reload confi
 bind('n', 'goog', '<Plug>(openbrowser-smart-search)', { desc = "Search using Google" })
 bind('v', 'goog', '<Plug>(openbrowser-smart-search)', { desc = "Search using Google" })
 
-bind('n', '<leader>vo', ':VimuxOpenRunner<CR>', { desc = "Open Vimux window" })
+bind('n', '<leader>vo', ':VimuxOpenRunner<CR>', { desc = "Open Vimux window", silent = true })
 
 bind('n', '<C-j>', '<C-w>j', { desc = "Move to down pane" })
 bind('n', '<C-k>', '<C-w>k', { desc = "Move to up pane" })
@@ -81,8 +81,8 @@ bind('n', 'tp', ':tabprev<CR>', { desc = "Previous tab" })
 bind('n', 'tt', ':tabnew<CR>', { desc = "New tab" })
 bind('n', 'tc', ':tabclose<CR>', { desc = "Close tab" })
 
-bind('n', '<leader>bc', ':close<CR>', { desc = 'Close buffer' })
-bind('n', '<leader>bd', ':bdelete<CR>', { desc = 'Delete buffer' })
+bind('n', '<leader>bc', ':close<CR>', { desc = 'Close buffer', silent = true })
+bind('n', '<leader>bd', ':bdelete<CR>', { desc = 'Delete buffer', silent = true })
 
 bind('n', '<esc>', function()
   for _, win in pairs(vim.api.nvim_list_wins()) do
@@ -92,3 +92,5 @@ bind('n', '<esc>', function()
   end
   vim.cmd(":noh")
 end, { silent = true, desc = "Remove Search Highlighting, Dismiss Popups" })
+
+bind('n', '<leader>hp', ':Gitsigns preview_hunk_inline<CR>', { desc = 'Preview hunk inline', silent = true })
