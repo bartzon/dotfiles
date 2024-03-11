@@ -25,6 +25,7 @@ bind('n', 'goog', '<Plug>(openbrowser-smart-search)', { desc = "Search using Goo
 bind('v', 'goog', '<Plug>(openbrowser-smart-search)', { desc = "Search using Google" })
 
 bind('n', '<leader>vo', ':VimuxOpenRunner<CR>', { desc = "Open Vimux window", silent = true })
+bind('n', '<leader>du', ":VimuxRunCommand 'dev up'<CR>", { desc = "Dev up", silent = true })
 
 bind('n', '<C-j>', '<C-w>j', { desc = "Move to down pane" })
 bind('n', '<C-k>', '<C-w>k', { desc = "Move to up pane" })
@@ -40,12 +41,12 @@ bind('n', '<leader>pr', ":!dev open pr<CR>", { desc = "Open PR", silent = true }
 
 bind('n', '<leader>cp', ':let @+=@%<CR>', { desc = 'Copy current file path to clipboard', silent = true })
 
-bind('n', '<leader>dt', ":VimuxRunCommand 'dt'<CR>", { desc = "dev test" })
-bind('n', '<leader>dr', ":VimuxRunCommand 'dr'<CR>", { desc = "dev style" })
-bind('n', '<leader>ds', ":VimuxRunCommand 'ds'<CR>", { desc = "srb typecheck" })
-bind('n', '<leader>da', ":VimuxRunCommand 'da'<CR>", { desc = "dev all" })
-bind('n', '<leader>tf', ":TestFile<CR>", { desc = "Test File" })
-bind('n', '<leader>ts', ":TestNearest<CR>", { desc = "Test Nearest" })
+bind('n', '<leader>dt', ":VimuxRunCommand 'dt'<CR>", { desc = "dev test", silent = true })
+bind('n', '<leader>dr', ":VimuxRunCommand 'dr'<CR>", { desc = "dev style", silent = true })
+bind('n', '<leader>ds', ":VimuxRunCommand 'ds'<CR>", { desc = "srb typecheck", silent = true })
+bind('n', '<leader>da', ":VimuxRunCommand 'da'<CR>", { desc = "dev all", silent = true })
+bind('n', '<leader>tf', ":TestFile<CR>", { desc = "Test File", silent = true })
+bind('n', '<leader>ts', ":TestNearest<CR>", { desc = "Test Nearest", silent = true })
 
 bind('n', 'gt', ':vsplit | lua vim.lsp.buf.definition()<CR>', {})
 bind('n', 'gT', ':tabnew | lua vim.lsp.buf.definition()<CR>', {})
@@ -84,6 +85,8 @@ bind('n', 'tc', ':tabclose<CR>', { desc = "Close tab" })
 bind('n', '<leader>bc', ':close<CR>', { desc = 'Close buffer', silent = true })
 bind('n', '<leader>bd', ':bdelete<CR>', { desc = 'Delete buffer', silent = true })
 
+bind("n", "<leader>tt", function() require("trouble").toggle() end)
+
 bind('n', '<esc>', function()
   for _, win in pairs(vim.api.nvim_list_wins()) do
     if vim.api.nvim_win_get_config(win).relative == "win" then
@@ -94,3 +97,6 @@ bind('n', '<esc>', function()
 end, { silent = true, desc = "Remove Search Highlighting, Dismiss Popups" })
 
 bind('n', '<leader>hp', ':Gitsigns preview_hunk_inline<CR>', { desc = 'Preview hunk inline', silent = true })
+
+bind('n', '<leader>tapi', ':VimuxRunCommand "./bin/tapioca dsl ".bufname("%")<CR>',
+  { desc = 'Run tapioca for current file', silent = true })

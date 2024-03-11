@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Meeting
   attr_reader :starts_at, :ends_at, :title
 
@@ -8,7 +10,7 @@ class Meeting
     @ends_at ||= 0
 
     @title = title.to_s.strip
-    @title = @title[0..TITLE_LENGTH] + '…' if @title.length > TITLE_LENGTH
+    @title = "#{@title[0..TITLE_LENGTH]}…" if @title.length > TITLE_LENGTH
   end
 
   def parse(timestamp)
@@ -23,7 +25,7 @@ class Meeting
   end
 
   def all_day?
-    starts_at.hour == 0 && ends_at.hour == 0
+    starts_at.hour.zero? && ends_at.hour.zero?
   end
 
   def ended?

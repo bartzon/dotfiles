@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'dotiw'
 
 class MeetingsFormatter
@@ -11,7 +13,7 @@ class MeetingsFormatter
     m = @meetings[0]
     n = @meetings[1]
 
-    if m.percentage < 0
+    if m.percentage.negative?
       upcoming(m)
     elsif m.percentage > 75
       upcoming(n) if n

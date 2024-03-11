@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 class Filter
   attr_reader :filter, :description
 
-  def initialize(filter, description = "")
+  def initialize(filter, description = '')
     @filter = filter
     @description = description
   end
