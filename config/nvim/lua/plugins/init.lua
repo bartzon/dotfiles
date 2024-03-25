@@ -13,7 +13,9 @@ local Plugins = {
     'tpope/vim-fugitive',
     dependencies = { 'tpope/vim-rhubarb' }
   },
+  { 'folke/zen-mode.nvim' },
   { 'nvim-tree/nvim-web-devicons' },
+  { 'christoomey/vim-tmux-navigator' },
 }
 
 return Plugins

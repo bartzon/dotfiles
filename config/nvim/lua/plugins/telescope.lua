@@ -27,12 +27,4 @@ Plugin.opts = {
   },
 }
 
-function Plugin.config()
-  local t = require('telescope')
-
-  t.setup({})
-
-  t.load_extension("noice")
-end
-
 return Plugin

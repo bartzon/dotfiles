@@ -27,10 +27,10 @@ bind('v', 'goog', '<Plug>(openbrowser-smart-search)', { desc = "Search using Goo
 bind('n', '<leader>vo', ':VimuxOpenRunner<CR>', { desc = "Open Vimux window", silent = true })
 bind('n', '<leader>du', ":VimuxRunCommand 'dev up'<CR>", { desc = "Dev up", silent = true })
 
-bind('n', '<C-j>', '<C-w>j', { desc = "Move to down pane" })
-bind('n', '<C-k>', '<C-w>k', { desc = "Move to up pane" })
-bind('n', '<C-h>', '<C-w>h', { desc = "Move to left pane" })
-bind('n', '<C-l>', '<C-w>l', { desc = "Move to right pane" })
+-- bind('n', '<C-j>', '<C-w>j', { desc = "Move to down pane" })
+-- bind('n', '<C-k>', '<C-w>k', { desc = "Move to up pane" })
+-- bind('n', '<C-h>', '<C-w>h', { desc = "Move to left pane" })
+-- bind('n', '<C-l>', '<C-w>l', { desc = "Move to right pane" })
 bind('n', '<leader>=', '<C-w>=', { desc = "Reformat panes" })
 
 bind('v', 'J', ":m '>+1<CR>gv=gv", { desc = "Move line up" })
@@ -62,6 +62,7 @@ bind('n', '<leader><leader>', ':Telescope find_files<CR>', { desc = "Telescope f
 bind('n', '<leader>sw', ':Telescope live_grep<CR>', { desc = "Telescope live grep" })
 bind('n', '<leader>ff', ':Telescope find_files<CR>', { desc = "Telescope find files" })
 bind('n', '<leader>fb', ':Telescope buffers<CR>', { desc = "Telescope find in buffers" })
+bind('n', '<leader>fs', ':Telescope lsp_document_symbols<CR>', { desc = "Telescope find in document symbols" })
 bind('v', '<leader>sw', function()
   local text = vim.getVisualSelection()
   require('telescope.builtin').live_grep({ default_text = text })
@@ -97,6 +98,8 @@ bind('n', '<esc>', function()
 end, { silent = true, desc = "Remove Search Highlighting, Dismiss Popups" })
 
 bind('n', '<leader>hp', ':Gitsigns preview_hunk_inline<CR>', { desc = 'Preview hunk inline', silent = true })
+
+bind('n', '<leader>zm', ':lua require("zen-mode").toggle()<CR>', { desc = 'Toggle zen mode', silent = true })
 
 bind('n', '<leader>tapi', ':VimuxRunCommand "./bin/tapioca dsl ".bufname("%")<CR>',
   { desc = 'Run tapioca for current file', silent = true })
