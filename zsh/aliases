@@ -10,6 +10,7 @@ alias vim='nvim'
 alias vi='nvim'
 alias todo='nvim ~/Documents/todo.md'
 alias v='vim $(fzf --height=25)'
+alias g='git'
 
 alias icat="kitten icat"
 
