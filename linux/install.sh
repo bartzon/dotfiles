@@ -30,3 +30,7 @@ if ! command -v fd-find &> /dev/null; then
   sudo apt-get install -y fd-find
   ln -s $(which fdfind) ~/.local/bin/fd
 fi
+
+if ! command -v difft &> /dev/null; then
+  nix-env --install difftastic
+fi
