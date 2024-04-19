@@ -14,6 +14,7 @@ Plugin.dependencies = {
       pcall(vim.cmd, 'MasonUpdate')
     end,
   },
+  { 'WhoIsSethDaniel/mason-tool-installer.nvim' },
   { 'pmizio/typescript-tools.nvim' },
   { 'folke/neodev.nvim' },
 }
@@ -30,16 +31,27 @@ function Plugin.config()
   require("mason-lspconfig").setup {
     ensure_installed = {
       'ruby_ls',
+      'ruby_lsp',
       'sorbet',
       'rubocop',
       'lua_ls',
+      'kotlin-language-server',
     },
+  }
+  require("mason-tool-installer").setup {
+    ensure_installed = {
+      'vim-language-server',
+      'prettier',
+      'eslint',
+      'rubocop',
+    }
   }
 
   lsp.sorbet.setup { capabilities = capabilities }
   lsp.ruby_ls.setup { capabilities = capabilities }
   lsp.lua_ls.setup { capabilities = capabilities }
   lsp.rubocop.setup { capabilities = capabilities }
+  lsp.kotlin_language_server.setup { capabilities = capabilities }
 
   -- Function to check if a floating dialog exists and if not
   -- then check for diagnostics under the cursor

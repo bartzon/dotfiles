@@ -68,6 +68,7 @@ Plugin.opts = {
     'json',
     'lua',
     'vim',
+    'kotlin',
   },
   hidesig = {
     enable = true,
