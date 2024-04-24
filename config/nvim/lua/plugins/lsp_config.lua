@@ -30,7 +30,6 @@ function Plugin.config()
   require('mason').setup()
   require("mason-lspconfig").setup {
     ensure_installed = {
-      'ruby_ls',
       'ruby_lsp',
       'sorbet',
       'rubocop',
@@ -48,7 +47,7 @@ function Plugin.config()
   }
 
   lsp.sorbet.setup { capabilities = capabilities }
-  lsp.ruby_ls.setup { capabilities = capabilities }
+  lsp.ruby_lsp.setup { capabilities = capabilities }
   lsp.lua_ls.setup { capabilities = capabilities }
   lsp.rubocop.setup { capabilities = capabilities }
   lsp.kotlin_language_server.setup { capabilities = capabilities }
