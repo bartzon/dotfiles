@@ -37,6 +37,7 @@ alias gd='git diff'
 alias gl="git log main.. --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%cN>%Creset' --abbrev-commit"
 alias gp='git push'
 alias gst='git status'
+alias gsst='git status'
 alias gu='git pull'
 alias groot="cd \$(git rev-parse --show-toplevel)"
 alias grp='git pull && git rebase origin/main && git push --force'

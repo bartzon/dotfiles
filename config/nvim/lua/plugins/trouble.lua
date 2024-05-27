@@ -1,6 +1,6 @@
 local Plugin = { 'folke/trouble.nvim' }
 
-Plugin.branch = 'dev'
+-- Plugin.branch = 'dev'
 
 Plugin.dependencies = {
   { "nvim-tree/nvim-web-devicons" },
