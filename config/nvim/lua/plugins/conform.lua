@@ -13,8 +13,12 @@ Plugin.opts = {
     }
   },
   formatters_by_ft = {
-    javascript = { 'custom_eslint' },
-    typescript = { 'custom_eslint' },
+    -- javascript = { 'custom_eslint' },
+    -- typescript = { 'custom_eslint' },
+    -- typescriptreact = { 'custom_eslint' },
+    javascript = { 'eslint_d' },
+    typescript = { 'eslint_d' },
+    typescriptreact = { 'eslint_d' },
     ruby = { 'rubocop', 'sorbet' },
   },
 

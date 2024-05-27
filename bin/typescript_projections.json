@@ -1,0 +1,51 @@
+{
+  "*.tsx": {
+    "alternate": "{dirname}/tests/{basename}.test.tsx",
+    "type": "source",
+    "template": [
+      "import type {open} FC {close} from 'react';",
+      "",
+      "type {basename|camelcase|capitalize}Props = {open}",
+      "  property?: unknown;",
+      "{close};",
+      "",
+      "const {basename|camelcase|capitalize}: FC<{basename|camelcase|capitalize}Props> = _props => {",
+      "  return <div>{basename|camelcase|capitalize}</div>;",
+      "};",
+      "",
+      "export default {basename|camelcase|capitalize};"
+    ]
+  },
+  "**/tests/*.test.tsx": {
+    "alternate": "{}.tsx",
+    "type": "test",
+    "template": [
+      "import {open} render {close} from '@/test-utils';",
+      "import {basename|camelcase|capitalize} from '@/{dirname}/{basename}';",
+      "",
+      "describe('{basename|camelcase|capitalize}', () => {open}",
+      "  it('matches snapshot', () => {open}",
+      "    const {open} asFragment {close} = render(<{basename|camelcase|capitalize} />, {open}{close});",
+      "    expect(asFragment()).toMatchSnapshot();",
+      "   {close});",
+      "{close});"
+    ]
+  },
+  "*.ts": {
+    "alternate": "{dirname}/tests/{basename}.test.ts",
+    "type": "source"
+  },
+  "**/tests/*.test.ts": {
+    "alternate": "{}.ts",
+    "type": "test",
+    "template": [
+      "import {basename|camelcase|capitalize} from '@/{dirname}/{basename}';",
+      "",
+      "describe('{basename|camelcase|capitalize}', () => {open}",
+      "  it('works', () => {open}",
+      "    expect(true).toBe(true);",
+      "   {close});",
+      "{close});"
+    ]
+  }
+}

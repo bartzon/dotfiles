@@ -9,6 +9,7 @@ Plugin.dependencies = {
   { 'hrsh7th/cmp-path' },
   { 'onsails/lspkind.nvim' },
   { 'saadparwaiz1/cmp_luasnip' },
+  { 'kristijanhusak/vim-dadbod-completion' },
 }
 
 Plugin.event = 'InsertEnter'
@@ -38,12 +39,13 @@ function Plugin.config()
       end,
     },
     sources = {
-      { name = 'nvim_lsp', keyword_length = 3 },
-      { name = 'buffer',   keyword_length = 3 },
-      { name = 'luasnip',  keyword_length = 2 },
+      { name = 'nvim_lsp',             keyword_length = 3 },
+      { name = 'buffer',               keyword_length = 3 },
+      { name = 'luasnip',              keyword_length = 2 },
       { name = 'nvim_lua' },
       { name = 'path' },
       { name = 'calc' },
+      { name = 'vim-dadbod-completion' },
     },
     formatting = {
       format = lspkind.cmp_format(),
@@ -68,6 +70,17 @@ function Plugin.config()
   }
 
   cmp.setup(user.config)
+
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "sql", "mysql", "plsql" },
+    callback = function()
+      cmp.setup.buffer {
+        sources = {
+          { name = 'vim-dadbod-completion' }
+        }
+      }
+    end,
+  })
 end
 
 function user.set_autocomplete(new_value)
