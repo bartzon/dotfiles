@@ -26,6 +26,7 @@ brew "tmux"
 brew "vale"
 brew "watchman"
 brew "ykman"
+brew "zsh-autosuggestions"
 
 cask "bartender"
 cask "betterdisplay"
