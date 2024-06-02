@@ -2,6 +2,7 @@ local Plugin = { 'nvim-telescope/telescope.nvim' }
 
 Plugin.dependencies = {
   { 'nvim-lua/plenary.nvim' },
+  { 'aznhe21/actions-preview.nvim' },
 }
 
 Plugin.cmd = 'Telescope'
@@ -26,5 +27,10 @@ Plugin.opts = {
     },
   },
 }
+
+function Plugin.config()
+  require('telescope').setup {}
+  require('actions-preview').setup {}
+end
 
 return Plugin

@@ -75,7 +75,7 @@ bind('n', "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", { noremap = true, d
 
 bind('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', { noremap = true, desc = 'Previous diagnostic' })
 bind('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', { noremap = true, desc = 'Next diagnostic' })
-bind('n', 'ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', { noremap = true, desc = 'Code actions' })
+bind('n', 'ca', '<cmd>lua require("actions-preview").code_actions()<CR>', { noremap = true, desc = 'Code actions' })
 bind('n', 'K', vim.lsp.buf.hover, { noremap = true, desc = 'Show definition' })
 
 bind('n', 'tn', ':tabnext<CR>', { desc = "Next tab" })
