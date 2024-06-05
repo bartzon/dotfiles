@@ -8,41 +8,36 @@ Plugin.event = { 'BufReadPre', 'BufNewFile' }
 Plugin.dependencies = {
   { 'hrsh7th/cmp-nvim-lsp' },
   { 'williamboman/mason-lspconfig.nvim' },
-  {
-    'williamboman/mason.nvim',
-    build = function()
-      pcall(vim.cmd, 'MasonUpdate')
-    end,
-  },
+  { 'williamboman/mason.nvim' },
   { 'WhoIsSethDaniel/mason-tool-installer.nvim' },
   { 'pmizio/typescript-tools.nvim' },
-  { 'folke/neodev.nvim' },
+  { 'folke/lazydev.nvim' },
 }
 
 function Plugin.config()
   local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
   require('typescript-tools').setup { capabilities = capabilities }
-  require("neodev").setup { capabilities = capabilities }
+  require('lazydev').setup { capabilities = capabilities }
 
   local lsp = require('lspconfig')
 
   require('mason').setup()
-  require("mason-lspconfig").setup {
+  require('mason-lspconfig').setup {
     ensure_installed = {
       'ruby_lsp',
       'sorbet',
-      'rubocop',
-      'lua_ls',
-      'kotlin-language-server',
+      'kotlin_language_server',
     },
   }
-  require("mason-tool-installer").setup {
+  require('mason-tool-installer').setup {
     ensure_installed = {
-      'vim-language-server',
       'prettier',
       'eslint',
       'rubocop',
+      'tsserver',
+      'eslint_d',
+      'vim_ls',
     }
   }
 
@@ -56,24 +51,24 @@ function Plugin.config()
   -- then check for diagnostics under the cursor
   function OpenDiagnosticIfNoFloat()
     vim.diagnostic.open_float({
-      scope = "cursor",
+      scope = 'cursor',
       focusable = false,
       close_events = {
-        "CursorMoved",
-        "CursorMovedI",
-        "BufHidden",
-        "InsertCharPre",
-        "WinLeave",
+        'CursorMoved',
+        'CursorMovedI',
+        'BufHidden',
+        'InsertCharPre',
+        'WinLeave',
       },
     })
   end
 
   -- Show diagnostics under the cursor when holding position
-  vim.api.nvim_create_augroup("lsp_diagnostics_hold", { clear = true })
-  vim.api.nvim_create_autocmd({ "CursorHold" }, {
-    pattern = "*",
-    command = "lua OpenDiagnosticIfNoFloat()",
-    group = "lsp_diagnostics_hold",
+  vim.api.nvim_create_augroup('lsp_diagnostics_hold', { clear = true })
+  vim.api.nvim_create_autocmd({ 'CursorHold' }, {
+    pattern = '*',
+    command = 'lua OpenDiagnosticIfNoFloat()',
+    group = 'lsp_diagnostics_hold',
   })
 end
 

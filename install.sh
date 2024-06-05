@@ -18,6 +18,8 @@ fi
 gem install neovim
 npm install -g neovim
 
+npm install -g eslint_d
+
 git submodule update --init --recursive
 
 rake install

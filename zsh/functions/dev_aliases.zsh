@@ -33,6 +33,9 @@ case $pwd_list[-1] in
     alias dr="dev style --include-branch-commits"
     alias ds="./bin/typecheck"
     ;;
+  "pos-next-react-native")
+    alias da="dt"
+    ;;
   *)
     unalias dt
     unalias dr
