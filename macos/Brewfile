@@ -28,7 +28,6 @@ brew "tmux"
 brew "vale"
 brew "watchman"
 brew "ykman"
-brew "zsh-autosuggestions"
 
 cask "betterdisplay"
 cask "hammerspoon"

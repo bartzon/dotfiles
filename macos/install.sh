@@ -30,3 +30,5 @@ brew install --cask font-sf-mono-nerd-font
 ykman config usb --disable OTP
 
 vale sync
+
+git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
