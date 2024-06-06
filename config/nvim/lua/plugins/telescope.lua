@@ -3,17 +3,20 @@ local Plugin = { 'nvim-telescope/telescope.nvim' }
 Plugin.dependencies = {
   { 'nvim-lua/plenary.nvim' },
   { 'aznhe21/actions-preview.nvim' },
+  {
+    'nvim-telescope/telescope-fzf-native.nvim',
+    build = 'make'
+  },
 }
 
 Plugin.cmd = 'Telescope'
 
 Plugin.opts = {
   defaults = {
-    find_command = { "fd", "-t=f", "-a" },
-    path_display = { "truncate" },
     wrap_results = true,
     file_ignore_patterns = {
-      'sorbet'
+      '**/*.rbi',
+      'node_modules/**/*',
     },
     vimgrep_arguments = {
       "rg",
@@ -29,7 +32,16 @@ Plugin.opts = {
 }
 
 function Plugin.config()
-  require('telescope').setup {}
+  require('telescope').setup {
+    extensions = {
+      fzf = {
+        fuzzy = true,
+        override_generic_sorter = true,
+        override_file_sorter = true,
+      }
+    }
+  }
+  require('telescope').load_extension('fzf')
   require('actions-preview').setup {}
 end
 

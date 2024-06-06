@@ -1,6 +1,7 @@
 {
     "diagnostics.globals": [
         "require",
-        "return"
+        "return",
+        "vim"
     ]
 }
