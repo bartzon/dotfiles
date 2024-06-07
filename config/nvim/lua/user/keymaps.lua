@@ -60,7 +60,7 @@ bind('n', '<leader>tS', ":VimuxRunCommand 'dev test $(< .pinned_tests.txt | uniq
 
 bind('n', '<leader><leader>', ':Telescope find_files<CR>', { desc = "Telescope find files" })
 bind('n', '<leader>sw', ':Telescope live_grep<CR>', { desc = "Telescope live grep" })
-bind('n', '<leader>ff', ':Telescope find_files<CR>', { desc = "Telescope find files" })
+bind('n', '<leader>ff', ':FzfLua files<CR>', { desc = "FzfLua find files" })
 bind('n', '<leader>fb', ':Telescope buffers<CR>', { desc = "Telescope find in buffers" })
 bind('n', '<leader>fs', ':Telescope lsp_document_symbols<CR>', { desc = "Telescope find in document symbols" })
 bind('v', '<leader>sw', function()
@@ -86,7 +86,7 @@ bind('n', 'tc', ':tabclose<CR>', { desc = "Close tab" })
 bind('n', '<leader>bc', ':close<CR>', { desc = 'Close buffer', silent = true })
 bind('n', '<leader>bd', ':bdelete<CR>', { desc = 'Delete buffer', silent = true })
 
-bind("n", "<leader>tt", function() require("trouble").toggle() end)
+bind("n", "<leader>tt", ':Trouble diagnostics toggle<CR>', { desc = 'Trouble toggle', silent = true })
 
 bind('n', '<esc>', function()
   for _, win in pairs(vim.api.nvim_list_wins()) do
