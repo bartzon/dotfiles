@@ -58,7 +58,7 @@ bind('n', '<leader>tl', ':silent vspl .pinned_tests.txt<CR>', { desc = "List tes
 bind('n', '<leader>tS', ":VimuxRunCommand 'dev test $(< .pinned_tests.txt | uniq)'<CR>",
   { desc = "Run test suite", silent = true })
 
-bind('n', '<leader><leader>', ':Telescope find_files<CR>', { desc = "Telescope find files" })
+bind('n', '<leader><leader>', ':FzfLua files<CR>', { desc = "FzfLua find files" })
 bind('n', '<leader>sw', ':Telescope live_grep<CR>', { desc = "Telescope live grep" })
 bind('n', '<leader>ff', ':FzfLua files<CR>', { desc = "FzfLua find files" })
 bind('n', '<leader>fb', ':Telescope buffers<CR>', { desc = "Telescope find in buffers" })
@@ -75,7 +75,8 @@ bind('n', "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", { noremap = true, d
 
 bind('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', { noremap = true, desc = 'Previous diagnostic' })
 bind('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', { noremap = true, desc = 'Next diagnostic' })
-bind('n', 'ca', '<cmd>lua require("actions-preview").code_actions()<CR>', { noremap = true, desc = 'Code actions' })
+bind('n', '<leader>ca', '<cmd>lua require("actions-preview").code_actions()<CR>',
+  { noremap = true, desc = 'Code actions' })
 bind('n', 'K', vim.lsp.buf.hover, { noremap = true, desc = 'Show definition' })
 
 bind('n', 'tn', ':tabnext<CR>', { desc = "Next tab" })

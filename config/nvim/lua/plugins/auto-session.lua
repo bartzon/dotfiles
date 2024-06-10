@@ -1,9 +1,9 @@
-local Plugin = { 'rmagatti/auto-session' }
-
-function Plugin.config()
-  require('auto-session').setup({
-    auto_session_use_git_branch = true
-  })
-end
-
-return Plugin
+return {
+  'rmagatti/auto-session',
+  options = {
+    auto_session_use_git_branch = true,
+  },
+  config = function()
+    require('auto-session').setup {}
+  end
+}

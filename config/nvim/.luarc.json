@@ -3,5 +3,8 @@
         "require",
         "return",
         "vim"
+    ],
+    "diagnostics.disable": [
+        "need-check-nil"
     ]
 }

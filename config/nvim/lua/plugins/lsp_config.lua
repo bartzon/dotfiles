@@ -47,8 +47,6 @@ function Plugin.config()
   lsp.rubocop.setup { capabilities = capabilities }
   lsp.kotlin_language_server.setup { capabilities = capabilities }
 
-  -- Function to check if a floating dialog exists and if not
-  -- then check for diagnostics under the cursor
   function OpenDiagnosticIfNoFloat()
     vim.diagnostic.open_float({
       scope = 'cursor',
@@ -63,7 +61,6 @@ function Plugin.config()
     })
   end
 
-  -- Show diagnostics under the cursor when holding position
   vim.api.nvim_create_augroup('lsp_diagnostics_hold', { clear = true })
   vim.api.nvim_create_autocmd({ 'CursorHold' }, {
     pattern = '*',

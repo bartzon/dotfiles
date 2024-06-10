@@ -23,7 +23,8 @@ FILTERS = [
   Filter.new(->(m) { m.title =~ /out of office/i }, 'out of office?'),
   Filter.new(->(m) { m.title =~ /On Call/ }, 'On Call'),
   Filter.new(->(m) { m.starts_at > 8.hours.from_now }, 'Starts at > 8 hours'),
-  Filter.new(->(m) { m.ends_at > 8.hours.from_now }, 'Ends at > 8 hours')
+  Filter.new(->(m) { m.ends_at > 8.hours.from_now }, 'Ends at > 8 hours'),
+  Filter.new(->(m) { m.title.include?('RCA') }, 'RCA')
 ].freeze
 
 FILE = '/tmp/next_calendar_meeting'
