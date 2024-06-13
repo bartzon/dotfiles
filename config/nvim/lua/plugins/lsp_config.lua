@@ -37,7 +37,7 @@ function Plugin.config()
       'rubocop',
       'tsserver',
       'eslint_d',
-      'vim_ls',
+      'vimls',
     }
   }
 

@@ -34,7 +34,7 @@ alias gb='git branch'
 alias gba='git branch -a'
 alias gc='git commit -v'
 alias gd='git diff'
-alias gl="git log main.. --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%cN>%Creset' --abbrev-commit"
+alias gl="glo"
 alias gp='git push'
 alias gst='git status'
 alias gsst='git status'

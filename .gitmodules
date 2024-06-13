@@ -1,3 +1,6 @@
 [submodule "zsh/functions/fzf-tab"]
 	path = zsh/functions/fzf-tab
 	url = https://github.com/Aloxaf/fzf-tab
+[submodule "bin/forgit"]
+	path = bin/forgit
+	url = https://github.com/wfxr/forgit.git
