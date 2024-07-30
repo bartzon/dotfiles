@@ -1,14 +1,11 @@
-local Plugin = { 'folke/trouble.nvim' }
-
--- Plugin.branch = 'dev'
-
-Plugin.dependencies = {
-  { "nvim-tree/nvim-web-devicons" },
+return {
+  'folke/trouble.nvim',
+  event = "VeryLazy",
+  dependencies = {
+    { "nvim-tree/nvim-web-devicons" },
+  },
+  opts = {
+    position = "bottom",
+    mode = "workspace_diagnostics",
+  }
 }
-
-Plugin.opts = {
-  position = "bottom",
-  mode = "workspace_diagnostics",
-}
-
-return Plugin

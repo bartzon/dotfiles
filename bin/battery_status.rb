@@ -4,6 +4,8 @@
 
 require 'json'
 
+SHOW_PHONE = false
+
 output = []
 
 data = JSON.parse(`system_profiler -json SPBluetoothDataType`)
@@ -44,14 +46,16 @@ def format_status(key, data)
   "#{color}#{key}:#{charging}#{data[:percentage]}%"
 end
 
-phone_info = %x(ideviceinfo -u `idevice_id --list` --domain com.apple.mobile.battery).split("\n")
-if phone_info
-  phone_bat = phone_info.find { |str| str =~ /BatteryCurrentCapacity/ }
-  if phone_bat
-    pct = phone_bat.split(':')[1].strip.to_i
+if SHOW_PHONE == true
+  phone_info = %x(ideviceinfo -u `idevice_id --list` --domain com.apple.mobile.battery).split("\n")
+  if phone_info
+    phone_bat = phone_info.find { |str| str =~ /BatteryCurrentCapacity/ }
+    if phone_bat
+      pct = phone_bat.split(':')[1].strip.to_i
 
-    charging = phone_info.any? { |str| str =~ /BatteryIsCharging: true/ }
-    output << format_status('iP', { percentage: pct, charging: })
+      charging = phone_info.any? { |str| str =~ /BatteryIsCharging: true/ }
+      output << format_status('iP', { percentage: pct, charging: })
+    end
   end
 end
 

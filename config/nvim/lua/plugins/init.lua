@@ -1,4 +1,4 @@
-local Plugins = {
+return {
   {
     'sainnhe/gruvbox-material',
     lazy = false,
@@ -8,14 +8,12 @@ local Plugins = {
   { 'tpope/vim-commentary' },
   { 'tpope/vim-projectionist' },
   { 'tpope/vim-rails' },
-  { 'tyru/open-browser.vim' },
   {
-    'tpope/vim-fugitive',
-    dependencies = { 'tpope/vim-rhubarb' }
+    'folke/zen-mode.nvim',
+    keys = {
+      { '<leader>zm', ':lua require("zen-mode").toggle()<CR>', desc = 'Toggle zen mode' }
+    },
   },
-  { 'folke/zen-mode.nvim' },
   { 'nvim-tree/nvim-web-devicons' },
   { 'christoomey/vim-tmux-navigator' },
 }
-
-return Plugins

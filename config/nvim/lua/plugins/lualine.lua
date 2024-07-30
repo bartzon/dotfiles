@@ -1,11 +1,10 @@
-local Plugin = { 'nvim-lualine/lualine.nvim' }
-
 local function window()
   return vim.api.nvim_win_get_number(0)
 end
 
-function Plugin.config()
-  require('lualine').setup({
+return {
+  'nvim-lualine/lualine.nvim',
+  opts = {
     options = {
       always_divide_middle = true,
       icons_enabled = true,
@@ -24,9 +23,7 @@ function Plugin.config()
           file_status = true,
           path = 1,
           on_click = function() vim.cmd('let @+ = expand("%")') end,
-        }
-      },
-      lualine_c = {
+        },
         {
           "diagnostics",
           sources = { "nvim_lsp" }
@@ -47,7 +44,5 @@ function Plugin.config()
       'fzf',
       'lazy',
     },
-  })
-end
-
-return Plugin
+  },
+}
