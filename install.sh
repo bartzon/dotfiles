@@ -28,3 +28,4 @@ git clone https://github.com/wfxr/forgit.git ~/.bin/forgit
 
 python3 -m pip install --user --upgrade pynvim
 
+nvim +":q"
