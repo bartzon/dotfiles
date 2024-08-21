@@ -36,8 +36,6 @@
   path = ~/.gitconfig_local
   path = ~/.gitconfig.spin
 	path = /Users/bartzonneveld/.config/dev/gitconfig
-[core]
-  pager = delta
 [interactive]
   diffFilter = delta --color-only
 [delta]
@@ -49,6 +47,5 @@
   conflictstyle = diff3
 [diff]
   colorMoved = default
-  external = difft
 [rerere]
 	enabled = true
