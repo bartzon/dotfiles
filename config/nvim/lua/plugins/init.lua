@@ -16,4 +16,5 @@ return {
   },
   { 'nvim-tree/nvim-web-devicons' },
   { 'christoomey/vim-tmux-navigator' },
+  { 'tpope/vim-rhubarb',             dependencies = { { 'tpope/vim-fugitive' } } },
 }
