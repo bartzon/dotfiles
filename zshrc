@@ -29,7 +29,6 @@ if [ "$TMUX" = "" ]; then tmux new -As0; fi
 source ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source ~/.bin/forgit/forgit.plugin.zsh
 
-
 # cloudplatform: add Shopify clusters to your local kubernetes config
 export KUBECONFIG=${KUBECONFIG:+$KUBECONFIG:}/Users/bartzonneveld/.kube/config:/Users/bartzonneveld/.kube/config.shopify.cloudplatform
 export PATH="/usr/local/opt/ruby/bin:$PATH"

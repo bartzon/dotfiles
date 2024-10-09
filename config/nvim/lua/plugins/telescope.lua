@@ -8,9 +8,9 @@ return {
   opts = {
     defaults = {
       file_ignore_patterns = {
-        'sorbet/',
-        '**/*.rbi',
-        'node_modules/',
+        'sorbet',
+        'gems',
+        'node_modules',
       },
     },
   },

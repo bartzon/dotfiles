@@ -23,7 +23,7 @@ o.splitbelow = true
 o.splitright = true
 
 o.cmdheight = 0
-o.laststatus = 3
+o.laststatus = 0 -- was 3
 o.numberwidth = 5
 
 o.list = true
