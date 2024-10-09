@@ -14,19 +14,20 @@ FILES = [
   'tuple',
   'vale.ini',
   'zsh',
-  'zshrc',
+  'zshrc'
 ]
 
 desc "install the dot files into user's home directory"
 task :install do
   FILES.each do |file|
     next if %w[Rakefile README LICENSE].include? file
+
     replace_file(file)
   end
 end
 
 def replace_file(file)
-  system %Q{rm -rf "$HOME/.#{file.sub('.erb', '')}"}
+  system %(rm -rf "$HOME/.#{file.sub('.erb', '')}")
   link_file(file)
 end
 
@@ -38,6 +39,6 @@ def link_file(file)
     end
   else
     puts "linking ~/.#{file}"
-    system %Q{ln -s "$PWD/#{file}" "$HOME/.#{file}"}
+    system %(ln -s "$PWD/#{file}" "$HOME/.#{file}")
   end
 end

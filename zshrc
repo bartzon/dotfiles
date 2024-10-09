@@ -15,8 +15,9 @@ else
 fi
 
 PATH=~/.bin:$PATH
-PATH=~/.bin:$PATH:`npm config get prefix`/bin
-PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+PATH=~"/usr/local/opt/ruby/bin:$PATH"
+PATH=~"/opt/homebrew/opt/node@20/bin:$PATH"
+PATH=~"/opt/homebrew/opt/ruby/bin:$PATH"
 
 GPG_TTY=$(tty)
 export GPG_TTY
@@ -31,5 +32,3 @@ source ~/.bin/forgit/forgit.plugin.zsh
 
 # cloudplatform: add Shopify clusters to your local kubernetes config
 export KUBECONFIG=${KUBECONFIG:+$KUBECONFIG:}/Users/bartzonneveld/.kube/config:/Users/bartzonneveld/.kube/config.shopify.cloudplatform
-export PATH="/usr/local/opt/ruby/bin:$PATH"
-export PATH="/opt/homebrew/opt/node@20/bin:$PATH"
