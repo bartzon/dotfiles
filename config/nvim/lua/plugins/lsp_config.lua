@@ -46,32 +46,6 @@ function Plugin.config()
   lsp.lua_ls.setup { capabilities = capabilities }
   lsp.rubocop.setup { capabilities = capabilities }
   lsp.kotlin_language_server.setup { capabilities = capabilities }
-
-  function OpenDiagnosticIfNoFloat()
-    vim.diagnostic.open_float({
-      scope = 'cursor',
-      focusable = false,
-      close_events = {
-        'CursorMoved',
-        'CursorMovedI',
-        'BufHidden',
-        'InsertCharPre',
-        'WinLeave',
-      },
-    })
-  end
-
-  vim.api.nvim_create_augroup('lsp_diagnostics_hold', { clear = true })
-  vim.api.nvim_create_autocmd({ 'CursorHold' }, {
-    pattern = '*',
-    command = 'lua OpenDiagnosticIfNoFloat()',
-    group = 'lsp_diagnostics_hold',
-  })
 end
-
-vim.diagnostic.config({
-  virtual_text = true,
-  focusable = false,
-})
 
 return Plugin
