@@ -6,7 +6,6 @@ Plugin.cmd = 'LspInfo'
 Plugin.event = { 'BufReadPre', 'BufNewFile' }
 
 Plugin.dependencies = {
-  { 'hrsh7th/cmp-nvim-lsp' },
   { 'williamboman/mason-lspconfig.nvim' },
   { 'williamboman/mason.nvim' },
   { 'WhoIsSethDaniel/mason-tool-installer.nvim' },
@@ -15,10 +14,10 @@ Plugin.dependencies = {
 }
 
 function Plugin.config()
-  local capabilities = require('cmp_nvim_lsp').default_capabilities()
+  -- local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
-  require('typescript-tools').setup { capabilities = capabilities }
-  require('lazydev').setup { capabilities = capabilities }
+  require('typescript-tools').setup {  }
+  require('lazydev').setup {  }
 
   local lsp = require('lspconfig')
 
@@ -41,11 +40,11 @@ function Plugin.config()
     }
   }
 
-  lsp.sorbet.setup { capabilities = capabilities }
-  lsp.ruby_lsp.setup { capabilities = capabilities }
-  lsp.lua_ls.setup { capabilities = capabilities }
-  lsp.rubocop.setup { capabilities = capabilities }
-  lsp.kotlin_language_server.setup { capabilities = capabilities }
+  lsp.sorbet.setup {}
+  lsp.ruby_lsp.setup {}
+  lsp.lua_ls.setup {}
+  lsp.rubocop.setup {}
+  lsp.kotlin_language_server.setup {}
 end
 
 return Plugin
