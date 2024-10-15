@@ -19,14 +19,17 @@ return {
       },
       lualine_b = {
         {
+          'branch',
+          'diff',
+          'diagnostics',
+        },
+      },
+      lualine_c = {
+        {
           'filename',
           file_status = true,
           path = 1,
           on_click = function() vim.cmd('let @+ = expand("%")') end,
-        },
-        {
-          "diagnostics",
-          sources = { "nvim_lsp" }
         },
       },
       lualine_x = {

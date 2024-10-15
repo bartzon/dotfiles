@@ -10,7 +10,10 @@ return {
       auto_start = true,
       display = {
         preview = {
-          border = "shadow",
+          border = "solid",
+          positions = {
+            north = 4, west = 4, south = 4, east = 1
+          }
         }
       }
     }

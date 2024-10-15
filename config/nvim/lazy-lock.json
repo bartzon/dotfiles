@@ -6,6 +6,7 @@
   "coq.thirdparty": { "branch": "3p", "commit": "a827c2ab76d7c803976765cac597c79a2a5b34f6" },
   "coq_nvim": { "branch": "coq", "commit": "a8d665bdff07f3c8a08832e823f13312b49bfa5c" },
   "diffview.nvim": { "branch": "main", "commit": "4516612fe98ff56ae0415a259ff6361a89419b0a" },
+  "fidget.nvim": { "branch": "main", "commit": "d855eed8a06531a7e8fd0684889b2943f373c469" },
   "fzf-lua": { "branch": "main", "commit": "5dec364c9dedec00dcd6d06e323d7bc7f8d6b596" },
   "gh-addressed.nvim": { "branch": "main", "commit": "64c12f0f2a1d28afe53220da5fb86e1adb79be07" },
   "gh-blame.nvim": { "branch": "main", "commit": "1a6e6444a6988135c5e71e73fa207277dceba906" },
