@@ -15,9 +15,9 @@ else
 fi
 
 PATH=~/.bin:$PATH
-PATH=~"/usr/local/opt/ruby/bin:$PATH"
-PATH=~"/opt/homebrew/opt/node@20/bin:$PATH"
-PATH=~"/opt/homebrew/opt/ruby/bin:$PATH"
+PATH="/usr/local/opt/ruby/bin:$PATH"
+PATH="/opt/homebrew/opt/node@20/bin:$PATH"
+PATH="/opt/homebrew/opt/ruby/bin:$PATH"
 
 GPG_TTY=$(tty)
 export GPG_TTY
