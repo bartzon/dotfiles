@@ -28,4 +28,8 @@ git clone https://github.com/wfxr/forgit.git ~/.bin/forgit
 
 python3 -m pip install --user --upgrade pynvim
 
+echo "export OPENAI_API_BASE=https://openai-proxy.shopify.ai" > ~/.openairc
+echo "export OPENAI_API_CHAT_COMPLETIONS=https://openai-proxy.shopify.ai/v3/v1" >> ~/.openairc
+echo "export OPENAI_API_KEY=`~/.bin/openai_key cat`" >> ~/.openairc
+
 nvim +":q"
