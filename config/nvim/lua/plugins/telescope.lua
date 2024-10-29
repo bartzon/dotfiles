@@ -8,6 +8,7 @@ return {
   opts = {
     defaults = {
       file_ignore_patterns = {
+        '*.rbi',
         'sorbet',
         'gems',
         'node_modules',
@@ -33,6 +34,13 @@ return {
     )
   end,
   keys = {
+    {
+      '<leader><leader>',
+      function ()
+        require("telescope").extensions.smart_open.smart_open()
+      end,
+      desc = 'Telescope smart open',
+    },
     { '<leader>sw', ':Telescope live_grep<CR>',            desc = "Telescope live grep" },
     { '<leader>ff', ':FzfLua files<CR>',                   desc = "FzfLua find files" },
     { '<leader>fb', ':Telescope buffers<CR>',              desc = "Telescope find in buffers" },

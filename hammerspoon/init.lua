@@ -24,3 +24,11 @@ camera:setPropertyWatcherCallback(function(camera, property, scope, element)
   hs.http.doRequest(meeting_url, "GET")
 end)
 camera:startPropertyWatcher()
+
+hs.spoons.use("HomeAssistant") -- include the spoon
+
+ha = spoon.HomeAssistant:configure({
+    entity_name = "m3",
+    url = "http://homeassistant.local:8123",
+    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJiNGIxOGQxNzQ5MTg0ZmQ1OTU5OGNhMTlhMTYwYWViNCIsImlhdCI6MTcyOTU5NTEyMywiZXhwIjoyMDQ0OTU1MTIzfQ.NEuuCSeCjnF0gvx4NvBSyrTFsAAOFwFvnVKsjSsXQ78",
+}):start()

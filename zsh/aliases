@@ -30,6 +30,8 @@ alias tldrf='tldr --list | fzf --preview "tldr {1} --color=always" --preview-win
 # git
 alias g='git'
 alias ga='git add'
+alias gai='git add `git ls-files --exclude-standard --modified --others | fzf --multi --height=40%`'
+alias gri='git restore `git ls-files --modified | fzf --multi --height=40%`'
 alias gb='git branch'
 alias gba='git branch -a'
 alias gc='git commit -v'

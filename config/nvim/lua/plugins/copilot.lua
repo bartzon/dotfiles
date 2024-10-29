@@ -1,8 +1,7 @@
+vim.keymap.set('i', '<C-space>', '<Plug>(copilot-accept-word)')
+
 return {
-  'zbirenbaum/copilot.lua',
-  event = 'InsertEnter',
+  'github/copilot.vim',
+  event = 'BufEnter',
   cmd = 'Copilot',
-  config = function()
-    require('copilot').setup {}
-  end
 }

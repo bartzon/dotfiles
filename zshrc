@@ -1,3 +1,5 @@
+#!/bin/zsh
+
 . ~/.zsh/config
 . ~/.zsh/aliases
 . ~/.zsh/opts

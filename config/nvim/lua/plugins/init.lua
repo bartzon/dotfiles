@@ -18,4 +18,5 @@ return {
   { 'christoomey/vim-tmux-navigator' },
   { 'tpope/vim-rhubarb',             dependencies = { { 'tpope/vim-fugitive' } } },
   { 'sindrets/diffview.nvim' },
+  { 'brenoprata10/nvim-highlight-colors' },
 }
