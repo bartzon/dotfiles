@@ -6,10 +6,13 @@ output = []
 
 def battery_status(type)
   data = `pmset -g accps | sed 's/[^\x20-\x7E]//g' | grep "#{type}"`
+  match = data.match(/\d+%;/)
+  return {} unless match
+
   num = data.match(/\d+%;/)[0].to_s.gsub(/%;/, '')
   charging = if data =~ /not charging present: true/
                false
-             elsif data =~ /discharging present/
+             elsif data =~ /discharging/
                false
              else
                true
@@ -18,6 +21,8 @@ def battery_status(type)
 end
 
 def format_status(key, data)
+  return unless data[:percentage]
+
   color = case data[:percentage].to_i
           when 30..50
             '#[fg=#A3BE8C,bg=black]'
