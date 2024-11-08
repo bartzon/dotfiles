@@ -1,5 +1,3 @@
--- vim.keymap.set('i', '<C-space>', '<Plug>(copilot-accept-word)')
-
 return {
   'github/copilot.vim',
   event = 'BufEnter',
@@ -13,3 +11,4 @@ return {
     vim.g.copilot_no_tab_map = true
   end
 }
+
