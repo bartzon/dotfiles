@@ -14,6 +14,14 @@ return {
       },
     },
   },
+  dependencies = {
+    'proxy_key',
+    dir = '~/.config/nvim/lua/local_plugins',
+    config = function()
+      require('local_plugins.proxy_key').setup()
+    end,
+    event = 'VeryLazy',
+  },
   config = function(_, opts)
     local avante = require('avante')
     local openai_provider = require('avante.providers.openai')

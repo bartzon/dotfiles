@@ -33,3 +33,4 @@ echo "export OPENAI_API_CHAT_COMPLETIONS=https://openai-proxy.shopify.ai/v3/v1" 
 echo "export OPENAI_API_KEY=`~/.bin/openai_key cat`" >> ~/.openairc
 
 nvim +":q"
+nvim +":COQdeps" +":qa"

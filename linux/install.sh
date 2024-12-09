@@ -1,5 +1,7 @@
 #!/bin/zsh
 
+sudo apt-get install -y python3.10-venv
+
 if ! command -v batcat &> /dev/null; then
   sudo apt-get install -y bat
   alias bat="/usr/bin/batcat"

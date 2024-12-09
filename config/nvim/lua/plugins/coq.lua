@@ -15,7 +15,7 @@ return {
             north = 4, west = 4, south = 4, east = 1
           }
         }
-      }
+      },
     }
   end,
   config = function()

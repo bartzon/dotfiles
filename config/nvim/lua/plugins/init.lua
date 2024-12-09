@@ -27,14 +27,14 @@ return {
   { 'tpope/vim-rails' },
 
   -- Local plugins
-  {
-    'proxy_key',
-    dir = '../local-plugins/proxy_key',
-    config = function()
-      require('local-plugins.proxy_key').setup()
-    end,
-    event = 'VeryLazy',
-  },
+  -- {
+  --   'proxy_key',
+  --   dir = '../local-plugins/proxy_key',
+  --   config = function()
+  --     require('local-plugins.proxy_key').setup()
+  --   end,
+  --   event = 'VeryLazy',
+  -- },
 
   -- Misc
   { 'tpope/vim-commentary' },
