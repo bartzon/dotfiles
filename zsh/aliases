@@ -30,8 +30,8 @@ alias tldrf='tldr --list | fzf --preview "tldr {1} --color=always" --preview-win
 # git
 alias g='git'
 alias ga='git add'
-alias gai='git add `git ls-files --exclude-standard --modified --others | fzf --multi --height=40% --preview="git diff {1} | delta"`'
-alias gri='git restore `git ls-files --modified | fzf --multi --height=40%`'
+alias gai='git add `git ls-files --exclude-standard --modified --others | fzf --bind one:accept --multi --height=40% --preview="git diff {1} | delta"`'
+alias gri='git restore `git ls-files --modified | fzf --bind one:accept --multi --height=40% --preview="git diff {1} | delta"`'
 alias gbi='git checkout $(gh pr list --author "@me" | fzf | cut -f3)'
 alias gb='git branch'
 alias gc='git commit -v'
@@ -43,7 +43,6 @@ alias gsst='git status'
 alias gu='git pull'
 alias groot="cd \$(git rev-parse --show-toplevel)"
 alias grp='git pull && git rebase origin/main && git push --force'
-alias gt='git checkout'
 alias grb='git branch --sort=-committerdate | fzf --header "Checkout Recent Branch" --preview "git diff {1} | delta" --pointer="" | xargs git checkout'
 
 # rails
