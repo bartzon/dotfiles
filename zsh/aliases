@@ -8,8 +8,6 @@ alias cat='bat'
 alias ls='lsd'
 alias vim='nvim'
 alias vi='nvim'
-alias todo='nvim ~/Documents/todo.md'
-alias v='vim $(fzf --height=25)'
 
 alias icat="kitten icat"
 
@@ -28,12 +26,10 @@ fi
 alias tldrf='tldr --list | fzf --preview "tldr {1} --color=always" --preview-window=right,70% | xargs tldr'
 
 # git
-alias g='git'
 alias ga='git add'
 alias gai='git add `git ls-files --exclude-standard --modified --others | fzf --bind one:accept --multi --height=40% --preview="git diff {1} | delta"`'
 alias gri='git restore `git ls-files --modified | fzf --bind one:accept --multi --height=40% --preview="git diff {1} | delta"`'
-alias gbi='git checkout $(gh pr list --author "@me" | fzf | cut -f3)'
-alias gb='git branch'
+alias gbi="GH_FORCE_TTY=100% gh pr list --author \"@me\" | fzf --ansi --preview 'GH_FORCE_TTY=100% gh pr view {1}' --header-lines 4 | awk '{print $1}' | xargs gh pr checkout"
 alias gc='git commit -v'
 alias gd='git diff'
 alias gl="glo"
@@ -41,19 +37,13 @@ alias gp='git push'
 alias gst='git status'
 alias gsst='git status'
 alias gu='git pull'
-alias groot="cd \$(git rev-parse --show-toplevel)"
 alias grp='git pull && git rebase origin/main && git push --force'
-alias grb='git branch --sort=-committerdate | fzf --header "Checkout Recent Branch" --preview "git diff {1} | delta" --pointer="" | xargs git checkout'
 
 # rails
 alias be='bundle exec'
 alias rs='bundle exec rails server'
 alias rc='bundle exec rails console'
-alias rspec='bundle exec rspec'
-alias tlog='tail -f log/development.log'
-alias rrr="bundle exec rake db:drop:all db:create:all db:migrate"
 alias rr="bundle exec rake db:migrate; RAILS_ENV=test bundle exec rake db:migrate"
-alias be='bundle exec'
 
 alias dt="dev test --include-branch-commits"
 alias dr="dev style --include-branch-commits"
