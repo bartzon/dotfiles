@@ -18,8 +18,6 @@ fi
 gem install neovim
 npm install -g neovim
 
-npm install -g eslint_d
-
 git submodule update --init --recursive
 
 rake install
@@ -32,5 +30,4 @@ echo "export OPENAI_API_BASE=https://openai-proxy.shopify.ai" > ~/.openairc
 echo "export OPENAI_API_CHAT_COMPLETIONS=https://openai-proxy.shopify.ai/v3/v1" >> ~/.openairc
 echo "export OPENAI_API_KEY=`~/.bin/openai_key cat`" >> ~/.openairc
 
-nvim +":q"
-nvim +":COQdeps" +":qa"
+nvim +":q" &
