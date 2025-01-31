@@ -1,0 +1,14 @@
+[general]
+import = [
+    "~/.config/alacritty/themes/themes/gruvbox_material_medium_dark.toml"
+]
+
+[window]
+startup_mode = "Fullscreen"
+opacity = 0.90
+
+[font]
+normal = { family = "FiraCode Nerd Font Mono", style = "Regular" }
+size = 18
+offset = { x = 0, y = 8 }
+

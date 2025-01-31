@@ -1,4 +1,5 @@
 parts = [
+  `~/.bin/connected.sh`,
   `~/.bin/battery_status.rb`,
   `cat /tmp/next_calendar_meeting_parsed`,
   `osascript ~/.bin/get_track.applescript`,

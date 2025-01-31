@@ -1,14 +1,14 @@
--- vim.o.completion.list.selection = "manual"
+-- vimperlfile.o.completion.list.selection = "manual"
 
 return {
   'saghen/blink.cmp',
-  lazy = false,
-  version = 'v0.*',
+  version = '*',
   opts = {
     keymap = {
-      ['Esc'] = { 'close', 'fallback' },
-      ['<CR>'] = { 'select_and_accept', 'fallback' },
+      preset = 'default',
+      ['<Esc>'] = { 'fallback' },
       ['<Tab>'] = { 'show', 'select_next', 'fallback'},
+      ['<CR>'] = { 'select_and_accept', 'fallback' },
       ['<S-Tab>'] = { 'select_prev', 'fallback' },
     },
     appearance = {
@@ -17,6 +17,7 @@ return {
     },
     sources = {
       default = { 'lsp', 'path', 'snippets', 'buffer', 'cmdline' },
+      cmdline = {},
     },
     signature = { enabled = true }
   },
