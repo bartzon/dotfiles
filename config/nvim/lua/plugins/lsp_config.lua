@@ -20,7 +20,6 @@ return {
       ensure_installed = {
         'ruby_lsp',
         'sorbet',
-        'kotlin_language_server',
       },
     }
     require('mason-tool-installer').setup {
@@ -34,9 +33,12 @@ return {
     }
 
     lsp.sorbet.setup {}
-    lsp.ruby_lsp.setup {}
+    lsp.ruby_lsp.setup {
+      init_options = {
+        enabledFeatureFlags = { ["tapiocaAddon"] = true }
+      }
+    }
     lsp.lua_ls.setup {}
     lsp.rubocop.setup {}
-    lsp.kotlin_language_server.setup {}
   end
 }
