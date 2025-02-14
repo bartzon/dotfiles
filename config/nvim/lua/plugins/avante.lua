@@ -15,7 +15,9 @@ return {
     },
   },
   dependencies = {
-    'proxy_key',
+    "stevearc/dressing.nvim",
+    "nvim-lua/plenary.nvim",
+    "MunifTanjim/nui.nvim",
     dir = '~/.config/nvim/lua/local_plugins',
     config = function()
       require('local_plugins.proxy_key').setup()

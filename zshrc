@@ -24,7 +24,7 @@ PATH="/opt/homebrew/opt/ruby/bin:$PATH"
 GPG_TTY=$(tty)
 export GPG_TTY
 
-if [ "$TMUX" = "" ]; then tmux new -As0; fi
+# if [ "$TMUX" = "" ]; then tmux new -As0; fi
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 [ -f ~/.zsh/functions/fzf-tab/fzf-tab.plugin.zsh ] && source ~/.zsh/functions/fzf-tab/fzf-tab.plugin.zsh
