@@ -51,8 +51,6 @@ bind('n', 'tc', ':tabclose<CR>', { desc = "Close tab" })
 bind('n', '<leader>bc', ':close<CR>', { desc = 'Close buffer', silent = true })
 bind('n', '<leader>bd', ':bdelete<CR>', { desc = 'Delete buffer', silent = true })
 
-bind("n", "<leader>tt", ':Trouble diagnostics toggle<CR>', { desc = 'Trouble toggle', silent = true })
-
 bind('n', '<esc>', function()
   for _, win in pairs(vim.api.nvim_list_wins()) do
     if vim.api.nvim_win_get_config(win).relative == "win" then

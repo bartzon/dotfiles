@@ -47,7 +47,6 @@ return {
   "folke/snacks.nvim",
   priority = 1000,
   lazy = false,
-  --- @type snacks.Config
   opts = {
     gitbrowse = { enabled = true },
     picker = { enabled = true },
@@ -76,6 +75,5 @@ return {
 
     { "<leader>z",  function() Snacks.zen() end, desc = "Toggle Zen Mode" },
     { "<leader>Z",  function() Snacks.zen.zoom() end, desc = "Toggle Zoom" },
-
   },
 }
