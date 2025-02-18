@@ -13,7 +13,9 @@ return {
       javascript = { 'eslint_d' },
       typescript = { 'eslint_d' },
       typescriptreact = { 'eslint_d' },
-      ruby = { 'rubocop', 'sorbet' },
+    },
+    default_format_opts = {
+      lsp_format = "first",
     },
     format_on_save = { timeout_ms = 500 },
   },

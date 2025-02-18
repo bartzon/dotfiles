@@ -16,29 +16,28 @@ return {
     local lsp = require('lspconfig')
 
     require('mason').setup()
-    require('mason-lspconfig').setup {
-      ensure_installed = {
-        'ruby_lsp',
-        'sorbet',
-      },
-    }
+    require('mason-lspconfig').setup {}
     require('mason-tool-installer').setup {
       ensure_installed = {
         'prettier',
         'eslint',
-        'rubocop',
         'eslint_d',
         'vimls',
       }
     }
 
-    lsp.sorbet.setup {}
+    lsp.sorbet.setup {
+      cmd = { "./bin/srb", "tc", "--lsp"},
+    }
     lsp.ruby_lsp.setup {
+      cmd = { "ruby-lsp" },
       init_options = {
         enabledFeatureFlags = { ["tapiocaAddon"] = true }
       }
     }
     lsp.lua_ls.setup {}
-    lsp.rubocop.setup {}
+    lsp.rubocop.setup {
+      cmd = { "./bin/rubocop", "--lsp" }
+    }
   end
 }
