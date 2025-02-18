@@ -29,7 +29,7 @@ alias tldrf='tldr --list | fzf --preview "tldr {1} --color=always" --preview-win
 alias ga='git add'
 alias gai='git add `git ls-files --exclude-standard --modified --others | fzf --bind one:accept --multi --preview="git diff {1} | delta"` $@'
 alias gri='git restore `git ls-files --modified | fzf --bind one:accept --multi --height=40% --preview="git diff {1} | delta"`'
-alias gbi="GH_FORCE_TTY=100% gh pr list --author \"@me\" | fzf --ansi --preview 'GH_FORCE_TTY=100% gh pr view {1}' --header-lines 4 | awk '{print $1}' | xargs gh pr checkout"
+alias gbi='gh pr list --author "@me" | fzf --ansi --preview "GH_FORCE_TTY=100% gh pr view {1}" | awk '\''{print $1}'\'' | xargs gh pr checkout'
 alias gc='git commit -v'
 alias gd='git diff'
 alias gl="glo"

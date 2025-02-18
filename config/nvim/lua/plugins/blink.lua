@@ -1,8 +1,6 @@
--- vimperlfile.o.completion.list.selection = "manual"
-
 return {
   'saghen/blink.cmp',
-  version = '*',
+  dependencies = { "fang2hou/blink-copilot" },
   opts = {
     keymap = {
       preset = 'default',
@@ -16,9 +14,19 @@ return {
       nerd_font_variant = 'mono'
     },
     sources = {
-      default = { 'lsp', 'path', 'snippets', 'buffer', 'cmdline' },
-      cmdline = {},
+      default = { 'lsp', 'path', 'snippets', 'buffer', 'copilot' },
+      providers = {
+        copilot = {
+          name = "copilot",
+          module = "blink-copilot",
+          score_offset = 100,
+          async = true,
+        },
+      },
+    },
+    cmdline = {
+      sources = {},
     },
     signature = { enabled = true }
-  },
+  }
 }

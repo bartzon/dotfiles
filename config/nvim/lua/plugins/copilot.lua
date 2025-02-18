@@ -1,11 +1,22 @@
 return {
-  'github/copilot.vim',
-  event = 'InsertEnter',
+  "github/copilot.vim",
+  cmd = "Copilot",
+  build = ":Copilot auth",
+  event = "BufWinEnter",
+  init = function()
+    vim.g.copilot_no_maps = true
+  end,
   config = function()
-    vim.g.copilot_no_tab_map = true
-    vim.g.copilot_assume_mapped = true
-    vim.api.nvim_set_keymap('i', '<C-J>', 'copilot#Accept("<CR>")', { silent = true, expr = true })
-    vim.api.nvim_set_keymap('i', '<C-Space>', 'copilot#Accept("<CR>")', { silent = true, expr = true })
-  end
+    -- Block the normal Copilot suggestions
+    vim.api.nvim_create_augroup("github_copilot", { clear = true })
+    for _, event in pairs({ "FileType", "BufUnload", "BufEnter" }) do
+      vim.api.nvim_create_autocmd({ event }, {
+        group = "github_copilot",
+        callback = function()
+          vim.fn["copilot#On" .. event]()
+        end,
+      })
+    end
+  end,
 }
 
