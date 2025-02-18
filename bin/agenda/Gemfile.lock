@@ -14,6 +14,9 @@ GEM
       tzinfo (~> 2.0)
       zeitwerk (~> 2.3)
     ast (2.4.2)
+    base64 (0.2.0)
+    benchmark (0.4.0)
+    bigdecimal (3.1.9)
     builder (3.2.4)
     chronic (0.10.2)
     concurrent-ruby (1.2.0)
@@ -26,14 +29,17 @@ GEM
       concurrent-ruby (~> 1.0)
     json (2.7.1)
     language_server-protocol (3.17.0.3)
+    logger (1.6.4)
     loofah (2.19.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mini_portile2 (2.8.5)
     minitest (5.17.0)
+    mutex_m (0.3.0)
     nokogiri (1.13.10)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
+    ostruct (0.6.1)
     parallel (1.24.0)
     parser (3.3.0.5)
       ast (~> 2.4.1)
@@ -76,10 +82,16 @@ PLATFORMS
 DEPENDENCIES
   actionview
   activesupport
+  base64
+  benchmark
+  bigdecimal
   dotiw
+  logger
+  mutex_m
   nokogiri
+  ostruct
   rubocop
   whenever
 
 BUNDLED WITH
-   2.2.28
+   2.6.4
