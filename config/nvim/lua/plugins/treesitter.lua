@@ -18,6 +18,9 @@ return {
     autopairs = {
       enable = true
     },
+    indent = {
+      enable = true,
+    },
     matchup = {
       enable = true,
     },
@@ -72,6 +75,11 @@ return {
       'lua',
       'vim',
       'kotlin',
+      'bash',
+      'html',
+      'yaml',
+      'markdown',
+      'vimdoc',
     },
     hidesig = {
       enable = true,

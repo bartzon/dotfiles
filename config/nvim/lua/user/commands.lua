@@ -5,20 +5,24 @@ autocmd('TextYankPost', {
   desc = 'highlight text after is copied',
   group = augroup,
   callback = function()
-    vim.highlight.on_yank({ higroup = 'Visual', timeout = 80 })
+    vim.highlight.on_yank({ higroup = 'Visual', timeout = 50 })
   end
 })
 
 autocmd({ 'BufEnter', 'FocusGained', 'InsertLeave', 'WinEnter' }, {
   desc = 'Turn on relative numbers',
   group = augroup,
-  command = 'set rnu'
+  callback = function()
+    vim.cmd('set rnu')
+  end
 })
 
 autocmd({ 'BufLeave', 'FocusLost', 'InsertEnter', 'WinLeave' }, {
   desc = 'Turn off relative numbers',
   group = augroup,
-  command = 'set nornu'
+  callback = function()
+    vim.cmd('set nornu')
+  end
 })
 
 autocmd('VimResized', {

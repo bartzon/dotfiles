@@ -36,11 +36,11 @@ bind('n', 'gT', ':tabnew | lua vim.lsp.buf.definition()<CR>', {})
 
 bind('n', 'gl', '<cmd>lua vim.diagnostic.open_float()<CR>', { desc = 'Diagnostics Float' })
 bind('n', "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", { noremap = true, desc = 'Rename with LSP' })
+bind('n', "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", { noremap = true, desc = 'Code actions' })
+bind('v', "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", { noremap = true, desc = 'Code actions' })
 
 bind('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', { noremap = true, desc = 'Previous diagnostic' })
 bind('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', { noremap = true, desc = 'Next diagnostic' })
-bind('n', '<leader>ca', '<cmd>lua require("actions-preview").code_actions()<CR>',
-  { noremap = true, desc = 'Code actions' })
 bind('n', 'K', vim.lsp.buf.hover, { noremap = true, desc = 'Show definition' })
 
 bind('n', 'tn', ':tabnext<CR>', { desc = "Next tab" })

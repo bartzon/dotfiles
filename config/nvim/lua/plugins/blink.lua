@@ -5,7 +5,7 @@ return {
     keymap = {
       preset = 'default',
       ['<Esc>'] = { 'fallback' },
-      ['<Tab>'] = { 'show', 'select_next', 'fallback'},
+      ['<Tab>'] = { 'show', 'select_next', 'fallback' },
       ['<CR>'] = { 'select_and_accept', 'fallback' },
       ['<S-Tab>'] = { 'select_prev', 'fallback' },
     },
@@ -27,6 +27,9 @@ return {
     cmdline = {
       sources = {},
     },
-    signature = { enabled = true }
+    signature = { enabled = true },
+    fuzzy = {
+      implementation = "lua",
+    }
   }
 }
