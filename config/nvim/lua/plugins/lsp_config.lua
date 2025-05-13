@@ -9,15 +9,22 @@ return {
     { 'WhoIsSethDaniel/mason-tool-installer.nvim' },
     { 'pmizio/typescript-tools.nvim' },
     { 'folke/lazydev.nvim' },
+    { 'saghen/blink.cmp' },
   },
   config = function()
     require('typescript-tools').setup {}
     require('lazydev').setup {}
-
+    --
     local lsp = require('lspconfig')
+    local capabilities = require('blink.cmp').get_lsp_capabilities()
 
     require('mason').setup()
-    require('mason-lspconfig').setup {}
+    require('mason-lspconfig').setup {
+      ensure_installed = {
+        "rubocop",
+        "ruby_lsp",
+      }
+    }
     require('mason-tool-installer').setup {
       ensure_installed = {
         'prettier',
@@ -42,26 +49,42 @@ return {
     end
 
     lsp.sorbet.setup {
+      capabilities = capabilities,
       cmd = get_cmd(
         { "./bin/srb", "tc", "--lsp" },
         { "srb", "tc", "--lsp" }
       )
     }
     lsp.ruby_lsp.setup {
+      capabilities = capabilities,
       cmd = get_cmd(
         { "./bin/ruby-lsp" },
         { "ruby-lsp" }
       ),
       init_options = {
-        enabledFeatureFlags = { ["tapiocaAddon"] = true }
+        enabledFeatureFlags = {
+          ["tapiocaAddon"] = true
+        }
       }
     }
-    lsp.lua_ls.setup {}
+    lsp.lua_ls.setup {
+      capabilities = capabilities,
+    }
+
     lsp.rubocop.setup {
+      capabilities = capabilities,
       cmd = get_cmd(
         { "./bin/rubocop", "--lsp" },
         { "rubocop", "--lsp" }
-      )
+      ),
+      settings = {
+        rubocop = { useBundler = false, lint = true, autocorrect = true }
+      },
+      on_attach = function(client, bufnr)
+        client.server_capabilities.documentFormattingProvider = true
+        local format = require('user.autocmds.formatting')
+        format.setup_rubocop_formatting(client, bufnr)
+      end
     }
   end
 }

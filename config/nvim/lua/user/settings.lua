@@ -52,7 +52,7 @@ o.mousescroll = 'ver:1,hor:0'
 
 o.signcolumn = 'yes'
 
-o.completeopt = 'menu'
+o.completeopt = { 'menu', 'menuone', 'noselect' }
 
 o.switchbuf = 'vsplit'
 
