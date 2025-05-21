@@ -10,7 +10,7 @@ o.shiftwidth = 2
 o.softtabstop = 2
 o.tabstop = 2
 
-o.relativenumber = true
+o.relativenumber = false
 o.number = true
 o.showmode = false
 
@@ -23,7 +23,7 @@ o.splitbelow = true
 o.splitright = true
 
 o.cmdheight = 0
-o.laststatus = 0 -- was 3
+o.laststatus = 0
 o.numberwidth = 5
 
 o.list = true
@@ -39,7 +39,7 @@ o.pumblend = 15
 o.winblend = 15
 o.updatetime = 100
 
-o.cursorline = true
+o.cursorline = false
 o.cursorlineopt = 'number'
 
 o.showmatch = true

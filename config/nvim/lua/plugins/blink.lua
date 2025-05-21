@@ -23,14 +23,19 @@ return {
     },
     completion = {
       documentation = {
-        auto_show = false
+        auto_show = true
+      },
+      menu = {
+        draw = {
+          treesitter = { 'lsp' }
+        }
+      },
+      ghost_text = {
+        enabled = true,
       }
     },
     signature = {
       enabled = true,
-      trigger = {
-        enabled = true,
-      },
       window = {
         treesitter_highlighting = true,
         show_documentation = true,
