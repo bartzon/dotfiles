@@ -71,81 +71,75 @@ calculate_column_widths() {
     set +u  # Temporarily disable undefined variable checking
     get_terminal_size
     
-    # Reserve space for separators and padding (9 spaces between columns)
-    local available_width=$((TERMINAL_WIDTH - 12))
+    # Calculate actual width needed for each column based on real data
+    local actual_pr_width=3        # "PR#" header
+    local actual_branch_width=6    # "Branch" header  
+    local actual_status_width=6    # "Status" header
+    local actual_checks_width=6    # "Checks" header
+    local actual_reviews_width=7   # "Reviews" header
+    local actual_merge_width=5     # "Merge" header
+    local actual_restack_width=7   # "Restack" header
     
-    # Set minimum and maximum widths for each column
-    local min_stack_width=5
-    local min_pr_width=6
-    local min_title_width=25
-    local min_branch_width=18
-    local min_status_width=8
-    local min_checks_width=8
-    local min_reviews_width=8
-    local min_merge_width=8
-    local min_restack_width=7
-    
-    # Calculate actual content widths from data
-    local max_pr_width=6
-    local max_status_width=8
-    local max_checks_width=8
-    local max_reviews_width=8
-    local max_merge_width=8
-    local max_restack_width=7
-    
-    # Find actual maximum widths from data
+    # Find the actual maximum width needed for each column from the data
     if [ "$TOTAL_PRS" -gt 0 ]; then
         for i in $(seq 0 $((TOTAL_PRS - 1))); do
+            # PR number width
             local pr_len=${#PR_NUMBERS[i]}
-            local status_len=${#PR_STATUSES[i]}
-            local checks_len=${#PR_CHECKS[i]}
-            local reviews_len=${#PR_REVIEWS[i]}
-            local merge_len=${#PR_MERGE_STATUS[i]}
-            local restack_len=${#PR_RESTACK_STATUS[i]}
+            [ "$pr_len" -gt "$actual_pr_width" ] && actual_pr_width="$pr_len"
             
-            [ "$pr_len" -gt "$max_pr_width" ] && max_pr_width="$pr_len"
-            [ "$status_len" -gt "$max_status_width" ] && max_status_width="$status_len"
-            [ "$checks_len" -gt "$max_checks_width" ] && max_checks_width="$checks_len"
-            [ "$reviews_len" -gt "$max_reviews_width" ] && max_reviews_width="$reviews_len"
-            [ "$merge_len" -gt "$max_merge_width" ] && max_merge_width="$merge_len"
-            [ "$restack_len" -gt "$max_restack_width" ] && max_restack_width="$restack_len"
+            # Branch name width
+            local branch_len=${#PR_BRANCHES[i]}
+            [ "$branch_len" -gt "$actual_branch_width" ] && actual_branch_width="$branch_len"
+            
+            # Status width
+            local status_len=${#PR_STATUSES[i]}
+            [ "$status_len" -gt "$actual_status_width" ] && actual_status_width="$status_len"
+            
+            # Checks width
+            local checks_len=${#PR_CHECKS[i]}
+            [ "$checks_len" -gt "$actual_checks_width" ] && actual_checks_width="$checks_len"
+            
+            # Reviews width
+            local reviews_len=${#PR_REVIEWS[i]}
+            [ "$reviews_len" -gt "$actual_reviews_width" ] && actual_reviews_width="$reviews_len"
+            
+            # Merge status width
+            local merge_len=${#PR_MERGE_STATUS[i]}
+            [ "$merge_len" -gt "$actual_merge_width" ] && actual_merge_width="$merge_len"
+            
+            # Restack status width
+            local restack_len=${#PR_RESTACK_STATUS[i]}
+            [ "$restack_len" -gt "$actual_restack_width" ] && actual_restack_width="$restack_len"
         done
     fi
     
-    # Set column widths with reasonable limits
-    COL_STACK_WIDTH="$min_stack_width"
-    COL_PR_WIDTH=$((max_pr_width > min_pr_width ? max_pr_width : min_pr_width))
-    COL_STATUS_WIDTH=$((max_status_width > min_status_width ? max_status_width : min_status_width))
-    COL_CHECKS_WIDTH=$((max_checks_width > min_checks_width ? max_checks_width : min_checks_width))
-    COL_REVIEWS_WIDTH=$((max_reviews_width > min_reviews_width ? max_reviews_width : min_reviews_width))
-    COL_MERGE_WIDTH=$((max_merge_width > min_merge_width ? max_merge_width : min_merge_width))
-    COL_RESTACK_WIDTH=$((max_restack_width > min_restack_width ? max_restack_width : min_restack_width))
+    # Add padding to each column (2 extra characters for comfort)
+    COL_STACK_WIDTH=5  # Fixed width for stack symbols
+    COL_PR_WIDTH=$((actual_pr_width + 2))
+    COL_BRANCH_WIDTH=$((actual_branch_width + 2))
+    COL_STATUS_WIDTH=$((actual_status_width + 2))
+    COL_CHECKS_WIDTH=$((actual_checks_width + 2))
+    COL_REVIEWS_WIDTH=$((actual_reviews_width + 2))
+    COL_MERGE_WIDTH=$((actual_merge_width + 2))
+    COL_RESTACK_WIDTH=$((actual_restack_width + 1))  # Less padding for last column
     
-    # Cap maximum widths to reasonable values
-    [ "$COL_PR_WIDTH" -gt 8 ] && COL_PR_WIDTH=8
+    # Cap maximum widths to reasonable values to prevent overly wide columns
+    [ "$COL_PR_WIDTH" -gt 10 ] && COL_PR_WIDTH=10
+    [ "$COL_BRANCH_WIDTH" -gt 25 ] && COL_BRANCH_WIDTH=25
     [ "$COL_STATUS_WIDTH" -gt 12 ] && COL_STATUS_WIDTH=12
     [ "$COL_CHECKS_WIDTH" -gt 12 ] && COL_CHECKS_WIDTH=12
     [ "$COL_REVIEWS_WIDTH" -gt 12 ] && COL_REVIEWS_WIDTH=12
     [ "$COL_MERGE_WIDTH" -gt 12 ] && COL_MERGE_WIDTH=12
-    [ "$COL_RESTACK_WIDTH" -gt 8 ] && COL_RESTACK_WIDTH=8
+    [ "$COL_RESTACK_WIDTH" -gt 10 ] && COL_RESTACK_WIDTH=10
     
-    # Calculate remaining space for title and branch
-    local fixed_width=$((COL_STACK_WIDTH + COL_PR_WIDTH + COL_STATUS_WIDTH + COL_CHECKS_WIDTH + COL_REVIEWS_WIDTH + COL_MERGE_WIDTH + COL_RESTACK_WIDTH))
-    local remaining=$((available_width - fixed_width))
+    # Calculate space used by fixed-width columns (including separators)
+    local fixed_columns_width=$((COL_STACK_WIDTH + COL_PR_WIDTH + COL_BRANCH_WIDTH + COL_STATUS_WIDTH + COL_CHECKS_WIDTH + COL_REVIEWS_WIDTH + COL_MERGE_WIDTH + COL_RESTACK_WIDTH))
+    local separators_width=8  # 8 spaces between 9 columns
+    local used_width=$((fixed_columns_width + separators_width))
     
-    if [ "$remaining" -gt 50 ]; then
-        # Distribute remaining space: more for title, less for branch
-        COL_TITLE_WIDTH=$((remaining * 3 / 5))
-        COL_BRANCH_WIDTH=$((remaining * 2 / 5))
-    else
-        # Fallback to minimum sizes
-        COL_TITLE_WIDTH="$min_title_width"
-        COL_BRANCH_WIDTH="$min_branch_width"
-    fi
-    
-    # Ensure minimum widths
-    [ "$COL_TITLE_WIDTH" -lt "$min_title_width" ] && COL_TITLE_WIDTH="$min_title_width"
-    [ "$COL_BRANCH_WIDTH" -lt "$min_branch_width" ] && COL_BRANCH_WIDTH="$min_branch_width"
+    # Use remaining terminal width for title column (with minimum)
+    local remaining_width=$((TERMINAL_WIDTH - used_width))
+    COL_TITLE_WIDTH=$((remaining_width > 20 ? remaining_width : 20))  # Minimum 20 chars for title
     
     set -u  # Re-enable undefined variable checking
 }
@@ -271,7 +265,7 @@ insert_main_branch() {
         PR_NUMBERS=("" "${PR_NUMBERS[@]}")
         PR_TITLES=("main" "${PR_TITLES[@]}")
         PR_BRANCHES=("main" "${PR_BRANCHES[@]}")
-        PR_STATUSES=("Trunk" "${PR_STATUSES[@]}")
+        PR_STATUSES=("  Trunk" "${PR_STATUSES[@]}")
         PR_CHECKS=("" "${PR_CHECKS[@]}")
         PR_REVIEWS=("" "${PR_REVIEWS[@]}")
         PR_MERGE_STATUS=("" "${PR_MERGE_STATUS[@]}")
@@ -506,7 +500,7 @@ draw_header() {
     
     # Draw table header
     printf "${BOLD}${WHITE}"
-    printf "%-${COL_STACK_WIDTH}s " "Stack"
+    printf "%-5s " "Stack"
     printf "%-${COL_PR_WIDTH}s " "PR#"
     printf "%-${COL_TITLE_WIDTH}s " "Title"
     printf "%-${COL_BRANCH_WIDTH}s " "Branch"
@@ -518,7 +512,7 @@ draw_header() {
     printf "${RESET}\n"
     
     printf "${WHITE}"
-    printf "%*s\n" "$((COL_STACK_WIDTH + COL_PR_WIDTH + COL_TITLE_WIDTH + COL_BRANCH_WIDTH + COL_STATUS_WIDTH + COL_CHECKS_WIDTH + COL_REVIEWS_WIDTH + COL_MERGE_WIDTH + COL_RESTACK_WIDTH + 8))" "" | sed 's/./─/g'
+    printf "%*s\n" "$((5 + COL_PR_WIDTH + COL_TITLE_WIDTH + COL_BRANCH_WIDTH + COL_STATUS_WIDTH + COL_CHECKS_WIDTH + COL_REVIEWS_WIDTH + COL_MERGE_WIDTH + COL_RESTACK_WIDTH + 8))" "" | sed 's/./─/g'
     printf "${RESET}"
 }
 
@@ -548,35 +542,37 @@ draw_pr_row() {
     
     # Set row color
     local row_color=""
+    local row_bg=""
     if [ "$is_selected" = "1" ]; then
         row_color="${CYAN}"
+        row_bg="\033[44m"  # Blue background instead of cyan for better visibility
     fi
     
-    printf "${row_color}"
-    printf "%-${COL_STACK_WIDTH}s " "$stack_char"
-    printf "%-${COL_PR_WIDTH}s " "$pr_num"
-    printf "%-${COL_TITLE_WIDTH}s " "$trunc_title"
-    printf "%-${COL_BRANCH_WIDTH}s " "$trunc_branch"
+    printf "${row_bg}${row_color}"
+    printf "%-5s " "  $stack_char"
+    printf "%-${COL_PR_WIDTH}s " "  $pr_num"
+    printf "%-${COL_TITLE_WIDTH}s " "  $trunc_title"
+    printf "%-${COL_BRANCH_WIDTH}s " "  $trunc_branch"
     
     # Status with color
     local status_color
     status_color=$(get_status_color "$status")
-    printf "${status_color}%-${COL_STATUS_WIDTH}s${row_color} " "$status"
+    printf "${status_color}%-${COL_STATUS_WIDTH}s${RESET}${row_bg}${row_color} " "$status"
     
     # Checks with color
     local checks_color
     checks_color=$(get_status_color "$checks")
-    printf "${checks_color}%-${COL_CHECKS_WIDTH}s${row_color} " "$checks"
+    printf "${checks_color}%-${COL_CHECKS_WIDTH}s${RESET}${row_bg}${row_color} " "$checks"
     
     # Reviews with color
     local reviews_color
     reviews_color=$(get_status_color "$reviews")
-    printf "${reviews_color}%-${COL_REVIEWS_WIDTH}s${row_color} " "$reviews"
+    printf "${reviews_color}%-${COL_REVIEWS_WIDTH}s${RESET}${row_bg}${row_color} " "$reviews"
     
     # Merge with color
     local merge_color
     merge_color=$(get_status_color "$merge")
-    printf "${merge_color}%-${COL_MERGE_WIDTH}s${row_color} " "$merge"
+    printf "${merge_color}%-${COL_MERGE_WIDTH}s${RESET}${row_bg}${row_color} " "$merge"
     
     # Restack with color
     local restack_color=""
@@ -585,7 +581,8 @@ draw_pr_row() {
     fi
     printf "${restack_color}%-${COL_RESTACK_WIDTH}s${RESET}" "$restack"
     
-    printf "\n"
+    # Reset all colors and background
+    printf "${RESET}\n"
 }
 
 draw_description() {
@@ -615,36 +612,7 @@ draw_help() {
     printf "  ${CYAN}B${RESET} - Open Buildkite   ${CYAN}d${RESET} - Toggle desc  ${CYAN}r${RESET} - Refresh   ${CYAN}q${RESET} - Quit\n"
 }
 
-draw_empty_table() {
-    printf "${CLEAR_SCREEN}${CURSOR_HOME}${HIDE_CURSOR}"
-    printf "${BOLD}${BLUE}––– Graphite Dashboard –––${RESET}\n\n"
-    
-    # Draw dynamic table header that matches the real header
-    printf "${BOLD}${WHITE}"
-    printf "%-5s " "Stack"
-    printf "%-6s " "PR#"
-    printf "%-25s " "Title"
-    printf "%-18s " "Branch"
-    printf "%-8s " "Status"
-    printf "%-8s " "Checks"
-    printf "%-8s " "Reviews"
-    printf "%-8s " "Merge"
-    printf "%-7s" "Restack"
-    printf "\n${RESET}"
-    
-    printf "${WHITE}"
-    printf "%.s─" $(seq 1 ${TERMINAL_WIDTH:-120})
-    printf "${RESET}\n"
-    
-    # Add some empty space for where PRs will appear
-    printf "\n\n\n\n"
-    
-    # Show basic controls
-    printf "\n${BOLD}${BLUE}Controls:${RESET}\n"
-    printf "  ${CYAN}j/k, ↑/↓${RESET} - Navigate   ${CYAN}Enter${RESET} - Checkout   ${CYAN}o${RESET} - Open in browser\n"
-    printf "  ${CYAN}v${RESET} - View details     ${CYAN}b${RESET} - Copy branch  ${CYAN}u${RESET} - Copy URL\n"
-    printf "  ${CYAN}B${RESET} - Open Buildkite   ${CYAN}d${RESET} - Toggle desc  ${CYAN}r${RESET} - Refresh   ${CYAN}q${RESET} - Quit\n"
-}
+
 
 draw_initial_screen() {
     calculate_column_widths
@@ -1010,14 +978,14 @@ main() {
     
     get_terminal_size
     
-    # Draw empty table structure first for immediate visual feedback
-    draw_empty_table
+    # Show loading message immediately
+    printf "${CLEAR_SCREEN}${CURSOR_HOME}${HIDE_CURSOR}"
+    printf "${BOLD}${BLUE}––– Graphite Dashboard –––${RESET}\n\n"
+    printf "${YELLOW}Fetching your PR data...${RESET}\n"
     
-    # Show fetching message
-    show_message "Fetching your PR data..." "${YELLOW}"
-    
+    # Fetch all data first
     if ! fetch_pr_data; then
-        show_message "Failed to fetch PR data" "${RED}"
+        printf "${RED}Failed to fetch PR data${RESET}\n"
         exit 1
     fi
     
@@ -1027,7 +995,7 @@ main() {
         has_prs=false
     fi
     
-    # Now draw the table with real data
+    # Now draw the complete table with real data and properly calculated column widths
     draw_initial_screen
     
     # Show message if no PRs found
