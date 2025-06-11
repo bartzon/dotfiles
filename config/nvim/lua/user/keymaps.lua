@@ -31,6 +31,7 @@ bind('n', '<leader>pr', ":!dev open pr<CR>", { desc = "Open PR", silent = true }
 
 bind('n', '<leader>cp', ':let @+=@%<CR>', { desc = 'Copy current file path to clipboard', silent = true })
 
+
 bind('n', 'gt', ':vsplit | lua vim.lsp.buf.definition()<CR>', {})
 bind('n', 'gT', ':tabnew | lua vim.lsp.buf.definition()<CR>', {})
 
@@ -63,3 +64,14 @@ end, { silent = true, desc = "Remove Search Highlighting, Dismiss Popups" })
 
 bind('n', '<leader>tapi', ':VimuxRunCommand "./bin/tapioca dsl ".bufname("%")<CR>',
   { desc = 'Run tapioca for current file', silent = true })
+
+-- Compare current file with main branch using gitsigns
+bind('n', '<leader>cm', function()
+  local current_buf = vim.api.nvim_get_current_buf()
+  vim.cmd('tabnew')
+  vim.api.nvim_set_current_buf(current_buf)
+  require('gitsigns').diffthis('main', {
+    vertical = true,
+    split = 'rightbelow'
+  })
+end, { desc = 'Compare file with main branch' })
