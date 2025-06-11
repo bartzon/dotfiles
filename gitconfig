@@ -42,3 +42,9 @@
 	enabled = true
 [maintenance]
 	repo = /Users/bartzonneveld/world/trees/root/src
+	repo = /Users/bartzonneveld/world/trees/root/src/areas/core/shopify/issue-analyzer
+[credential]
+	helper = 
+	helper = /usr/local/share/gcm-core/git-credential-manager
+[credential "https://dev.azure.com"]
+	useHttpPath = true

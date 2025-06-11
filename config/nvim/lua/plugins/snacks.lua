@@ -32,11 +32,6 @@ return {
       desc = "Smart Find Files"
     },
     {
-      "<leader><leader>r",
-      function() Snacks.picker.resume() end,
-      desc = "Resume Last Picker"
-    },
-    {
       "<leader>sw",
       function() Snacks.picker.grep_word() end,
       desc = "Visual selection or word",

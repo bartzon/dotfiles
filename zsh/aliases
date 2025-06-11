@@ -1,5 +1,6 @@
 alias ..='cd ..'
 
+alias dash=~/.bin/gt-dashboard-interactive
 alias ctop="top -o cpu"
 alias whereis="which"
 alias more='less -RFX'
