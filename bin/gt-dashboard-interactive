@@ -609,7 +609,7 @@ draw_help() {
     printf "\n${BOLD}${BLUE}Controls:${RESET}\n"
     printf "  ${CYAN}j/k, ↑/↓${RESET} - Navigate   ${CYAN}Enter${RESET} - Checkout   ${CYAN}o${RESET} - Open in browser\n"
     printf "  ${CYAN}v${RESET} - View details     ${CYAN}b${RESET} - Copy branch  ${CYAN}u${RESET} - Copy URL\n"
-    printf "  ${CYAN}B${RESET} - Open Buildkite   ${CYAN}d${RESET} - Toggle desc  ${CYAN}r${RESET} - Refresh   ${CYAN}q${RESET} - Quit\n"
+    printf "  ${CYAN}B${RESET} - Open Buildkite   ${CYAN}i${RESET} - Copy build ID  ${CYAN}d${RESET} - Toggle desc  ${CYAN}r${RESET} - Refresh  ${CYAN}q${RESET} - Quit\n"
 }
 
 
@@ -808,6 +808,40 @@ copy_pr_url() {
     fi
 }
 
+copy_buildkite_id() {
+    local pr_num="${PR_NUMBERS[CURRENT_SELECTION]}"
+    
+    if [ -z "$pr_num" ]; then
+        show_message "Cannot copy Buildkite ID for main branch (no PR)" "${RED}"
+        return
+    fi
+    
+    local buildkite_url="${PR_BUILDKITE_URLS[CURRENT_SELECTION]}"
+    if [ -z "$buildkite_url" ]; then
+        show_message "No Buildkite URL available for this PR" "${RED}"
+        return
+    fi
+    
+    # Extract build ID from URL like: https://buildkite.com/shopify/world-shopify-selective-tests/builds/243057#01975df8-c035-4bd7-a0c8-e303393a7b2a
+    local build_id
+    build_id=$(echo "$buildkite_url" | sed -n 's|.*/builds/\([0-9][0-9]*\).*|\1|p')
+    
+    if [ -z "$build_id" ]; then
+        show_message "Could not extract build ID from Buildkite URL" "${RED}"
+        return
+    fi
+    
+    if command -v pbcopy >/dev/null 2>&1; then
+        echo -n "$build_id" | pbcopy
+        show_message "Copied Buildkite build ID '$build_id' to clipboard" "${GREEN}"
+    elif command -v xclip >/dev/null 2>&1; then
+        echo -n "$build_id" | xclip -selection clipboard
+        show_message "Copied Buildkite build ID '$build_id' to clipboard" "${GREEN}"
+    else
+        show_message "Clipboard not available (no pbcopy/xclip)" "${RED}"
+    fi
+}
+
 refresh_data() {
     show_message "Refreshing PR data..." "${YELLOW}"
     if fetch_pr_data; then
@@ -823,15 +857,19 @@ navigate_up() {
         clear_message  # Clear any previous messages
         ((CURRENT_SELECTION--))
         if [ "$DESCRIPTION_MODE" -eq 1 ]; then
-            # Full redraw when descriptions are active
+            # Full redraw when descriptions are active (they change content)
             draw_initial_screen
         else
-            # Redraw the previously selected row (the one we just moved from)
-            printf "\033[%d;1H" "$((CURRENT_SELECTION + 6))"
+            # Partial redraw for efficiency - just update the two affected rows
+            # Row positions: header=line 4, separator=line 5, data starts at line 6
+            # So PR row N is at line (6 + N)
+            
+            # Redraw the previously selected row (now unselected)
+            printf "\033[%d;1H" "$((6 + CURRENT_SELECTION + 1))"
             draw_pr_row "$((CURRENT_SELECTION + 1))" "0"
             
             # Redraw the newly selected row
-            printf "\033[%d;1H" "$((CURRENT_SELECTION + 5))"
+            printf "\033[%d;1H" "$((6 + CURRENT_SELECTION))"
             draw_pr_row "${CURRENT_SELECTION}" "1"
         fi
     fi
@@ -842,15 +880,19 @@ navigate_down() {
         clear_message  # Clear any previous messages
         ((CURRENT_SELECTION++))
         if [ "$DESCRIPTION_MODE" -eq 1 ]; then
-            # Full redraw when descriptions are active
+            # Full redraw when descriptions are active (they change content)
             draw_initial_screen
         else
-            # Redraw the previously selected row (the one we just moved from)
-            printf "\033[%d;1H" "$((CURRENT_SELECTION + 4))"
+            # Partial redraw for efficiency - just update the two affected rows
+            # Row positions: header=line 4, separator=line 5, data starts at line 6
+            # So PR row N is at line (6 + N)
+            
+            # Redraw the previously selected row (now unselected)
+            printf "\033[%d;1H" "$((6 + CURRENT_SELECTION - 1))"
             draw_pr_row "$((CURRENT_SELECTION - 1))" "0"
             
             # Redraw the newly selected row
-            printf "\033[%d;1H" "$((CURRENT_SELECTION + 5))"
+            printf "\033[%d;1H" "$((6 + CURRENT_SELECTION))"
             draw_pr_row "${CURRENT_SELECTION}" "1"
         fi
     fi
@@ -938,6 +980,9 @@ handle_key() {
             ;;
         'u')
             copy_pr_url
+            ;;
+        'i')  # i for build ID
+            copy_buildkite_id
             ;;
         'd')
             toggle_descriptions
