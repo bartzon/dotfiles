@@ -49,12 +49,28 @@ return {
     },
     {
       'gd',
-      function() Snacks.picker.lsp_definitions() end,
+      function() 
+        Snacks.picker.lsp_definitions({
+          filter = {
+            filter = function(item, self)
+              return not (item.file and item.file:match("%.rbi$"))
+            end,
+          },
+        })
+      end,
       desc = "LSP Definitions"
     },
     {
       'gr',
-      function() Snacks.picker.lsp_references() end,
+      function() 
+        Snacks.picker.lsp_references({
+          filter = {
+            filter = function(item, self)
+              return not (item.file and item.file:match("%.rbi$"))
+            end,
+          },
+        })
+      end,
       desc = "LSP References"
     },
     {
