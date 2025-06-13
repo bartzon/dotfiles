@@ -1,0 +1,580 @@
+#!/usr/bin/env ruby
+
+require 'json'
+require 'open3'
+require 'thread'
+require 'csv'
+
+# Graphite CLI Interactive Dashboard using Gum
+# Shows PRs with status, checks, and interactive navigation
+
+# PR value object with display and stack logic
+class PR
+  attr_reader :number, :title, :branch, :status, :checks, :reviews, :merge, :url, :description, :buildkite_url, :main
+  attr_accessor :stack_char, :restack
+
+  def initialize(number:, title:, branch:, status:, checks:, reviews:, merge:, url:, description:, buildkite_url:, stack_char:, restack:, main: false)
+    @number = number
+    @title = title
+    @branch = branch
+    @status = status
+    @checks = checks
+    @reviews = reviews
+    @merge = merge
+    @url = url
+    @description = description
+    @buildkite_url = buildkite_url
+    @stack_char = stack_char
+    @restack = restack
+    @main = main
+  end
+
+  def main?
+    @main
+  end
+
+  def pr_number_display
+    number.empty? ? stack_char : "#{stack_char.ljust(4)}##{number}"
+  end
+
+  def to_table_row
+    [
+      pr_number_display,
+      title.gsub("\n", " ").strip,
+      branch,
+      status,
+      checks,
+      reviews,
+      merge,
+      restack
+    ]
+  end
+end
+
+# Service class to fetch PRs
+class PRFetcher
+  def self.fetch
+    prs = []
+    gh_output, status = Open3.capture2('gh pr list --author @me --json number,title,headRefName,state,statusCheckRollup,reviewDecision,mergeable,url,body --limit 20 2>/dev/null')
+    if status.success? && !gh_output.strip.empty? && gh_output.strip != "[]"
+      pr_data = JSON.parse(gh_output)
+      pr_data.each do |pr|
+        prs << build_pr(pr)
+      end
+    end
+    prs
+  end
+
+  def self.build_pr(pr)
+    # Process status checks
+    checks_status = "Unknown"
+    buildkite_url = ""
+    if pr['statusCheckRollup'] && pr['statusCheckRollup'].any?
+      all_success = true
+      has_failure = false
+      has_pending = false
+      pr['statusCheckRollup'].each do |context|
+        next if context['name'] =~ /(review|required|mergeable)/i
+        target_url = context['detailsUrl'] || context['targetUrl'] || ""
+        buildkite_url = target_url if target_url.include?('buildkite.com') && buildkite_url.empty?
+        conclusion = context['conclusion'] || context['state'] || ""
+        case conclusion
+        when 'SUCCESS'
+          next
+        when 'FAILURE', 'CANCELLED', 'ERROR'
+          has_failure = true
+          all_success = false
+        when 'PENDING', 'IN_PROGRESS', ''
+          has_pending = true
+          all_success = false
+        else
+          all_success = false
+        end
+      end
+      if has_failure
+        checks_status = "Failed"
+      elsif has_pending
+        checks_status = "Running"
+      elsif all_success
+        checks_status = "Passed"
+      end
+    end
+    # Process review status
+    review_status = case pr['reviewDecision']
+                   when 'APPROVED' then 'Approved'
+                   when 'CHANGES_REQUESTED' then 'Changes'
+                   when 'REVIEW_REQUIRED' then 'Required'
+                   else 'None'
+                   end
+    # Process merge status
+    merge_status = case pr['mergeable']
+                  when 'MERGEABLE' then 'Ready'
+                  when 'CONFLICTING' then 'Conflicts'
+                  else 'Unknown'
+                  end
+    PR.new(
+      number: pr['number'].to_s,
+      title: pr['title'] || "",
+      branch: pr['headRefName'] || "",
+      status: pr['state'] || "",
+      checks: checks_status,
+      reviews: review_status,
+      merge: merge_status,
+      url: pr['url'] || "",
+      description: (pr['body'] || "").strip[0..800],
+      buildkite_url: buildkite_url,
+      stack_char: "◯",
+      restack: "",
+      main: false
+    )
+  end
+end
+
+# Service class to build stack info
+class StackInfoBuilder
+  def self.build(prs)
+    gt_output, _ = Open3.capture2('timeout 3s gt log --no-interactive 2>/dev/null || echo ""')
+    pr_deps = []
+    parent_branches = []
+    threads = []
+    pr_mutex = Mutex.new
+    prs.each do |pr|
+      next if pr.branch == "main" || pr.number.empty?
+      threads << Thread.new(pr) do |pr_thread|
+        needs_restack = gt_output.include?("#{pr_thread.branch}.*needs restack") ? "Yes" : ""
+        pr_data, status = Open3.capture2("gh pr view #{pr_thread.number} --json baseRefName 2>/dev/null")
+        if status.success? && !pr_data.empty?
+          begin
+            data = JSON.parse(pr_data)
+            base_branch = data.dig('baseRefName')
+            if base_branch
+              depth = base_branch == "main" ? 1 : 2
+              pr_mutex.synchronize do
+                parent_branches << base_branch if base_branch != "main"
+                pr_deps << "#{pr_thread.number}:#{depth}:#{needs_restack}:#{base_branch}"
+              end
+            end
+          rescue JSON::ParserError
+          end
+        end
+      end
+    end
+    threads.each(&:join)
+    pr_indices = (0...prs.length).to_a
+    sortable_prs = []
+    pr_indices.each do |i|
+      pr = prs[i]
+      depth = 999
+      restack = ""
+      pr_deps.each do |dep|
+        dep_parts = dep.split(':')
+        if dep_parts[0] == pr.number
+          depth = dep_parts[1].to_i
+          restack = dep_parts[2]
+          break
+        end
+      end
+      sortable_prs << [depth, pr.number.to_i, i, restack]
+    end
+    sorted_indices = sortable_prs.sort.map { |entry| entry[2] }
+    new_prs = []
+    sorted_indices.each do |i|
+      pr = prs[i].dup
+      pr_num = pr.number
+      branch = pr.branch
+      depth = 1
+      restack = ""
+      pr_deps.each do |dep|
+        dep_parts = dep.split(':')
+        if dep_parts[0] == pr_num
+          depth = dep_parts[1].to_i
+          restack = dep_parts[2]
+          break
+        end
+      end
+      has_children = parent_branches.include?(branch)
+      stack_char = case depth
+                  when 1
+                    has_children ? "│┐" : "├"
+                  when 2
+                    "│├"
+                  when 3
+                    "││├"
+                  else
+                    "│││├"
+                  end
+      pr.stack_char = stack_char
+      pr.restack = restack
+      new_prs << pr
+    end
+    prs.replace(new_prs)
+  end
+end
+
+# Action handler for PR actions
+class Action
+  def initialize(dashboard)
+    @dashboard = dashboard
+  end
+
+  def perform(action, pr)
+    case action
+    when /Checkout/
+      checkout_branch(pr.branch)
+    when /Open PR in browser/
+      open_in_browser(pr.url)
+    when /Copy branch name/
+      copy_to_clipboard(pr.branch, "branch name")
+    when /Copy PR URL/
+      copy_to_clipboard(pr.url, "PR URL")
+    when /View PR details/
+      view_pr_details(pr.number)
+    when /Show description/
+      show_description(pr.description)
+    when /Open Buildkite/
+      open_in_browser(pr.buildkite_url)
+    when /Copy build ID/
+      build_id = extract_build_id(pr.buildkite_url)
+      copy_to_clipboard(build_id, "build ID") if build_id
+    when /Refresh data/
+      @dashboard.refresh_data
+    when /Back to list/
+      @dashboard.show_main_menu
+    else
+      @dashboard.show_main_menu
+    end
+  end
+
+  def checkout_branch(branch)
+    system("clear")
+    puts "Checking out #{branch}..."
+    if system("git checkout #{branch} 2>/dev/null")
+      system("gum style --foreground 212 'Successfully checked out #{branch}'")
+      exit 0
+    else
+      system("gum style --foreground 196 'Failed to checkout #{branch}'")
+      puts "Press Enter to continue..."
+      gets
+      @dashboard.show_main_menu
+    end
+  end
+
+  def open_in_browser(url)
+    return if url.empty?
+    if system("which open > /dev/null 2>&1")
+      system("open '#{url}' 2>/dev/null &")
+    elsif system("which xdg-open > /dev/null 2>&1")
+      system("xdg-open '#{url}' 2>/dev/null &")
+    else
+      system("gum style --foreground 196 'Cannot open browser (no open/xdg-open command)'")
+      puts "URL: #{url}"
+      puts "Press Enter to continue..."
+      gets
+      @dashboard.show_main_menu
+      return
+    end
+    system("gum style --foreground 212 'Opened in browser'")
+    sleep 1
+    @dashboard.show_main_menu
+  end
+
+  def copy_to_clipboard(text, description)
+    return if text.empty?
+    if system("which pbcopy > /dev/null 2>&1")
+      system("echo -n '#{text}' | pbcopy")
+    elsif system("which xclip > /dev/null 2>&1")
+      system("echo -n '#{text}' | xclip -selection clipboard")
+    else
+      system("gum style --foreground 196 'Clipboard not available (no pbcopy/xclip)'")
+      puts "#{description.capitalize}: #{text}"
+      puts "Press Enter to continue..."
+      gets
+      @dashboard.show_main_menu
+      return
+    end
+    system("gum style --foreground 212 'Copied #{description} to clipboard'")
+    sleep 1
+    @dashboard.show_main_menu
+  end
+
+  def view_pr_details(pr_number)
+    return if pr_number.empty?
+    system("clear")
+    puts "Loading PR ##{pr_number} details..."
+    puts
+    system("gh pr view #{pr_number}")
+    puts "\nPress Enter to continue..."
+    gets
+    @dashboard.show_main_menu
+  end
+
+  def show_description(description)
+    return if description.empty?
+    system("clear")
+    system("gum style --foreground 212 --bold 'Description:'")
+    puts
+    puts description
+    puts "\nPress Enter to continue..."
+    gets
+    @dashboard.show_main_menu
+  end
+
+  def extract_build_id(url)
+    return nil if url.empty?
+    match = url.match(/\/builds\/(\d+)/)
+    match ? match[1] : nil
+  end
+end
+
+# In GraphiteDashboard, use Action for all actions
+class GraphiteDashboard
+  def initialize
+    check_dependencies
+    @prs = PRFetcher.fetch
+    StackInfoBuilder.build(@prs)
+    @main_branch = PR.new(
+      number: "",
+      title: "main",
+      branch: "main",
+      status: "Trunk",
+      checks: "",
+      reviews: "",
+      merge: "",
+      url: "",
+      description: "The main trunk branch - base for all feature branches",
+      buildkite_url: "",
+      stack_char: "◯",
+      restack: "",
+      main: true
+    )
+    @action_handler = Action.new(self)
+  end
+
+  def check_dependencies
+    missing = []
+    %w[gh jq gt gum].each do |cmd|
+      unless system("which #{cmd} > /dev/null 2>&1")
+        puts "#{cmd} is not installed. Installing with brew..."
+        if system("which brew > /dev/null 2>&1")
+          install_cmd = case cmd
+                        when 'gh' then 'brew install gh'
+                        when 'jq' then 'brew install jq'
+                        when 'gt' then 'npm install -g @withgraphite/graphite-cli'
+                        when 'gum' then 'brew install gum'
+                        end
+          unless system(install_cmd)
+            puts "Failed to install #{cmd} with brew. Please install it manually."
+            exit 1
+          end
+        else
+          puts "Homebrew is not installed. Please install #{cmd} manually."
+          exit 1
+        end
+      end
+    end
+
+    unless system("git rev-parse --git-dir > /dev/null 2>&1")
+      puts "Error: Not in a git repository"
+      exit 1
+    end
+  end
+
+  def format_pr_for_display(pr, is_main = false, title_width = 30)
+    # Fixed widths for columns
+    stack_w = 4
+    num_w = 6
+    branch_w = 22
+    status_w = 8
+    checks_w = 8
+    reviews_w = 10
+    merge_w = 10
+    restack_w = 8
+
+    if is_main
+      "#{pr.stack_char.ljust(stack_w)} #{pr.title.ljust(title_width)} #{pr.branch.ljust(branch_w)} #{pr.status.ljust(status_w)} #{''.ljust(checks_w)} #{''.ljust(reviews_w)} #{''.ljust(merge_w)} #{''.ljust(restack_w)}"
+    else
+      stack = pr.stack_char.ljust(stack_w)
+      num = ("##{pr.number}").ljust(num_w)
+      title = truncate(pr.title, title_width - 2).ljust(title_width)
+      branch = truncate(pr.branch, branch_w - 2).ljust(branch_w)
+      status = pr.status.ljust(status_w)
+      checks = pr.checks.ljust(checks_w)
+      reviews = pr.reviews.ljust(reviews_w)
+      merge = pr.merge.ljust(merge_w)
+      restack = pr.restack.ljust(restack_w)
+
+      "#{stack} #{num} #{title} #{branch} #{status} #{checks} #{reviews} #{merge} #{restack}"
+    end
+  end
+
+  def truncate(str, length)
+    return str if str.length <= length
+    str[0..length-4] + "..."
+  end
+
+  def show_main_menu
+    term_width = `tput cols`.to_i
+    stack_w = 4
+    num_w = 6
+    branch_w = 22
+    status_w = 8
+    checks_w = 8
+    reviews_w = 10
+    merge_w = 10
+    restack_w = 8
+    n_spaces = 8
+    fixed_width = stack_w + num_w + branch_w + status_w + checks_w + reviews_w + merge_w + restack_w + n_spaces
+    title_width = [term_width - fixed_width, 10].max
+
+    all_prs = [@main_branch] + @prs
+    pr_row_map = []
+    csv_header = ["PR#", "Title", "Branch", "Status", "Checks", "Reviews", "Merge", "Restack"]
+
+    # Build main branch row
+    main_branch_row = [
+      'MAIN',
+      'MAIN BRANCH',
+      'main',
+      'TRUNK',
+      '', '', '', ''
+    ]
+
+    pr_rows = @prs.map do |pr|
+      pr_row_map << pr
+      pr.to_table_row
+    end
+
+    all_rows = [csv_header, main_branch_row] + pr_rows
+    col_widths = all_rows.transpose.map { |col| col.map { |v| v.to_s.length }.max }
+    separator_row = col_widths.map { |w| '─' * w }
+    csv_rows = [separator_row, main_branch_row] + pr_rows
+
+    csv_string = CSV.generate do |csv|
+      csv << csv_header
+      csv_rows.each { |row| csv << row }
+    end
+
+    system("clear")
+    Drawing.styled_block('Graphite CLI Dashboard', foreground: 212, bold: true, align: 'center')
+    puts
+
+    selected_csv = Drawing.table(csv_string)
+
+    return if selected_csv.empty? || selected_csv == csv_header.join(",")
+
+    selected_fields = CSV.parse_line(selected_csv)
+    if selected_fields[0] =~ /^-+$/
+      show_main_menu
+      return
+    end
+    if selected_fields[0] == 'MAIN'
+      show_action_menu(@main_branch)
+      return
+    end
+    pr_index = csv_rows.index(selected_fields) - 2
+    if pr_index && pr_index >= 0 && pr_index < pr_row_map.size
+      selected_pr = pr_row_map[pr_index]
+      show_action_menu(selected_pr)
+    else
+      show_main_menu
+    end
+  end
+
+  def show_action_menu(pr)
+    actions = if pr.main?
+      [
+        "Checkout main",
+        "Copy branch name",
+        "Refresh data",
+        "Back to list"
+      ]
+    else
+      acts = [
+        "Checkout branch",
+        "Open PR in browser",
+        "Copy branch name",
+        "Copy PR URL",
+        "View PR details",
+        "Show description"
+      ]
+      acts += ["Open Buildkite", "Copy build ID"] unless pr.buildkite_url.empty?
+      acts += ["Refresh data", "Back to list"]
+      acts
+    end
+    system("clear")
+    Drawing.styled_block('Selected: ' + pr.title, foreground: 212, bold: true)
+    if !pr.number.empty?
+      puts "PR ##{pr.number} | Branch: #{pr.branch} | Status: #{pr.status}"
+      puts "Checks: #{pr.checks} | Reviews: #{pr.reviews} | Merge: #{pr.merge}"
+      puts "Restack: #{pr.restack}" unless pr.restack.empty?
+    else
+      puts "Branch: #{pr.branch} | Status: #{pr.status}"
+    end
+    puts
+    choice = Drawing.menu(actions, header: "Choose an action:")
+    handle_action(choice, pr)
+  end
+
+  def handle_action(action, pr)
+    @action_handler.perform(action, pr)
+  end
+
+  def refresh_data
+    @prs = PRFetcher.fetch
+    StackInfoBuilder.build(@prs)
+    show_main_menu
+  end
+
+  def run
+    system("clear")
+
+    if @prs.empty?
+      system("gum style --foreground 221 --align center '⚠️  You don\\'t have any PRs in this repo'")
+      puts
+      puts "Only main branch is available:"
+      puts
+    end
+
+    show_main_menu
+  end
+end
+
+class Drawing
+  def self.styled_text(text, foreground: nil, bold: false, align: nil)
+    cmd = ["gum style"]
+    cmd << "--foreground #{foreground}" if foreground
+    cmd << "--bold" if bold
+    cmd << "--align #{align}" if align
+    cmd << "'#{text}'"
+    system(cmd.join(' '))
+  end
+
+  def self.styled_block(text, foreground: nil, bold: false, align: nil)
+    styled_text(text, foreground: foreground, bold: bold, align: align)
+  end
+
+  def self.table(csv_string)
+    IO.popen("gum table", "r+") do |io|
+      io.puts csv_string
+      io.close_write
+      io.read
+    end.strip
+  end
+
+  def self.menu(options, header: nil)
+    header_opt = header ? "--header \"#{header}\"" : ""
+    `echo "#{options.join("\n")}" | gum choose #{header_opt}`.strip
+  end
+end
+
+# Run the dashboard
+begin
+  dashboard = GraphiteDashboard.new
+  dashboard.run
+rescue Interrupt
+  puts "\n👋 Goodbye!"
+  exit 0
+rescue => e
+  puts "❌ Error: #{e.message}"
+  exit 1
+end

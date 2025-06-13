@@ -17,7 +17,8 @@ BOLD='\033[1m'
 RESET='\033[0m'
 
 # Control sequences
-CLEAR_SCREEN='\033[2J'
+# CLEAR_SCREEN='\033[2J'
+CLEAR_SCREEN=''
 CURSOR_HOME='\033[H'
 HIDE_CURSOR='\033[?25l'
 SHOW_CURSOR='\033[?25h'
@@ -42,6 +43,7 @@ declare -i TOTAL_PRS=0
 declare -i DESCRIPTION_MODE=0
 declare -i TERMINAL_WIDTH
 declare -i TERMINAL_HEIGHT
+declare DEBUG_TABLE=false
 
 # Column widths (will be calculated dynamically)
 declare -i COL_STACK_WIDTH=5
@@ -72,6 +74,7 @@ calculate_column_widths() {
     get_terminal_size
     
     # Calculate actual width needed for each column based on real data
+    local actual_stack_width=5     # "Stack" header
     local actual_pr_width=3        # "PR#" header
     local actual_branch_width=6    # "Branch" header  
     local actual_status_width=6    # "Status" header
@@ -83,6 +86,10 @@ calculate_column_widths() {
     # Find the actual maximum width needed for each column from the data
     if [ "$TOTAL_PRS" -gt 0 ]; then
         for i in $(seq 0 $((TOTAL_PRS - 1))); do
+            # Stack character width (account for 2-space prefix)
+            local stack_len=$((${#PR_STACK_CHARS[i]} + 2))
+            [ "$stack_len" -gt "$actual_stack_width" ] && actual_stack_width="$stack_len"
+            
             # PR number width
             local pr_len=${#PR_NUMBERS[i]}
             [ "$pr_len" -gt "$actual_pr_width" ] && actual_pr_width="$pr_len"
@@ -114,7 +121,7 @@ calculate_column_widths() {
     fi
     
     # Add padding to each column (2 extra characters for comfort)
-    COL_STACK_WIDTH=5  # Fixed width for stack symbols
+    COL_STACK_WIDTH=$((actual_stack_width + 2))  # Dynamic width for stack symbols
     COL_PR_WIDTH=$((actual_pr_width + 2))
     COL_BRANCH_WIDTH=$((actual_branch_width + 2))
     COL_STATUS_WIDTH=$((actual_status_width + 2))
@@ -164,84 +171,205 @@ get_stack_info() {
         done
     fi
     
-    # Use fast gt log short - much faster than regular gt log (0.5s vs 3+s)
-    local stack_output
-    stack_output=$(timeout 3s gt log short --no-interactive 2>/dev/null || echo "")
+    # Use GitHub API to get stack dependencies - much more reliable than parsing gt log
+    # First, get restack info from gt log
+    local gt_output
+    gt_output=$(timeout 3s gt log --no-interactive 2>/dev/null || echo "")
     
-    # Parse the gt log short output which looks like:
-    # ◯        branch_name (status)
-    # │ ◯      another_branch
-    # │ │ ◯    third_branch (needs restack)
-    # ◉─┴─┴─┘  main
+    # Simple approach: build a list of PR dependencies and find which PRs have children
+    declare -a pr_deps=()  # Will store "pr_number:depth:restack_status:base_branch"
+    declare -a parent_branches=()  # Track which branches have children
     
-    while IFS= read -r line; do
-        # Skip empty lines and lines that don't contain branch info
-        if [[ -z "$line" || ! "$line" =~ [◯◉] ]]; then
-            continue
-        fi
-        
-        # Extract branch name and determine stack position from the line structure
-        if [[ "$line" =~ ([◯◉])[[:space:]]*([^[:space:]]+) ]]; then
-            local branch_info="${BASH_REMATCH[2]}"
-            local branch_name
-            local restack_status=""
+    if [ "$TOTAL_PRS" -gt 0 ]; then
+        for i in $(seq 0 $((TOTAL_PRS - 1))); do
+            local pr_num="${PR_NUMBERS[i]}"
+            local branch="${PR_BRANCHES[i]}"
             
-            # Check for restack status
-            if [[ "$line" =~ \(needs\ restack\) ]]; then
-                restack_status="Yes"
-            fi
-            
-            # Clean up branch name (remove status info in parentheses)
-            branch_name="${branch_info%% (*}"
-            
-            # Skip main/trunk branches
-            if [[ "$branch_name" == "main" || "$branch_name" == "master" || "$branch_name" == "trunk" ]]; then
+            # Skip main branch
+            if [ "$branch" = "main" ] || [ -z "$pr_num" ]; then
                 continue
             fi
             
-            # Find this branch in our PR list and set appropriate stack character
-            if [ "$TOTAL_PRS" -gt 0 ]; then
-                for j in $(seq 0 $((TOTAL_PRS - 1))); do
-                if [ "${PR_BRANCHES[j]}" = "$branch_name" ]; then
-                    # Set restack status
-                    PR_RESTACK_STATUS[j]="$restack_status"
-                    
-                    # Use the symbol from gt log short output directly
-                    # ◯ = standalone or part of stack
-                    # We could enhance this by parsing the tree structure more carefully,
-                    # but for now, let's keep it simple and fast
-                    
-                    # Check if this line has connectors indicating it's part of a stack
-                    if [[ "$line" =~ ├|└|│ ]]; then
-                        # Has tree connectors - it's connected in a stack
-                        if [[ "$line" =~ ├ ]]; then
-                            PR_STACK_CHARS[j]="├"  # Middle of stack
-                        elif [[ "$line" =~ └ ]] || [[ "$line" =~ ┘ ]]; then
-                            PR_STACK_CHARS[j]="└"  # End of stack branch
-                        else
-                            PR_STACK_CHARS[j]="│"  # Part of stack chain
-                        fi
-                    else
-                        # Count leading │ characters to determine if it's connected
-                        local connector_count=0
-                        local temp_line="$line"
-                        while [[ "$temp_line" =~ ^[[:space:]]*│ ]]; do
-                            ((connector_count++))
-                            temp_line="${temp_line#*│}"
-                        done
-                        
-                        if [ "$connector_count" -gt 0 ]; then
-                            PR_STACK_CHARS[j]="├"  # Connected in stack
-                        else
-                            PR_STACK_CHARS[j]="◯"  # Standalone
-                        fi
+            # Check if this branch needs restack from gt log
+            local needs_restack=""
+            if echo "$gt_output" | grep -q "$branch.*needs restack"; then
+                needs_restack="Yes"
+            fi
+            
+            # Get PR base branch from GitHub API
+            local pr_data
+            pr_data=$(curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $(gh auth token)" \
+                "https://api.github.com/repos/shop/world/pulls/$pr_num" 2>/dev/null)
+            
+            if [ $? -eq 0 ] && [ -n "$pr_data" ]; then
+                local base_branch
+                base_branch=$(echo "$pr_data" | jq -r '.base.ref // ""' 2>/dev/null)
+                
+                if [ -n "$base_branch" ]; then
+                    # Calculate depth: if base is main, depth is 1; otherwise depth is 2+
+                    local depth=1
+                    if [ "$base_branch" != "main" ]; then
+                        # For now, assume depth 2 for stacked PRs (we could make this more sophisticated)
+                        depth=2
+                        # Track that the base branch has children
+                        parent_branches+=("$base_branch")
                     fi
+                    
+                    pr_deps+=("$pr_num:$depth:$needs_restack:$base_branch")
+                fi
+            fi
+        done
+    fi
+    
+    # Now reorder PRs based on their dependencies
+    if [ "$TOTAL_PRS" -gt 0 ]; then
+        # Create arrays to hold the reordered data
+        declare -a new_PR_NUMBERS=()
+        declare -a new_PR_TITLES=()
+        declare -a new_PR_BRANCHES=()
+        declare -a new_PR_STATUSES=()
+        declare -a new_PR_CHECKS=()
+        declare -a new_PR_REVIEWS=()
+        declare -a new_PR_MERGE_STATUS=()
+        declare -a new_PR_URLS=()
+        declare -a new_PR_DESCRIPTIONS=()
+        declare -a new_PR_BUILDKITE_URLS=()
+        declare -a new_PR_STACK_CHARS=()
+        declare -a new_PR_RESTACK_STATUS=()
+        
+        # Separate main branch and PRs
+        local main_index=-1
+        declare -a pr_indices=()
+        
+        for i in $(seq 0 $((TOTAL_PRS - 1))); do
+            if [ "${PR_BRANCHES[i]}" = "main" ]; then
+                main_index=$i
+            else
+                pr_indices+=($i)
+            fi
+        done
+        
+        # Sort PR indices by their depth (base PRs first, then stacked PRs)
+        declare -a sortable_prs=()
+        for i in "${pr_indices[@]}"; do
+            local pr_num="${PR_NUMBERS[i]}"
+            local depth=999  # Default for PRs not found in dependencies
+            local restack=""
+            
+            # Find this PR in our dependencies list
+            for dep in "${pr_deps[@]}"; do
+                local dep_pr_num=$(echo "$dep" | cut -d: -f1)
+                if [ "$dep_pr_num" = "$pr_num" ]; then
+                    depth=$(echo "$dep" | cut -d: -f2)
+                    restack=$(echo "$dep" | cut -d: -f3)
                     break
                 fi
-                done
+            done
+            
+            # Use depth as primary sort key, PR number as secondary for stable sorting
+            sortable_prs+=("$depth:$pr_num:$i:$restack")
+        done
+        
+        # Sort by depth first, then by PR number
+        declare -a sorted_pr_indices=()
+        while IFS= read -r entry; do
+            if [ -n "$entry" ]; then
+                local index=$(echo "$entry" | cut -d: -f3)
+                sorted_pr_indices+=("$index")
             fi
+        done < <(printf '%s\n' "${sortable_prs[@]}" | sort -n)
+        
+        # Rebuild arrays: main first, then sorted PRs
+        local new_index=0
+        
+        # Add main branch first if it exists
+        if [ "$main_index" -ge 0 ]; then
+            new_PR_NUMBERS[new_index]="${PR_NUMBERS[main_index]}"
+            new_PR_TITLES[new_index]="${PR_TITLES[main_index]}"
+            new_PR_BRANCHES[new_index]="${PR_BRANCHES[main_index]}"
+            new_PR_STATUSES[new_index]="${PR_STATUSES[main_index]}"
+            new_PR_CHECKS[new_index]="${PR_CHECKS[main_index]}"
+            new_PR_REVIEWS[new_index]="${PR_REVIEWS[main_index]}"
+            new_PR_MERGE_STATUS[new_index]="${PR_MERGE_STATUS[main_index]}"
+            new_PR_URLS[new_index]="${PR_URLS[main_index]}"
+            new_PR_DESCRIPTIONS[new_index]="${PR_DESCRIPTIONS[main_index]}"
+            new_PR_BUILDKITE_URLS[new_index]="${PR_BUILDKITE_URLS[main_index]}"
+            new_PR_STACK_CHARS[new_index]="◯"
+            new_PR_RESTACK_STATUS[new_index]=""
+            ((new_index++))
         fi
-    done <<< "$stack_output"
+        
+        # Add sorted PRs with proper stack visualization
+        for i in "${sorted_pr_indices[@]}"; do
+            local pr_num="${PR_NUMBERS[i]}"
+            local branch="${PR_BRANCHES[i]}"
+            local depth=1
+            local restack=""
+            
+            # Find depth and restack status for this PR
+            for dep in "${pr_deps[@]}"; do
+                local dep_pr_num=$(echo "$dep" | cut -d: -f1)
+                if [ "$dep_pr_num" = "$pr_num" ]; then
+                    depth=$(echo "$dep" | cut -d: -f2)
+                    restack=$(echo "$dep" | cut -d: -f3)
+                    break
+                fi
+            done
+            
+            # Check if this branch has children (is a parent)
+            local has_children=false
+            for parent_branch in "${parent_branches[@]}"; do
+                if [ "$parent_branch" = "$branch" ]; then
+                    has_children=true
+                    break
+                fi
+            done
+            
+            # Determine stack character based on depth and whether it has children
+            local stack_char="├"  # Default for depth 1 (direct children of main)
+            if [ "$depth" -gt 1 ]; then
+                # For stacked PRs (depth 2+), add visual indentation
+                case $depth in
+                    2) stack_char="│├" ;;
+                    3) stack_char="││├" ;;
+                    *) stack_char="│││├" ;;
+                esac
+            elif [ "$has_children" = true ]; then
+                # This PR has children, use │┐ for stacked PRs with children
+                stack_char="│┐"
+            fi
+            
+            new_PR_NUMBERS[new_index]="${PR_NUMBERS[i]}"
+            new_PR_TITLES[new_index]="${PR_TITLES[i]}"
+            new_PR_BRANCHES[new_index]="${PR_BRANCHES[i]}"
+            new_PR_STATUSES[new_index]="${PR_STATUSES[i]}"
+            new_PR_CHECKS[new_index]="${PR_CHECKS[i]}"
+            new_PR_REVIEWS[new_index]="${PR_REVIEWS[i]}"
+            new_PR_MERGE_STATUS[new_index]="${PR_MERGE_STATUS[i]}"
+            new_PR_URLS[new_index]="${PR_URLS[i]}"
+            new_PR_DESCRIPTIONS[new_index]="${PR_DESCRIPTIONS[i]}"
+            new_PR_BUILDKITE_URLS[new_index]="${PR_BUILDKITE_URLS[i]}"
+            new_PR_STACK_CHARS[new_index]="$stack_char"
+            new_PR_RESTACK_STATUS[new_index]="$restack"
+            ((new_index++))
+        done
+        
+        # Replace original arrays with reordered ones
+        PR_NUMBERS=("${new_PR_NUMBERS[@]}")
+        PR_TITLES=("${new_PR_TITLES[@]}")
+        PR_BRANCHES=("${new_PR_BRANCHES[@]}")
+        PR_STATUSES=("${new_PR_STATUSES[@]}")
+        PR_CHECKS=("${new_PR_CHECKS[@]}")
+        PR_REVIEWS=("${new_PR_REVIEWS[@]}")
+        PR_MERGE_STATUS=("${new_PR_MERGE_STATUS[@]}")
+        PR_URLS=("${new_PR_URLS[@]}")
+        PR_DESCRIPTIONS=("${new_PR_DESCRIPTIONS[@]}")
+        PR_BUILDKITE_URLS=("${new_PR_BUILDKITE_URLS[@]}")
+        PR_STACK_CHARS=("${new_PR_STACK_CHARS[@]}")
+        PR_RESTACK_STATUS=("${new_PR_RESTACK_STATUS[@]}")
+        
+        TOTAL_PRS=$new_index
+    fi
 }
 
 insert_main_branch() {
@@ -495,12 +623,17 @@ get_status_color() {
 }
 
 draw_header() {
-    printf "${CLEAR_SCREEN}${CURSOR_HOME}${HIDE_CURSOR}"
-    printf "${BOLD}${BLUE}––– Graphite Dashboard –––\n\n"
+    # Only clear screen and hide cursor if not in debug mode
+    if [ "$DEBUG_TABLE" != "true" ]; then
+        printf "${CLEAR_SCREEN}${CURSOR_HOME}${HIDE_CURSOR}"
+    else
+        # In debug mode, print the header since main function doesn't
+        printf "${BOLD}${BLUE}––– Graphite Dashboard –––\n\n"
+    fi
     
     # Draw table header
     printf "${BOLD}${WHITE}"
-    printf "%-5s " "Stack"
+    printf "%-${COL_STACK_WIDTH}s " "Stack"
     printf "%-${COL_PR_WIDTH}s " "PR#"
     printf "%-${COL_TITLE_WIDTH}s " "Title"
     printf "%-${COL_BRANCH_WIDTH}s " "Branch"
@@ -512,7 +645,7 @@ draw_header() {
     printf "${RESET}\n"
     
     printf "${WHITE}"
-    printf "%*s\n" "$((5 + COL_PR_WIDTH + COL_TITLE_WIDTH + COL_BRANCH_WIDTH + COL_STATUS_WIDTH + COL_CHECKS_WIDTH + COL_REVIEWS_WIDTH + COL_MERGE_WIDTH + COL_RESTACK_WIDTH + 8))" "" | sed 's/./─/g'
+    printf "%*s\n" "$((COL_STACK_WIDTH + COL_PR_WIDTH + COL_TITLE_WIDTH + COL_BRANCH_WIDTH + COL_STATUS_WIDTH + COL_CHECKS_WIDTH + COL_REVIEWS_WIDTH + COL_MERGE_WIDTH + COL_RESTACK_WIDTH + 8))" "" | sed 's/./─/g'
     printf "${RESET}"
 }
 
@@ -549,7 +682,7 @@ draw_pr_row() {
     fi
     
     printf "${row_bg}${row_color}"
-    printf "%-5s " "  $stack_char"
+    printf "%-${COL_STACK_WIDTH}s " "  $stack_char"
     printf "%-${COL_PR_WIDTH}s " "  $pr_num"
     printf "%-${COL_TITLE_WIDTH}s " "  $trunc_title"
     printf "%-${COL_BRANCH_WIDTH}s " "  $trunc_branch"
@@ -885,31 +1018,31 @@ read_key() {
     local key
     
     # Read from terminal directly with timeout
-    if IFS= read -r -n 1 -s -t 1 key < /dev/tty 2>/dev/null; then
+    if IFS= read -r -n 1 -s -t 1 key 2>/dev/null; then
         # Handle different key types
         case "$key" in
             '')  # Enter key (empty string)
                 echo "enter"
                 ;;
             $'\x1b')  # Escape sequence
-                if IFS= read -r -n 1 -s -t 0.1 key < /dev/tty 2>/dev/null; then
+                if IFS= read -r -n 1 -s -t 0.1 key 2>/dev/null; then
                     if [[ "$key" == '[' ]]; then
-                        if IFS= read -r -n 1 -s -t 0.1 key < /dev/tty 2>/dev/null; then
+                        if IFS= read -r -n 1 -s -t 0.1 key 2>/dev/null; then
                             case "$key" in
                                 'A') echo "up" ;;
                                 'B') echo "down" ;;
                                 'C') echo "right" ;;
                                 'D') echo "left" ;;
-                                *) echo "escape" ;;
+                                *) echo "" ;;  # Don't return "escape" for unknown sequences
                             esac
                         else
-                            echo "escape"
+                            echo ""  # Don't return "escape" for incomplete sequences
                         fi
                     else
-                        echo "escape"
+                        echo ""  # Don't return "escape" for other escape sequences
                     fi
                 else
-                    echo "escape"
+                    echo ""  # Don't return "escape" for lone escape key
                 fi
                 ;;
             $'\n'|$'\r')  # Newline/carriage return
@@ -920,7 +1053,7 @@ read_key() {
                 ;;
         esac
     else
-        # Read timeout or error
+        # Read timeout or error - return empty string
         echo ""
     fi
 }
@@ -969,6 +1102,11 @@ handle_key() {
 }
 
 main() {
+    # Check for debug flag
+    if [ "$1" = "--debug-table" ]; then
+        DEBUG_TABLE=true
+    fi
+    
     if ! command -v gh >/dev/null 2>&1; then
         echo "Error: GitHub CLI (gh) is required but not installed."
         echo "Please install it with: brew install gh"
@@ -995,10 +1133,12 @@ main() {
     
     get_terminal_size
     
-    # Show loading message immediately
-    printf "${CLEAR_SCREEN}${CURSOR_HOME}${HIDE_CURSOR}"
-    printf "${BOLD}${BLUE}––– Graphite Dashboard –––${RESET}\n\n"
-    printf "${YELLOW}Fetching your PR data...${RESET}\n"
+    # Show loading message immediately (only clear screen if not in debug mode)
+    if [ "$DEBUG_TABLE" != "true" ]; then
+        printf "${CLEAR_SCREEN}${CURSOR_HOME}${HIDE_CURSOR}"
+        printf "${BOLD}${BLUE}––– Graphite Dashboard –––${RESET}\n\n"
+        printf "${YELLOW}Fetching your PR data...${RESET}\n"
+    fi
     
     # Fetch all data first
     if ! fetch_pr_data; then
@@ -1018,6 +1158,13 @@ main() {
     # Show message if no PRs found
     if [ "$has_prs" = false ]; then
         show_message "You don't have any PRs in this repo" "${YELLOW}"
+    fi
+    
+    # If debug mode, exit immediately after drawing the table
+    if [ "$DEBUG_TABLE" = true ]; then
+        printf "${RESET}\n"
+        echo "Debug table rendered. Exiting."
+        exit 0
     fi
     
     # Main input loop
