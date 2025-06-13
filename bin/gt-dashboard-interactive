@@ -1,1182 +1,594 @@
-#!/bin/bash
+#!/usr/bin/env ruby
 
-# Graphite CLI Interactive Dashboard
-# Shows PRs with status, checks, and interactive navigation
+# --- Graphite Dashboard: Curses UI for PRs ---
+# Refactored for clarity, modularity, and idiomatic Ruby
 
-set -euo pipefail
+require 'json'
+require 'open3'
+require 'thread'
+require 'csv'
+require 'curses'
 
+module GraphiteDashboard
+  # Constants
+  DEPENDENCIES = %w[gh jq gt].freeze
+  LEGEND = "[c] Checkout  [o] Open PR  [b] Copy branch  [u] Copy URL  [v] View details  [d] Description  [k] Buildkite  [i] Build ID  [r] Refresh  [q] Quit"
+  MAIN_BRANCH_NAME = 'main'.freeze
+  MAIN_BRANCH_DESC = 'The main trunk branch - base for all feature branches'.freeze
+  INSTALL_CMDS = {
+    'gh' => 'brew install gh',
+    'jq' => 'brew install jq',
+    'gt' => 'npm install -g @withgraphite/graphite-cli'
+  }.freeze
 
-# Color codes
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-WHITE='\033[0;37m'
-BOLD='\033[1m'
-RESET='\033[0m'
+  # --- PR Value Object ---
+  class PR
+    attr_reader :number, :title, :branch, :status, :checks, :reviews, :merge, :url, :description, :buildkite_url, :main
+    attr_accessor :stack_char, :restack
 
-# Control sequences
-# CLEAR_SCREEN='\033[2J'
-CLEAR_SCREEN=''
-CURSOR_HOME='\033[H'
-HIDE_CURSOR='\033[?25l'
-SHOW_CURSOR='\033[?25h'
-CLEAR_LINE='\033[2K'
+    def initialize(number:, title:, branch:, status:, checks:, reviews:, merge:, url:, description:, buildkite_url:, stack_char:, restack:, main: false)
+      @number = number
+      @title = title
+      @branch = branch
+      @status = status
+      @checks = checks
+      @reviews = reviews
+      @merge = merge
+      @url = url
+      @description = description
+      @buildkite_url = buildkite_url
+      @stack_char = stack_char
+      @restack = restack
+      @main = main
+    end
 
-# Global variables
-declare -a PR_NUMBERS=()
-declare -a PR_TITLES=()
-declare -a PR_BRANCHES=()
-declare -a PR_STATUSES=()
-declare -a PR_CHECKS=()
-declare -a PR_REVIEWS=()
-declare -a PR_MERGE_STATUS=()
-declare -a PR_URLS=()
-declare -a PR_DESCRIPTIONS=()
-declare -a PR_BUILDKITE_URLS=()
-declare -a PR_STACK_CHARS=()
-declare -a PR_RESTACK_STATUS=()
+    def main?
+      @main
+    end
 
-declare -i CURRENT_SELECTION=0
-declare -i TOTAL_PRS=0
-declare -i DESCRIPTION_MODE=0
-declare -i TERMINAL_WIDTH
-declare -i TERMINAL_HEIGHT
-declare DEBUG_TABLE=false
+    def pr_number_display
+      number.empty? ? '*' : "* ##{number}"
+    end
 
-# Column widths (will be calculated dynamically)
-declare -i COL_STACK_WIDTH=5
-declare -i COL_PR_WIDTH=6
-declare -i COL_TITLE_WIDTH=30
-declare -i COL_BRANCH_WIDTH=20
-declare -i COL_STATUS_WIDTH=12
-declare -i COL_CHECKS_WIDTH=12
-declare -i COL_REVIEWS_WIDTH=12
-declare -i COL_MERGE_WIDTH=12
-declare -i COL_RESTACK_WIDTH=8
+    def to_table_row
+      [
+        pr_number_display,
+        title.gsub("\n", " ").strip,
+        branch,
+        status,
+        checks,
+        reviews,
+        merge,
+        restack
+      ]
+    end
+  end
 
-cleanup() {
-    # Reset terminal state and show cursor
-    printf '\033[?25h\033[0m\033[2J\033[H'
-    exit 0
-}
-
-trap cleanup EXIT INT TERM
-
-get_terminal_size() {
-    TERMINAL_WIDTH=$(tput cols)
-    TERMINAL_HEIGHT=$(tput lines)
-}
-
-calculate_column_widths() {
-    set +u  # Temporarily disable undefined variable checking
-    get_terminal_size
-    
-    # Calculate actual width needed for each column based on real data
-    local actual_stack_width=5     # "Stack" header
-    local actual_pr_width=3        # "PR#" header
-    local actual_branch_width=6    # "Branch" header  
-    local actual_status_width=6    # "Status" header
-    local actual_checks_width=6    # "Checks" header
-    local actual_reviews_width=7   # "Reviews" header
-    local actual_merge_width=5     # "Merge" header
-    local actual_restack_width=7   # "Restack" header
-    
-    # Find the actual maximum width needed for each column from the data
-    if [ "$TOTAL_PRS" -gt 0 ]; then
-        for i in $(seq 0 $((TOTAL_PRS - 1))); do
-            # Stack character width (account for 2-space prefix)
-            local stack_len=$((${#PR_STACK_CHARS[i]} + 2))
-            [ "$stack_len" -gt "$actual_stack_width" ] && actual_stack_width="$stack_len"
-            
-            # PR number width
-            local pr_len=${#PR_NUMBERS[i]}
-            [ "$pr_len" -gt "$actual_pr_width" ] && actual_pr_width="$pr_len"
-            
-            # Branch name width
-            local branch_len=${#PR_BRANCHES[i]}
-            [ "$branch_len" -gt "$actual_branch_width" ] && actual_branch_width="$branch_len"
-            
-            # Status width
-            local status_len=${#PR_STATUSES[i]}
-            [ "$status_len" -gt "$actual_status_width" ] && actual_status_width="$status_len"
-            
-            # Checks width
-            local checks_len=${#PR_CHECKS[i]}
-            [ "$checks_len" -gt "$actual_checks_width" ] && actual_checks_width="$checks_len"
-            
-            # Reviews width
-            local reviews_len=${#PR_REVIEWS[i]}
-            [ "$reviews_len" -gt "$actual_reviews_width" ] && actual_reviews_width="$reviews_len"
-            
-            # Merge status width
-            local merge_len=${#PR_MERGE_STATUS[i]}
-            [ "$merge_len" -gt "$actual_merge_width" ] && actual_merge_width="$merge_len"
-            
-            # Restack status width
-            local restack_len=${#PR_RESTACK_STATUS[i]}
-            [ "$restack_len" -gt "$actual_restack_width" ] && actual_restack_width="$restack_len"
-        done
-    fi
-    
-    # Add padding to each column (2 extra characters for comfort)
-    COL_STACK_WIDTH=$((actual_stack_width + 2))  # Dynamic width for stack symbols
-    COL_PR_WIDTH=$((actual_pr_width + 2))
-    COL_BRANCH_WIDTH=$((actual_branch_width + 2))
-    COL_STATUS_WIDTH=$((actual_status_width + 2))
-    COL_CHECKS_WIDTH=$((actual_checks_width + 2))
-    COL_REVIEWS_WIDTH=$((actual_reviews_width + 2))
-    COL_MERGE_WIDTH=$((actual_merge_width + 2))
-    COL_RESTACK_WIDTH=$((actual_restack_width + 1))  # Less padding for last column
-    
-    # Cap maximum widths to reasonable values to prevent overly wide columns
-    [ "$COL_PR_WIDTH" -gt 10 ] && COL_PR_WIDTH=10
-    [ "$COL_BRANCH_WIDTH" -gt 25 ] && COL_BRANCH_WIDTH=25
-    [ "$COL_STATUS_WIDTH" -gt 12 ] && COL_STATUS_WIDTH=12
-    [ "$COL_CHECKS_WIDTH" -gt 12 ] && COL_CHECKS_WIDTH=12
-    [ "$COL_REVIEWS_WIDTH" -gt 12 ] && COL_REVIEWS_WIDTH=12
-    [ "$COL_MERGE_WIDTH" -gt 12 ] && COL_MERGE_WIDTH=12
-    [ "$COL_RESTACK_WIDTH" -gt 10 ] && COL_RESTACK_WIDTH=10
-    
-    # Calculate space used by fixed-width columns (including separators)
-    local fixed_columns_width=$((COL_STACK_WIDTH + COL_PR_WIDTH + COL_BRANCH_WIDTH + COL_STATUS_WIDTH + COL_CHECKS_WIDTH + COL_REVIEWS_WIDTH + COL_MERGE_WIDTH + COL_RESTACK_WIDTH))
-    local separators_width=8  # 8 spaces between 9 columns
-    local used_width=$((fixed_columns_width + separators_width))
-    
-    # Use remaining terminal width for title column (with minimum)
-    local remaining_width=$((TERMINAL_WIDTH - used_width))
-    COL_TITLE_WIDTH=$((remaining_width > 20 ? remaining_width : 20))  # Minimum 20 chars for title
-    
-    set -u  # Re-enable undefined variable checking
-}
-
-truncate_string() {
-    local str="$1"
-    local max_len="$2"
-    
-    if [ ${#str} -gt "$max_len" ]; then
-        printf "%.*s..." "$((max_len - 3))" "$str"
-    else
-        printf "%s" "$str"
-    fi
-}
-
-get_stack_info() {
-    # Initialize all PRs as standalone
-    if [ "$TOTAL_PRS" -gt 0 ]; then
-        for i in $(seq 0 $((TOTAL_PRS - 1))); do
-            PR_STACK_CHARS[i]="◯"
-            PR_RESTACK_STATUS[i]=""
-        done
-    fi
-    
-    # Use GitHub API to get stack dependencies - much more reliable than parsing gt log
-    # First, get restack info from gt log
-    local gt_output
-    gt_output=$(timeout 3s gt log --no-interactive 2>/dev/null || echo "")
-    
-    # Simple approach: build a list of PR dependencies and find which PRs have children
-    declare -a pr_deps=()  # Will store "pr_number:depth:restack_status:base_branch"
-    declare -a parent_branches=()  # Track which branches have children
-    
-    if [ "$TOTAL_PRS" -gt 0 ]; then
-        for i in $(seq 0 $((TOTAL_PRS - 1))); do
-            local pr_num="${PR_NUMBERS[i]}"
-            local branch="${PR_BRANCHES[i]}"
-            
-            # Skip main branch
-            if [ "$branch" = "main" ] || [ -z "$pr_num" ]; then
-                continue
-            fi
-            
-            # Check if this branch needs restack from gt log
-            local needs_restack=""
-            if echo "$gt_output" | grep -q "$branch.*needs restack"; then
-                needs_restack="Yes"
-            fi
-            
-            # Get PR base branch from GitHub API
-            local pr_data
-            pr_data=$(curl -s -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $(gh auth token)" \
-                "https://api.github.com/repos/shop/world/pulls/$pr_num" 2>/dev/null)
-            
-            if [ $? -eq 0 ] && [ -n "$pr_data" ]; then
-                local base_branch
-                base_branch=$(echo "$pr_data" | jq -r '.base.ref // ""' 2>/dev/null)
-                
-                if [ -n "$base_branch" ]; then
-                    # Calculate depth: if base is main, depth is 1; otherwise depth is 2+
-                    local depth=1
-                    if [ "$base_branch" != "main" ]; then
-                        # For now, assume depth 2 for stacked PRs (we could make this more sophisticated)
-                        depth=2
-                        # Track that the base branch has children
-                        parent_branches+=("$base_branch")
-                    fi
-                    
-                    pr_deps+=("$pr_num:$depth:$needs_restack:$base_branch")
-                fi
-            fi
-        done
-    fi
-    
-    # Now reorder PRs based on their dependencies
-    if [ "$TOTAL_PRS" -gt 0 ]; then
-        # Create arrays to hold the reordered data
-        declare -a new_PR_NUMBERS=()
-        declare -a new_PR_TITLES=()
-        declare -a new_PR_BRANCHES=()
-        declare -a new_PR_STATUSES=()
-        declare -a new_PR_CHECKS=()
-        declare -a new_PR_REVIEWS=()
-        declare -a new_PR_MERGE_STATUS=()
-        declare -a new_PR_URLS=()
-        declare -a new_PR_DESCRIPTIONS=()
-        declare -a new_PR_BUILDKITE_URLS=()
-        declare -a new_PR_STACK_CHARS=()
-        declare -a new_PR_RESTACK_STATUS=()
-        
-        # Separate main branch and PRs
-        local main_index=-1
-        declare -a pr_indices=()
-        
-        for i in $(seq 0 $((TOTAL_PRS - 1))); do
-            if [ "${PR_BRANCHES[i]}" = "main" ]; then
-                main_index=$i
-            else
-                pr_indices+=($i)
-            fi
-        done
-        
-        # Sort PR indices by their depth (base PRs first, then stacked PRs)
-        declare -a sortable_prs=()
-        for i in "${pr_indices[@]}"; do
-            local pr_num="${PR_NUMBERS[i]}"
-            local depth=999  # Default for PRs not found in dependencies
-            local restack=""
-            
-            # Find this PR in our dependencies list
-            for dep in "${pr_deps[@]}"; do
-                local dep_pr_num=$(echo "$dep" | cut -d: -f1)
-                if [ "$dep_pr_num" = "$pr_num" ]; then
-                    depth=$(echo "$dep" | cut -d: -f2)
-                    restack=$(echo "$dep" | cut -d: -f3)
-                    break
-                fi
-            done
-            
-            # Use depth as primary sort key, PR number as secondary for stable sorting
-            sortable_prs+=("$depth:$pr_num:$i:$restack")
-        done
-        
-        # Sort by depth first, then by PR number
-        declare -a sorted_pr_indices=()
-        while IFS= read -r entry; do
-            if [ -n "$entry" ]; then
-                local index=$(echo "$entry" | cut -d: -f3)
-                sorted_pr_indices+=("$index")
-            fi
-        done < <(printf '%s\n' "${sortable_prs[@]}" | sort -n)
-        
-        # Rebuild arrays: main first, then sorted PRs
-        local new_index=0
-        
-        # Add main branch first if it exists
-        if [ "$main_index" -ge 0 ]; then
-            new_PR_NUMBERS[new_index]="${PR_NUMBERS[main_index]}"
-            new_PR_TITLES[new_index]="${PR_TITLES[main_index]}"
-            new_PR_BRANCHES[new_index]="${PR_BRANCHES[main_index]}"
-            new_PR_STATUSES[new_index]="${PR_STATUSES[main_index]}"
-            new_PR_CHECKS[new_index]="${PR_CHECKS[main_index]}"
-            new_PR_REVIEWS[new_index]="${PR_REVIEWS[main_index]}"
-            new_PR_MERGE_STATUS[new_index]="${PR_MERGE_STATUS[main_index]}"
-            new_PR_URLS[new_index]="${PR_URLS[main_index]}"
-            new_PR_DESCRIPTIONS[new_index]="${PR_DESCRIPTIONS[main_index]}"
-            new_PR_BUILDKITE_URLS[new_index]="${PR_BUILDKITE_URLS[main_index]}"
-            new_PR_STACK_CHARS[new_index]="◯"
-            new_PR_RESTACK_STATUS[new_index]=""
-            ((new_index++))
-        fi
-        
-        # Add sorted PRs with proper stack visualization
-        for i in "${sorted_pr_indices[@]}"; do
-            local pr_num="${PR_NUMBERS[i]}"
-            local branch="${PR_BRANCHES[i]}"
-            local depth=1
-            local restack=""
-            
-            # Find depth and restack status for this PR
-            for dep in "${pr_deps[@]}"; do
-                local dep_pr_num=$(echo "$dep" | cut -d: -f1)
-                if [ "$dep_pr_num" = "$pr_num" ]; then
-                    depth=$(echo "$dep" | cut -d: -f2)
-                    restack=$(echo "$dep" | cut -d: -f3)
-                    break
-                fi
-            done
-            
-            # Check if this branch has children (is a parent)
-            local has_children=false
-            for parent_branch in "${parent_branches[@]}"; do
-                if [ "$parent_branch" = "$branch" ]; then
-                    has_children=true
-                    break
-                fi
-            done
-            
-            # Determine stack character based on depth and whether it has children
-            local stack_char="├"  # Default for depth 1 (direct children of main)
-            if [ "$depth" -gt 1 ]; then
-                # For stacked PRs (depth 2+), add visual indentation
-                case $depth in
-                    2) stack_char="│├" ;;
-                    3) stack_char="││├" ;;
-                    *) stack_char="│││├" ;;
-                esac
-            elif [ "$has_children" = true ]; then
-                # This PR has children, use │┐ for stacked PRs with children
-                stack_char="│┐"
-            fi
-            
-            new_PR_NUMBERS[new_index]="${PR_NUMBERS[i]}"
-            new_PR_TITLES[new_index]="${PR_TITLES[i]}"
-            new_PR_BRANCHES[new_index]="${PR_BRANCHES[i]}"
-            new_PR_STATUSES[new_index]="${PR_STATUSES[i]}"
-            new_PR_CHECKS[new_index]="${PR_CHECKS[i]}"
-            new_PR_REVIEWS[new_index]="${PR_REVIEWS[i]}"
-            new_PR_MERGE_STATUS[new_index]="${PR_MERGE_STATUS[i]}"
-            new_PR_URLS[new_index]="${PR_URLS[i]}"
-            new_PR_DESCRIPTIONS[new_index]="${PR_DESCRIPTIONS[i]}"
-            new_PR_BUILDKITE_URLS[new_index]="${PR_BUILDKITE_URLS[i]}"
-            new_PR_STACK_CHARS[new_index]="$stack_char"
-            new_PR_RESTACK_STATUS[new_index]="$restack"
-            ((new_index++))
-        done
-        
-        # Replace original arrays with reordered ones
-        PR_NUMBERS=("${new_PR_NUMBERS[@]}")
-        PR_TITLES=("${new_PR_TITLES[@]}")
-        PR_BRANCHES=("${new_PR_BRANCHES[@]}")
-        PR_STATUSES=("${new_PR_STATUSES[@]}")
-        PR_CHECKS=("${new_PR_CHECKS[@]}")
-        PR_REVIEWS=("${new_PR_REVIEWS[@]}")
-        PR_MERGE_STATUS=("${new_PR_MERGE_STATUS[@]}")
-        PR_URLS=("${new_PR_URLS[@]}")
-        PR_DESCRIPTIONS=("${new_PR_DESCRIPTIONS[@]}")
-        PR_BUILDKITE_URLS=("${new_PR_BUILDKITE_URLS[@]}")
-        PR_STACK_CHARS=("${new_PR_STACK_CHARS[@]}")
-        PR_RESTACK_STATUS=("${new_PR_RESTACK_STATUS[@]}")
-        
-        TOTAL_PRS=$new_index
-    fi
-}
-
-insert_main_branch() {
-    # Add main branch to arrays - handle empty arrays safely
-    if [ ${#PR_NUMBERS[@]} -eq 0 ]; then
-        # Arrays are empty, just add main branch
-        PR_NUMBERS=("")
-        PR_TITLES=("main")
-        PR_BRANCHES=("main")
-        PR_STATUSES=("Trunk")
-        PR_CHECKS=("")
-        PR_REVIEWS=("")
-        PR_MERGE_STATUS=("")
-        PR_URLS=("")
-        PR_DESCRIPTIONS=("The main trunk branch - base for all feature branches")
-        PR_BUILDKITE_URLS=("")
-        PR_STACK_CHARS=("◯")
-        PR_RESTACK_STATUS=("")
-    else
-        # Arrays have content, shift them down
-        PR_NUMBERS=("" "${PR_NUMBERS[@]}")
-        PR_TITLES=("main" "${PR_TITLES[@]}")
-        PR_BRANCHES=("main" "${PR_BRANCHES[@]}")
-        PR_STATUSES=("  Trunk" "${PR_STATUSES[@]}")
-        PR_CHECKS=("" "${PR_CHECKS[@]}")
-        PR_REVIEWS=("" "${PR_REVIEWS[@]}")
-        PR_MERGE_STATUS=("" "${PR_MERGE_STATUS[@]}")
-        PR_URLS=("" "${PR_URLS[@]}")
-        PR_DESCRIPTIONS=("The main trunk branch - base for all feature branches" "${PR_DESCRIPTIONS[@]}")
-        PR_BUILDKITE_URLS=("" "${PR_BUILDKITE_URLS[@]}")
-        PR_STACK_CHARS=("◯" "${PR_STACK_CHARS[@]}")
-        PR_RESTACK_STATUS=("" "${PR_RESTACK_STATUS[@]}")
-    fi
-    
-    ((TOTAL_PRS++))
-}
-
-fetch_pr_data() {
-    local gh_output
-    gh_output=$(gh pr list --author @me --json number,title,headRefName,state,statusCheckRollup,reviewDecision,mergeable,url,body --limit 20 2>/dev/null)
-    
-    if [ -z "$gh_output" ] || [ "$gh_output" = "[]" ]; then
-        # No PRs found, but continue with just the main branch
-        # Clear arrays and set up empty state
-        PR_NUMBERS=()
-        PR_TITLES=()
-        PR_BRANCHES=()
-        PR_STATUSES=()
-        PR_CHECKS=()
-        PR_REVIEWS=()
-        PR_MERGE_STATUS=()
-        PR_URLS=()
-        PR_DESCRIPTIONS=()
-        PR_BUILDKITE_URLS=()
-        PR_STACK_CHARS=()
-        PR_RESTACK_STATUS=()
-        TOTAL_PRS=0
-        
-        # Get stack information for main branch
-        get_stack_info
-        
-        # Insert main branch
-        insert_main_branch
-        
-        # Adjust selection if needed
-        if [ $CURRENT_SELECTION -ge $TOTAL_PRS ]; then
-            CURRENT_SELECTION=$((TOTAL_PRS - 1))
-        fi
-        
-        return 0
-    fi
-    
-    # Clear arrays
-    PR_NUMBERS=()
-    PR_TITLES=()
-    PR_BRANCHES=()
-    PR_STATUSES=()
-    PR_CHECKS=()
-    PR_REVIEWS=()
-    PR_MERGE_STATUS=()
-    PR_URLS=()
-    PR_DESCRIPTIONS=()
-    PR_BUILDKITE_URLS=()
-    PR_STACK_CHARS=()
-    PR_RESTACK_STATUS=()
-    TOTAL_PRS=0
-    
-    # Parse JSON data
-    while IFS= read -r pr; do
-        if [ "$pr" = "null" ] || [ -z "$pr" ]; then
-            continue
-        fi
-        
-        local number
-        number=$(echo "$pr" | jq -r '.number // ""')
-        local title
-        title=$(echo "$pr" | jq -r '.title // ""')
-        local branch
-        branch=$(echo "$pr" | jq -r '.headRefName // ""')
-        local state
-        state=$(echo "$pr" | jq -r '.state // ""')
-        local url
-        url=$(echo "$pr" | jq -r '.url // ""')
-        local body
-        body=$(echo "$pr" | jq -r '.body // ""')
-        
-        # Parse status checks and extract CI/build related checks
-        local checks_status="Unknown"
-        local buildkite_url=""
-        local status_rollup
-        status_rollup=$(echo "$pr" | jq -r '.statusCheckRollup // null')
-        
-        if [ "$status_rollup" != "null" ] && [ -n "$status_rollup" ]; then
-            # Check if array exists and get the count
-            local contexts_count
-            contexts_count=$(echo "$status_rollup" | jq -r 'length // 0' 2>/dev/null || echo "0")
-            
-            if [ "$contexts_count" -gt 0 ]; then
-                local all_success=true
-                local has_failure=false
-                local has_pending=false
-                
-                # Process each context by index
-                for i in $(seq 0 $((contexts_count - 1))); do
-                    local context
-                    context=$(echo "$status_rollup" | jq -r ".[$i] // null" 2>/dev/null)
-                    
-                    if [ "$context" = "null" ] || [ -z "$context" ]; then
-                        continue
-                    fi
-                    
-                    # Handle both CheckRun and StatusContext types
-                    local context_name
-                    local conclusion
-                    local state_val
-                    local target_url
-                    
-                    # For CheckRun objects, use 'name' field
-                    context_name=$(echo "$context" | jq -r '.name // .context // ""' 2>/dev/null)
-                    conclusion=$(echo "$context" | jq -r '.conclusion // ""' 2>/dev/null)
-                    state_val=$(echo "$context" | jq -r '.state // ""' 2>/dev/null)
-                    target_url=$(echo "$context" | jq -r '.detailsUrl // .targetUrl // ""' 2>/dev/null)
-                    
-                    # Skip non-CI contexts (like review requirements)
-                    if [[ "$context_name" =~ (review|required|mergeable) ]]; then
-                        continue
-                    fi
-                    
-                    # Extract Buildkite URL
-                    if [[ "$target_url" =~ buildkite\.com ]] && [ -z "$buildkite_url" ]; then
-                        buildkite_url="$target_url"
-                    fi
-                    
-                    # Determine status - handle both CheckRun and StatusContext
-                    local check_status=""
-                    if [ -n "$conclusion" ]; then
-                        # CheckRun object
-                        check_status="$conclusion"
-                    elif [ -n "$state_val" ]; then
-                        # StatusContext object
-                        check_status="$state_val"
-                    fi
-                    
-                    if [ "$check_status" = "SUCCESS" ]; then
-                        continue  # This check passed
-                    elif [ "$check_status" = "FAILURE" ] || [ "$check_status" = "CANCELLED" ] || [ "$check_status" = "ERROR" ]; then
-                        has_failure=true
-                        all_success=false
-                    elif [ "$check_status" = "PENDING" ] || [ "$check_status" = "IN_PROGRESS" ] || [ -z "$check_status" ]; then
-                        has_pending=true
-                        all_success=false
-                    else
-                        all_success=false
-                    fi
-                done
-                
-                if [ "$has_failure" = true ]; then
-                    checks_status="Failed"
-                elif [ "$has_pending" = true ]; then
-                    checks_status="Running"
-                elif [ "$all_success" = true ]; then
-                    checks_status="Passed"
-                else
-                    checks_status="Unknown"
-                fi
-            fi
-        fi
-        
-        # Parse review decision
-        local review_status="None"
-        local review_decision
-        review_decision=$(echo "$pr" | jq -r '.reviewDecision // ""')
-        case "$review_decision" in
-            "APPROVED") review_status="Approved" ;;
-            "CHANGES_REQUESTED") review_status="Changes" ;;
-            "REVIEW_REQUIRED") review_status="Required" ;;
-            *) review_status="None" ;;
-        esac
-        
-        # Parse mergeable status
-        local merge_status="Unknown"
-        local mergeable
-        mergeable=$(echo "$pr" | jq -r '.mergeable // ""')
-        case "$mergeable" in
-            "MERGEABLE") merge_status="Ready" ;;
-            "CONFLICTING") merge_status="Conflicts" ;;
-            "UNKNOWN") merge_status="Unknown" ;;
-            *) merge_status="Unknown" ;;
-        esac
-        
-        # Clean up description while preserving newlines
-        local clean_description
-        clean_description=$(echo "$body" | sed 's/[[:space:]]*$//' | sed '/^$/N;/^\n$/d' | head -c 800)
-        
-        PR_NUMBERS+=("$number")
-        PR_TITLES+=("$title")
-        PR_BRANCHES+=("$branch")
-        PR_STATUSES+=("$state")
-        PR_CHECKS+=("$checks_status")
-        PR_REVIEWS+=("$review_status")
-        PR_MERGE_STATUS+=("$merge_status")
-        PR_URLS+=("$url")
-        PR_DESCRIPTIONS+=("$clean_description")
-        PR_BUILDKITE_URLS+=("$buildkite_url")
-        
-        ((TOTAL_PRS++))
-    done < <(echo "$gh_output" | jq -c '.[]')
-    
-    # Get stack information
-    get_stack_info
-    
-    # Insert main branch at the beginning
-    insert_main_branch
-    
-    # Adjust selection if needed
-    if [ $CURRENT_SELECTION -ge $TOTAL_PRS ]; then
-        CURRENT_SELECTION=$((TOTAL_PRS - 1))
-    fi
-    
-    return 0
-}
-
-get_status_color() {
-    local status="$1"
-    case "$status" in
-        "OPEN"|"Ready"|"Approved"|"Passed"|"Trunk") echo "${GREEN}" ;;
-        "CLOSED"|"MERGED"|"Conflicts"|"Failed"|"Changes") echo "${RED}" ;;
-        "DRAFT"|"Unknown"|"Running"|"Required") echo "${YELLOW}" ;;
-        *) echo "${WHITE}" ;;
-    esac
-}
-
-draw_header() {
-    # Only clear screen and hide cursor if not in debug mode
-    if [ "$DEBUG_TABLE" != "true" ]; then
-        printf "${CLEAR_SCREEN}${CURSOR_HOME}${HIDE_CURSOR}"
-    else
-        # In debug mode, print the header since main function doesn't
-        printf "${BOLD}${BLUE}––– Graphite Dashboard –––\n\n"
-    fi
-    
-    # Draw table header
-    printf "${BOLD}${WHITE}"
-    printf "%-${COL_STACK_WIDTH}s " "Stack"
-    printf "%-${COL_PR_WIDTH}s " "PR#"
-    printf "%-${COL_TITLE_WIDTH}s " "Title"
-    printf "%-${COL_BRANCH_WIDTH}s " "Branch"
-    printf "%-${COL_STATUS_WIDTH}s " "Status"
-    printf "%-${COL_CHECKS_WIDTH}s " "Checks"
-    printf "%-${COL_REVIEWS_WIDTH}s " "Reviews"
-    printf "%-${COL_MERGE_WIDTH}s " "Merge"
-    printf "%-${COL_RESTACK_WIDTH}s" "Restack"
-    printf "${RESET}\n"
-    
-    printf "${WHITE}"
-    printf "%*s\n" "$((COL_STACK_WIDTH + COL_PR_WIDTH + COL_TITLE_WIDTH + COL_BRANCH_WIDTH + COL_STATUS_WIDTH + COL_CHECKS_WIDTH + COL_REVIEWS_WIDTH + COL_MERGE_WIDTH + COL_RESTACK_WIDTH + 8))" "" | sed 's/./─/g'
-    printf "${RESET}"
-}
-
-draw_pr_row() {
-    local index="$1"
-    local is_selected="$2"
-    
-    if [ "$index" -ge "$TOTAL_PRS" ]; then
-        return
-    fi
-    
-    local stack_char="${PR_STACK_CHARS[index]}"
-    local pr_num="${PR_NUMBERS[index]}"
-    local title="${PR_TITLES[index]}"
-    local branch="${PR_BRANCHES[index]}"
-    local status="${PR_STATUSES[index]}"
-    local checks="${PR_CHECKS[index]}"
-    local reviews="${PR_REVIEWS[index]}"
-    local merge="${PR_MERGE_STATUS[index]}"
-    local restack="${PR_RESTACK_STATUS[index]}"
-    
-    # Truncate long strings
-    local trunc_title
-    trunc_title=$(truncate_string "$title" $COL_TITLE_WIDTH)
-    local trunc_branch
-    trunc_branch=$(truncate_string "$branch" $COL_BRANCH_WIDTH)
-    
-    # Set row color
-    local row_color=""
-    local row_bg=""
-    if [ "$is_selected" = "1" ]; then
-        row_color="${CYAN}"
-        row_bg="\033[44m"  # Blue background instead of cyan for better visibility
-    fi
-    
-    printf "${row_bg}${row_color}"
-    printf "%-${COL_STACK_WIDTH}s " "  $stack_char"
-    printf "%-${COL_PR_WIDTH}s " "  $pr_num"
-    printf "%-${COL_TITLE_WIDTH}s " "  $trunc_title"
-    printf "%-${COL_BRANCH_WIDTH}s " "  $trunc_branch"
-    
-    # Status with color
-    local status_color
-    status_color=$(get_status_color "$status")
-    printf "${status_color}%-${COL_STATUS_WIDTH}s${RESET}${row_bg}${row_color} " "$status"
-    
-    # Checks with color
-    local checks_color
-    checks_color=$(get_status_color "$checks")
-    printf "${checks_color}%-${COL_CHECKS_WIDTH}s${RESET}${row_bg}${row_color} " "$checks"
-    
-    # Reviews with color
-    local reviews_color
-    reviews_color=$(get_status_color "$reviews")
-    printf "${reviews_color}%-${COL_REVIEWS_WIDTH}s${RESET}${row_bg}${row_color} " "$reviews"
-    
-    # Merge with color
-    local merge_color
-    merge_color=$(get_status_color "$merge")
-    printf "${merge_color}%-${COL_MERGE_WIDTH}s${RESET}${row_bg}${row_color} " "$merge"
-    
-    # Restack with color
-    local restack_color=""
-    if [ "$restack" = "Yes" ]; then
-        restack_color="${YELLOW}"
-    fi
-    printf "${restack_color}%-${COL_RESTACK_WIDTH}s${RESET}" "$restack"
-    
-    # Reset all colors and background
-    printf "${RESET}\n"
-}
-
-draw_description() {
-    if [ "$DESCRIPTION_MODE" -eq 1 ] && [ "$CURRENT_SELECTION" -lt "$TOTAL_PRS" ]; then
-        local description="${PR_DESCRIPTIONS[CURRENT_SELECTION]}"
-        if [ -n "$description" ]; then
-            printf "\n${BOLD}${YELLOW}Description:${RESET}\n"
-            # Process each line separately to preserve markdown formatting
-            local wrap_width=$((TERMINAL_WIDTH - 12))
-            echo "$description" | while IFS= read -r line; do
-                if [ -z "$line" ]; then
-                    # Empty line - just add indentation
-                    printf "          \n"
-                else
-                    # Non-empty line - word wrap and indent
-                    echo "$line" | fold -w "$wrap_width" -s | sed 's/^/          /'
-                fi
-            done
-        fi
-    fi
-}
-
-draw_help() {
-    printf "\n${BOLD}${BLUE}Controls:${RESET}\n"
-    printf "  ${CYAN}j/k, ↑/↓${RESET} - Navigate   ${CYAN}Enter${RESET} - Checkout   ${CYAN}o${RESET} - Open in browser\n"
-    printf "  ${CYAN}v${RESET} - View details     ${CYAN}b${RESET} - Copy branch  ${CYAN}u${RESET} - Copy URL\n"
-    printf "  ${CYAN}B${RESET} - Open Buildkite   ${CYAN}i${RESET} - Copy build ID  ${CYAN}d${RESET} - Toggle desc  ${CYAN}r${RESET} - Refresh  ${CYAN}q${RESET} - Quit\n"
-}
-
-
-
-draw_initial_screen() {
-    calculate_column_widths
-    draw_header
-    
-    for i in $(seq 0 $((TOTAL_PRS - 1))); do
-        local is_selected=0
-        if [ "$i" -eq "$CURRENT_SELECTION" ]; then
-            is_selected=1
-        fi
-        draw_pr_row "$i" "$is_selected"
-    done
-    
-    draw_description
-    draw_help
-}
-
-show_message() {
-    local message="$1"
-    local color="${2:-$YELLOW}"
-    
-    # Move to bottom of screen and show message
-    printf "\033[%d;1H" "${TERMINAL_HEIGHT}"
-    printf "${CLEAR_LINE}${color}${message}${RESET}"
-    printf "\033[%d;1H" "$((TERMINAL_HEIGHT - 1))"
-}
-
-clear_message() {
-    printf "\033[%d;1H" "${TERMINAL_HEIGHT}"
-    printf "${CLEAR_LINE}"
-}
-
-checkout_branch() {
-    local branch="${PR_BRANCHES[CURRENT_SELECTION]}"
-    local pr_num="${PR_NUMBERS[CURRENT_SELECTION]}"
-    
-    if [ -z "$pr_num" ] && [ "$branch" = "main" ]; then
-        # This is the main branch
-        if git checkout main 2>/dev/null; then
-            show_message "Checked out main branch" "${GREEN}"
-            cleanup
+  # --- Dependency Checker ---
+  class DependencyChecker
+    def self.check_and_install
+      missing = DEPENDENCIES.reject { |cmd| system("which #{cmd} > /dev/null 2>&1") }
+      missing.each do |cmd|
+        puts "#{cmd} is not installed. Installing with brew..."
+        if system("which brew > /dev/null 2>&1")
+          unless system(INSTALL_CMDS[cmd])
+            puts "Failed to install #{cmd} with brew. Please install it manually."
+            exit 1
+          end
         else
-            show_message "Failed to checkout main branch" "${RED}"
-        fi
-        return
-    fi
-    
-    if [ -z "$branch" ]; then
-        show_message "No branch information available" "${RED}"
-        return
-    fi
-    
-    show_message "Checking out $branch..." "${YELLOW}"
-    
-    if git checkout "$branch" 2>/dev/null; then
-        show_message "Checked out $branch" "${GREEN}"
-        cleanup
-    else
-        show_message "Failed to checkout $branch" "${RED}"
-    fi
-}
+          puts "Homebrew is not installed. Please install #{cmd} manually."
+          exit 1
+        end
+      end
 
-open_pr_in_browser() {
-    local pr_num="${PR_NUMBERS[CURRENT_SELECTION]}"
-    
-    if [ -z "$pr_num" ]; then
-        show_message "Cannot open browser for main branch (no PR)" "${RED}"
-        return
-    fi
-    
-    local url="${PR_URLS[CURRENT_SELECTION]}"
-    if [ -z "$url" ]; then
-        show_message "No URL available for this PR" "${RED}"
-        return
-    fi
-    
-    if command -v open >/dev/null 2>&1; then
-        open "$url" 2>/dev/null &
-    elif command -v xdg-open >/dev/null 2>&1; then
-        xdg-open "$url" 2>/dev/null &
-    else
-        show_message "Cannot open browser (no open/xdg-open command)" "${RED}"
-        return
-    fi
-    
-    show_message "Opened PR #$pr_num in browser" "${GREEN}"
-}
+      unless system("git rev-parse --git-dir > /dev/null 2>&1")
+        puts "Error: Not in a git repository"
+        exit 1
+      end
+    end
+  end
 
-open_buildkite() {
-    local pr_num="${PR_NUMBERS[CURRENT_SELECTION]}"
-    
-    if [ -z "$pr_num" ]; then
-        show_message "Cannot open Buildkite for main branch (no PR)" "${RED}"
-        return
-    fi
-    
-    local buildkite_url="${PR_BUILDKITE_URLS[CURRENT_SELECTION]}"
-    if [ -z "$buildkite_url" ]; then
-        show_message "No Buildkite URL available for this PR" "${RED}"
-        return
-    fi
-    
-    if command -v open >/dev/null 2>&1; then
-        open "$buildkite_url" 2>/dev/null &
-    elif command -v xdg-open >/dev/null 2>&1; then
-        xdg-open "$buildkite_url" 2>/dev/null &
-    else
-        show_message "Cannot open browser (no open/xdg-open command)" "${RED}"
-        return
-    fi
-    
-    show_message "Opened Buildkite build in browser" "${GREEN}"
-}
+  # --- PR Fetcher ---
+  class PRFetcher
+    class << self
+      def fetch
+        prs = []
+        gh_output, status = Open3.capture2('gh pr list --author @me --json number,title,headRefName,state,statusCheckRollup,reviewDecision,mergeable,url,body --limit 20 2>/dev/null')
+        return prs unless status.success? && !gh_output.strip.empty? && gh_output.strip != "[]"
+        pr_data = JSON.parse(gh_output)
+        pr_data.each { |pr| prs << build_pr(pr) }
+        prs
+      rescue JSON::ParserError
+        []
+      end
 
-view_pr_details() {
-    local pr_num="${PR_NUMBERS[CURRENT_SELECTION]}"
-    
-    if [ -z "$pr_num" ]; then
-        show_message "Cannot view details for main branch (no PR)" "${RED}"
-        return
-    fi
-    
-    show_message "Opening PR #$pr_num details..." "${YELLOW}"
-    
-    if command -v gh >/dev/null 2>&1; then
-        printf "\033[?25h\033[2J\033[H"
-        gh pr view "$pr_num"
-        printf "\nPress any key to return to dashboard..."
-        read -r -n 1
-        printf "\033[?25l"
-        draw_initial_screen
-    else
-        show_message "GitHub CLI not available" "${RED}"
-    fi
-}
+      private
 
-copy_branch_name() {
-    local pr_num="${PR_NUMBERS[CURRENT_SELECTION]}"
-    local branch="${PR_BRANCHES[CURRENT_SELECTION]}"
-    
-    if [ -z "$pr_num" ] && [ "$branch" = "main" ]; then
-        # This is the main branch
-        if command -v pbcopy >/dev/null 2>&1; then
-            echo -n "$branch" | pbcopy
-            show_message "Copied 'main' to clipboard" "${GREEN}"
-        elif command -v xclip >/dev/null 2>&1; then
-            echo -n "$branch" | xclip -selection clipboard
-            show_message "Copied 'main' to clipboard" "${GREEN}"
-        else
-            show_message "Clipboard not available (no pbcopy/xclip)" "${RED}"
-        fi
-        return
-    fi
-    
-    if [ -z "$branch" ]; then
-        show_message "No branch information available" "${RED}"
-        return
-    fi
-    
-    if command -v pbcopy >/dev/null 2>&1; then
-        echo -n "$branch" | pbcopy
-        show_message "Copied '$branch' to clipboard" "${GREEN}"
-    elif command -v xclip >/dev/null 2>&1; then
-        echo -n "$branch" | xclip -selection clipboard
-        show_message "Copied '$branch' to clipboard" "${GREEN}"
-    else
-        show_message "Clipboard not available (no pbcopy/xclip)" "${RED}"
-    fi
-}
+      def build_pr(pr)
+        checks_status, buildkite_url = parse_checks(pr['statusCheckRollup'])
+        review_status = parse_review(pr['reviewDecision'])
+        merge_status = parse_merge(pr['mergeable'])
+        PR.new(
+          number: pr['number'].to_s,
+          title: pr['title'] || "",
+          branch: pr['headRefName'] || "",
+          status: pr['state'] || "",
+          checks: checks_status,
+          reviews: review_status,
+          merge: merge_status,
+          url: pr['url'] || "",
+          description: (pr['body'] || "").strip[0..800],
+          buildkite_url: buildkite_url,
+          stack_char: "◯",
+          restack: "",
+          main: false
+        )
+      end
 
-copy_pr_url() {
-    local pr_num="${PR_NUMBERS[CURRENT_SELECTION]}"
-    
-    if [ -z "$pr_num" ]; then
-        show_message "Cannot copy URL for main branch (no PR)" "${RED}"
-        return
-    fi
-    
-    local url="${PR_URLS[CURRENT_SELECTION]}"
-    if [ -z "$url" ]; then
-        show_message "No URL available for this PR" "${RED}"
-        return
-    fi
-    
-    if command -v pbcopy >/dev/null 2>&1; then
-        echo -n "$url" | pbcopy
-        show_message "Copied PR URL to clipboard" "${GREEN}"
-    elif command -v xclip >/dev/null 2>&1; then
-        echo -n "$url" | xclip -selection clipboard
-        show_message "Copied PR URL to clipboard" "${GREEN}"
-    else
-        show_message "Clipboard not available (no pbcopy/xclip)" "${RED}"
-    fi
-}
-
-copy_buildkite_id() {
-    local pr_num="${PR_NUMBERS[CURRENT_SELECTION]}"
-    
-    if [ -z "$pr_num" ]; then
-        show_message "Cannot copy Buildkite ID for main branch (no PR)" "${RED}"
-        return
-    fi
-    
-    local buildkite_url="${PR_BUILDKITE_URLS[CURRENT_SELECTION]}"
-    if [ -z "$buildkite_url" ]; then
-        show_message "No Buildkite URL available for this PR" "${RED}"
-        return
-    fi
-    
-    # Extract build ID from URL like: https://buildkite.com/shopify/world-shopify-selective-tests/builds/243057#01975df8-c035-4bd7-a0c8-e303393a7b2a
-    local build_id
-    build_id=$(echo "$buildkite_url" | sed -n 's|.*/builds/\([0-9][0-9]*\).*|\1|p')
-    
-    if [ -z "$build_id" ]; then
-        show_message "Could not extract build ID from Buildkite URL" "${RED}"
-        return
-    fi
-    
-    if command -v pbcopy >/dev/null 2>&1; then
-        echo -n "$build_id" | pbcopy
-        show_message "Copied Buildkite build ID '$build_id' to clipboard" "${GREEN}"
-    elif command -v xclip >/dev/null 2>&1; then
-        echo -n "$build_id" | xclip -selection clipboard
-        show_message "Copied Buildkite build ID '$build_id' to clipboard" "${GREEN}"
-    else
-        show_message "Clipboard not available (no pbcopy/xclip)" "${RED}"
-    fi
-}
-
-refresh_data() {
-    show_message "Refreshing PR data..." "${YELLOW}"
-    if fetch_pr_data; then
-        draw_initial_screen
-        show_message "Data refreshed" "${GREEN}"
-    else
-        show_message "Failed to refresh data" "${RED}"
-    fi
-}
-
-navigate_up() {
-    if [ "$CURRENT_SELECTION" -gt 0 ]; then
-        clear_message  # Clear any previous messages
-        ((CURRENT_SELECTION--))
-        # Use full redraw to avoid cursor positioning issues and key echoing
-        draw_initial_screen
-    fi
-}
-
-navigate_down() {
-    if [ "$CURRENT_SELECTION" -lt $((TOTAL_PRS - 1)) ]; then
-        clear_message  # Clear any previous messages
-        ((CURRENT_SELECTION++))
-        # Use full redraw to avoid cursor positioning issues and key echoing
-        draw_initial_screen
-    fi
-}
-
-toggle_descriptions() {
-    if [ "$DESCRIPTION_MODE" -eq 0 ]; then
-        DESCRIPTION_MODE=1
-        show_message "Description mode ON" "${GREEN}"
-    else
-        DESCRIPTION_MODE=0
-        show_message "Description mode OFF" "${YELLOW}"
-    fi
-    draw_initial_screen
-}
-
-read_key() {
-    local key
-    
-    # Read from terminal directly with timeout
-    if IFS= read -r -n 1 -s -t 1 key 2>/dev/null; then
-        # Handle different key types
-        case "$key" in
-            '')  # Enter key (empty string)
-                echo "enter"
-                ;;
-            $'\x1b')  # Escape sequence
-                if IFS= read -r -n 1 -s -t 0.1 key 2>/dev/null; then
-                    if [[ "$key" == '[' ]]; then
-                        if IFS= read -r -n 1 -s -t 0.1 key 2>/dev/null; then
-                            case "$key" in
-                                'A') echo "up" ;;
-                                'B') echo "down" ;;
-                                'C') echo "right" ;;
-                                'D') echo "left" ;;
-                                *) echo "" ;;  # Don't return "escape" for unknown sequences
-                            esac
+      def parse_checks(status_rollup)
+        return ["Unknown", ""] unless status_rollup && status_rollup.any?
+        all_success = true
+        has_failure = false
+        has_pending = false
+        buildkite_url = ""
+        status_rollup.each do |context|
+          next if context['name'] =~ /(review|required|mergeable)/i
+          target_url = context['detailsUrl'] || context['targetUrl'] || ""
+          buildkite_url = target_url if target_url.include?('buildkite.com') && buildkite_url.empty?
+          conclusion = context['conclusion'] || context['state'] || ""
+          case conclusion
+          when 'SUCCESS'
+            next
+          when 'FAILURE', 'CANCELLED', 'ERROR'
+            has_failure = true
+            all_success = false
+          when 'PENDING', 'IN_PROGRESS', ''
+            has_pending = true
+            all_success = false
+          else
+            all_success = false
+          end
+        end
+        checks_status = if has_failure
+                          "Failed"
+                        elsif has_pending
+                          "Running"
+                        elsif all_success
+                          "Passed"
                         else
-                            echo ""  # Don't return "escape" for incomplete sequences
-                        fi
-                    else
-                        echo ""  # Don't return "escape" for other escape sequences
-                    fi
-                else
-                    echo ""  # Don't return "escape" for lone escape key
-                fi
-                ;;
-            $'\n'|$'\r')  # Newline/carriage return
-                echo "enter"
-                ;;
-            *)  # Regular character
-                echo "$key"
-                ;;
-        esac
-    else
-        # Read timeout or error - return empty string
-        echo ""
-    fi
-}
+                          "Unknown"
+                        end
+        [checks_status, buildkite_url]
+      end
 
-handle_key() {
-    local key="$1"
-    
-    case "$key" in
-        'j'|'down')  # j or down arrow
-            navigate_down
-            ;;
-        'k'|'up')  # k or up arrow
-            navigate_up
-            ;;
-        'enter')  # Enter key
-            checkout_branch
-            ;;
-        'o')
-            open_pr_in_browser
-            ;;
-        'B')  # Uppercase B for Buildkite
-            open_buildkite
-            ;;
-        'v')
-            view_pr_details
-            ;;
-        'b')  # Lowercase b for branch
-            copy_branch_name
-            ;;
-        'u')
-            copy_pr_url
-            ;;
-        'i')  # i for build ID
-            copy_buildkite_id
-            ;;
-        'd')
-            toggle_descriptions
-            ;;
-        'r')
-            refresh_data
-            ;;
-        'q'|'escape'|$'\x03')  # q, ESC, or Ctrl+C
-            cleanup
-            ;;
-    esac
-}
+      def parse_review(decision)
+        case decision
+        when 'APPROVED' then 'Approved'
+        when 'CHANGES_REQUESTED' then 'Changes'
+        when 'REVIEW_REQUIRED' then 'Required'
+        else 'None'
+        end
+      end
 
-main() {
-    # Check for debug flag
-    if [ "$1" = "--debug-table" ]; then
-        DEBUG_TABLE=true
-    fi
-    
-    if ! command -v gh >/dev/null 2>&1; then
-        echo "Error: GitHub CLI (gh) is required but not installed."
-        echo "Please install it with: brew install gh"
-        exit 1
-    fi
-    
-    if ! command -v jq >/dev/null 2>&1; then
-        echo "Error: jq is required but not installed."
-        echo "Please install it with: brew install jq"
-        exit 1
-    fi
-    
-    if ! command -v gt >/dev/null 2>&1; then
-        echo "Error: Graphite CLI (gt) is required but not installed."
-        echo "Please install it with: npm install -g @withgraphite/graphite-cli"
-        exit 1
-    fi
-    
-    # Check if we're in a git repository
-    if ! git rev-parse --git-dir >/dev/null 2>&1; then
-        echo "Error: Not in a git repository"
-        exit 1
-    fi
-    
-    get_terminal_size
-    
-    # Show loading message immediately (only clear screen if not in debug mode)
-    if [ "$DEBUG_TABLE" != "true" ]; then
-        printf "${CLEAR_SCREEN}${CURSOR_HOME}${HIDE_CURSOR}"
-        printf "${BOLD}${BLUE}––– Graphite Dashboard –––${RESET}\n\n"
-        printf "${YELLOW}Fetching your PR data...${RESET}\n"
-    fi
-    
-    # Fetch all data first
-    if ! fetch_pr_data; then
-        printf "${RED}Failed to fetch PR data${RESET}\n"
-        exit 1
-    fi
-    
-    # Check if we only have the main branch (TOTAL_PRS = 1 means just main branch)
-    local has_prs=true
-    if [ "$TOTAL_PRS" -eq 1 ] && [ "${PR_BRANCHES[0]}" = "main" ]; then
-        has_prs=false
-    fi
-    
-    # Now draw the complete table with real data and properly calculated column widths
-    draw_initial_screen
-    
-    # Show message if no PRs found
-    if [ "$has_prs" = false ]; then
-        show_message "You don't have any PRs in this repo" "${YELLOW}"
-    fi
-    
-    # If debug mode, exit immediately after drawing the table
-    if [ "$DEBUG_TABLE" = true ]; then
-        printf "${RESET}\n"
-        echo "Debug table rendered. Exiting."
-        exit 0
-    fi
-    
-    # Main input loop
-    while true; do
-        key=$(read_key)
-        # Only process non-empty keys
-        if [ -n "$key" ] && [ "$key" != "" ]; then
-            handle_key "$key"
-        fi
-        # Small delay to prevent busy loops
-        sleep 0.01
-    done
-}
+      def parse_merge(mergeable)
+        case mergeable
+        when 'MERGEABLE' then 'Ready'
+        when 'CONFLICTING' then 'Conflicts'
+        else 'Unknown'
+        end
+      end
+    end
+  end
 
-main "$@" 
+  # --- Stack Info Builder ---
+  class StackInfoBuilder
+    class << self
+      def build(prs)
+        gt_output, _ = Open3.capture2('timeout 3s gt log --no-interactive 2>/dev/null || echo ""')
+        pr_deps, parent_branches = fetch_pr_dependencies(prs, gt_output)
+        sorted_indices = sort_prs(prs, pr_deps, parent_branches)
+        update_prs(prs, pr_deps, parent_branches, sorted_indices)
+      end
+
+      private
+
+      def fetch_pr_dependencies(prs, gt_output)
+        pr_deps = []
+        parent_branches = []
+        threads = []
+        pr_mutex = Mutex.new
+        prs.each do |pr|
+          next if pr.branch == MAIN_BRANCH_NAME || pr.number.empty?
+          threads << Thread.new(pr) do |pr_thread|
+            needs_restack = gt_output.include?("#{pr_thread.branch}.*needs restack") ? "Yes" : ""
+            pr_data, status = Open3.capture2("gh pr view #{pr_thread.number} --json baseRefName 2>/dev/null")
+            if status.success? && !pr_data.empty?
+              begin
+                data = JSON.parse(pr_data)
+                base_branch = data.dig('baseRefName')
+                if base_branch
+                  depth = base_branch == MAIN_BRANCH_NAME ? 1 : 2
+                  pr_mutex.synchronize do
+                    parent_branches << base_branch if base_branch != MAIN_BRANCH_NAME
+                    pr_deps << "#{pr_thread.number}:#{depth}:#{needs_restack}:#{base_branch}"
+                  end
+                end
+              rescue JSON::ParserError
+              end
+            end
+          end
+        end
+        threads.each(&:join)
+        [pr_deps, parent_branches]
+      end
+
+      def sort_prs(prs, pr_deps, parent_branches)
+        pr_indices = (0...prs.length).to_a
+        sortable_prs = pr_indices.map do |i|
+          pr = prs[i]
+          depth, restack = 999, ""
+          pr_deps.each do |dep|
+            dep_parts = dep.split(':')
+            if dep_parts[0] == pr.number
+              depth = dep_parts[1].to_i
+              restack = dep_parts[2]
+              break
+            end
+          end
+          [depth, pr.number.to_i, i, restack]
+        end
+        sortable_prs.sort.map { |entry| entry[2] }
+      end
+
+      def update_prs(prs, pr_deps, parent_branches, sorted_indices)
+        new_prs = []
+        sorted_indices.each do |i|
+          pr = prs[i].dup
+          pr_num = pr.number
+          branch = pr.branch
+          depth, restack = 1, ""
+          pr_deps.each do |dep|
+            dep_parts = dep.split(':')
+            if dep_parts[0] == pr_num
+              depth = dep_parts[1].to_i
+              restack = dep_parts[2]
+              break
+            end
+          end
+          has_children = parent_branches.include?(branch)
+          stack_char = case depth
+                      when 1 then has_children ? "│┐" : "├"
+                      when 2 then "│├"
+                      when 3 then "││├"
+                      else "│││├"
+                      end
+          pr.stack_char = stack_char
+          pr.restack = restack
+          new_prs << pr
+        end
+        prs.replace(new_prs)
+      end
+    end
+  end
+
+  # --- Action Superclass and Subclasses ---
+  class Action
+    def initialize(dashboard)
+      @dashboard = dashboard
+    end
+
+    def perform(*args)
+      raise NotImplementedError, 'Subclasses must implement perform.'
+    end
+
+    protected
+
+    def prompt_continue
+      puts "Press Enter to continue..."
+      gets
+    end
+  end
+
+  class CheckoutBranchAction < Action
+    def perform(branch)
+      system("clear")
+      puts "Checking out #{branch}..."
+      if system("git checkout #{branch} 2>/dev/null")
+        puts "Successfully checked out #{branch}"
+        sleep 1
+      else
+        puts "Failed to checkout #{branch}"
+        prompt_continue
+      end
+    end
+  end
+
+  class OpenInBrowserAction < Action
+    def perform(url)
+      return if url.empty?
+
+      if system("which open > /dev/null 2>&1")
+        system("open '#{url}' 2>/dev/null &")
+      elsif system("which xdg-open > /dev/null 2>&1")
+        system("xdg-open '#{url}' 2>/dev/null &")
+      else
+        puts "Cannot open browser (no open/xdg-open command)"
+        puts "URL: #{url}"
+        prompt_continue
+        return
+      end
+
+      puts "Opened in browser"
+      sleep 1
+    end
+  end
+
+  class CopyToClipboardAction < Action
+    def perform(text, description)
+      return if text.empty?
+
+      if system("which pbcopy > /dev/null 2>&1")
+        system("echo -n '#{text}' | pbcopy")
+      elsif system("which xclip > /dev/null 2>&1")
+        system("echo -n '#{text}' | xclip -selection clipboard")
+      else
+        puts "Clipboard not available (no pbcopy/xclip)"
+        puts "#{description.capitalize}: #{text}"
+        prompt_continue
+        return
+      end
+
+      puts "Copied #{description} to clipboard"
+      sleep 1
+    end
+  end
+
+  class ViewPRDetailsAction < Action
+    def perform(pr_number)
+      return if pr_number.empty?
+
+      system("clear")
+      puts "Loading PR ##{pr_number} details..."
+      puts
+      system("gh pr view #{pr_number}")
+      prompt_continue
+    end
+  end
+
+  class ShowDescriptionAction < Action
+    def perform(description)
+      return if description.empty?
+
+      system("clear")
+      puts "Description:"
+      puts
+      puts description
+      prompt_continue
+    end
+  end
+
+  class CopyBuildIDAction < Action
+    def perform(buildkite_url)
+      return if buildkite_url.empty?
+
+      match = buildkite_url.match(/\/builds\/(\d+)/)
+      build_id = match ? match[1] : nil
+      if build_id
+        CopyToClipboardAction.new(@dashboard).perform(build_id, "build ID")
+      end
+    end
+  end
+
+  # --- Dashboard Main Logic ---
+  class Dashboard
+    attr_reader :prs, :main_branch, :action_handler
+
+    def initialize
+      DependencyChecker.check_and_install
+      @prs = PRFetcher.fetch
+      StackInfoBuilder.build(@prs)
+      @main_branch = PR.new(
+        number: "",
+        title: MAIN_BRANCH_NAME,
+        branch: MAIN_BRANCH_NAME,
+        status: "Trunk",
+        checks: "",
+        reviews: "",
+        merge: "",
+        url: "",
+        description: MAIN_BRANCH_DESC,
+        buildkite_url: "",
+        stack_char: "◯",
+        restack: "",
+        main: true
+      )
+      @action_handler = Action.new(self)
+    end
+
+    def refresh_data
+      @prs = PRFetcher.fetch
+      StackInfoBuilder.build(@prs)
+    end
+
+    def action_for_hotkey(hotkey)
+      case hotkey
+      when 'c' then CheckoutBranchAction.new(self)
+      when 'o' then OpenInBrowserAction.new(self)
+      when 'b' then CopyToClipboardAction.new(self)
+      when 'u' then CopyToClipboardAction.new(self)
+      when 'v' then ViewPRDetailsAction.new(self)
+      when 'd' then ShowDescriptionAction.new(self)
+      when 'k' then OpenInBrowserAction.new(self)
+      when 'i' then CopyBuildIDAction.new(self)
+      else nil
+      end
+    end
+  end
+
+  # --- Curses Drawing Implementation ---
+  class Drawing
+    def self.styled_text(window, text, color_pair: 0, bold: false, y: nil, x: nil)
+      window.attron(Curses.color_pair(color_pair) | (bold ? Curses::A_BOLD : 0)) do
+        window.setpos(y, x) if y && x
+        window.addstr(text)
+      end
+    end
+
+    def self.styled_block(window, text, color_pair: 0, bold: false, align: :center, y: nil)
+      width = window.maxx
+      text = text.to_s
+      x = case align
+          when :center then [(width - text.length) / 2, 0].max
+          when :right then [width - text.length - 1, 0].max
+          else 0
+          end
+      y ||= window.cury
+      styled_text(window, text, color_pair: color_pair, bold: bold, y: y, x: x)
+    end
+
+    def self.status_color(status)
+      case status.to_s.downcase
+      when 'trunk', 'ready', 'passed', 'approved'
+        5 # green
+      when 'running', 'required'
+        6 # yellow
+      when 'failed', 'conflicts', 'changes', 'error'
+        4 # red
+      when 'none', 'unknown'
+        7 # gray
+      else
+        0 # default
+      end
+    end
+
+    def self.table_with_hotkeys(prs, main_branch, legend, &on_action)
+      Curses.init_screen
+      Curses.curs_set(0)
+      Curses.start_color
+      Curses.use_default_colors
+      Curses.init_pair(1, Curses::COLOR_BLACK, Curses::COLOR_CYAN) # highlight (black on cyan)
+      Curses.init_pair(2, Curses::COLOR_YELLOW, -1) # legend
+      Curses.init_pair(3, Curses::COLOR_GREEN, -1) # success
+      Curses.init_pair(4, Curses::COLOR_RED, -1)   # error
+      Curses.init_pair(5, Curses::COLOR_GREEN, -1) # status good
+      Curses.init_pair(6, Curses::COLOR_YELLOW, -1) # status running
+      Curses.init_pair(7, Curses::COLOR_WHITE, -1) # PR#, Title, Branch (white on transparent)
+      win = Curses.stdscr
+      win.keypad(true)
+      Curses.raw
+      selected = 0
+      offset = 0
+      header = ["PR#", "Title", "Branch", "Status", "Checks", "Reviews", "Merge", "Restack"]
+      all_prs = [main_branch] + prs
+      rows = [header] + all_prs.map(&:to_table_row)
+      col_widths = rows.transpose.map { |col| col.map { |v| v.to_s.length }.max }
+      per_page = win.maxy - 5
+
+      loop do
+        win.clear
+        styled_block(win, 'Graphite CLI Dashboard', color_pair: 2, bold: true, align: :center, y: 0)
+        win.setpos(2, 0)
+        header_line = header.each_with_index.map { |h, i| h.ljust(col_widths[i]) }.join('  ')
+        win.attron(Curses::A_BOLD) { win.addstr(header_line) }
+        start = offset
+        finish = [offset + per_page, all_prs.size].min
+
+        (start...finish).each_with_index do |idx, i|
+          pr = all_prs[idx]
+          y = 3 + i
+          win.setpos(y, 0)
+          row = pr.to_table_row
+
+          if idx == selected
+            win.attron(Curses.color_pair(1)) do
+              row_str = row.each_with_index.map { |cell, j| cell.ljust(col_widths[j]) }.join('  ')
+              win.addstr(row_str)
+            end
+          else
+            row.each_with_index do |cell, j|
+              x = col_widths[0..j-1].sum + (j * 2)
+              win.setpos(y, x)
+              color = 0
+              attr = Curses.color_pair(color)
+              if [0,1,2].include?(j)
+                color = 7 # PR#, Title, Branch: white on transparent
+                attr = Curses.color_pair(color)
+              elsif [3,4,5,6].include?(j) && y > 2 # Status, Checks, Reviews, Merge
+                color = status_color(cell)
+                attr = Curses.color_pair(color)
+              end
+              win.attron(attr) { win.addstr(cell.ljust(col_widths[j])) }
+            end
+          end
+        end
+
+        win.setpos(win.maxy - 2, 0)
+        win.attron(Curses.color_pair(2)) { win.addstr(legend) }
+        win.refresh
+        ch = win.getch
+
+        case ch
+        when Curses::Key::UP, 65, 'k', 'K'.ord
+          selected = [selected - 1, 0].max
+          offset = [selected - per_page + 1, 0].max if selected < offset
+        when Curses::Key::DOWN, 66, 'j', 'J'.ord
+          selected = [selected + 1, all_prs.size - 1].min
+          offset = [selected, all_prs.size - per_page].min if selected >= offset + per_page
+          offset = 0 if offset < 0
+        when 'q', 'Q'.ord
+          break
+        when 'c', 'C'.ord, 'o', 'O'.ord, 'b', 'B'.ord, 'u', 'U'.ord, 'v', 'V'.ord, 'd', 'D'.ord, 'k', 'K'.ord, 'i', 'I'.ord, 'r', 'R'.ord
+          key = ch.is_a?(Integer) ? ch.chr.downcase : ch.downcase
+          pr = all_prs[selected]
+          Curses.close_screen
+          on_action.call(key, pr)
+          # Re-initialize Curses after the action
+          Curses.init_screen
+          Curses.curs_set(0)
+          Curses.start_color
+          Curses.use_default_colors
+          Curses.init_pair(1, Curses::COLOR_BLACK, Curses::COLOR_CYAN)
+          Curses.init_pair(2, Curses::COLOR_YELLOW, -1)
+          Curses.init_pair(3, Curses::COLOR_GREEN, -1)
+          Curses.init_pair(4, Curses::COLOR_RED, -1)
+          Curses.init_pair(5, Curses::COLOR_GREEN, -1)
+          Curses.init_pair(6, Curses::COLOR_YELLOW, -1)
+          Curses.init_pair(7, Curses::COLOR_WHITE, -1)
+          win = Curses.stdscr
+          win.keypad(true)
+          Curses.raw
+        end
+      end
+    ensure
+      Curses.close_screen
+    end
+  end
+end
+
+# --- Main Loop ---
+if __FILE__ == $0
+  include GraphiteDashboard
+  dashboard = Dashboard.new
+  Drawing.table_with_hotkeys(dashboard.prs, dashboard.main_branch, LEGEND) do |hotkey, pr|
+    case hotkey
+    when 'c'
+      dashboard.action_for_hotkey('c').perform(pr.branch)
+    when 'o'
+      dashboard.action_for_hotkey('o').perform(pr.url)
+    when 'b'
+      dashboard.action_for_hotkey('b').perform(pr.branch, "branch name")
+    when 'u'
+      dashboard.action_for_hotkey('u').perform(pr.url, "PR URL")
+    when 'v'
+      dashboard.action_for_hotkey('v').perform(pr.number)
+    when 'd'
+      dashboard.action_for_hotkey('d').perform(pr.description)
+    when 'k'
+      dashboard.action_for_hotkey('k').perform(pr.buildkite_url)
+    when 'i'
+      dashboard.action_for_hotkey('i').perform(pr.buildkite_url)
+    when 'r'
+      dashboard.refresh_data
+    end
+  end
+end
