@@ -20,7 +20,7 @@ return {
       if ok then
         -- Add capabilities to each config
         config.capabilities = capabilities
-        
+
         -- Resolve cmd if it's a function
         if type(config.cmd) == 'function' then
           local cmd_func = config.cmd
@@ -152,14 +152,14 @@ return {
             if config and vim.tbl_contains(config.filetypes or {}, args.match) then
               local start_config = vim.tbl_deep_extend('force', config, {
                 name = server_name,
-                root_dir = vim.fs.root(args.buf, config.root_markers or {'.git'})
+                root_dir = vim.fs.root(args.buf, config.root_markers or { '.git' })
               })
-              
+
               -- Resolve cmd if it's still a function
               if type(start_config.cmd) == 'function' then
                 start_config.cmd = start_config.cmd()
               end
-              
+
               vim.lsp.start(start_config)
             end
           end,
