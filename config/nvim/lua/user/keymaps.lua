@@ -44,6 +44,11 @@ bind('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', { noremap = true, des
 bind('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', { noremap = true, desc = 'Next diagnostic' })
 bind('n', 'K', vim.lsp.buf.hover, { noremap = true, desc = 'Show definition' })
 
+-- Additional LSP keymaps for Neovim 0.10+
+bind('n', '<leader>ih', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled()) end, { desc = 'Toggle inlay hints' })
+bind({ 'n', 'x' }, '<leader>cf', function() vim.lsp.buf.format({ async = true }) end, { desc = 'Format buffer' })
+bind('n', '<leader>F', ':FormatOnSaveToggle<CR>', { desc = 'Toggle format on save' })
+
 bind('n', 'tn', ':tabnext<CR>', { desc = "Next tab" })
 bind('n', 'tp', ':tabprev<CR>', { desc = "Previous tab" })
 bind('n', 'tt', ':tabnew<CR>', { desc = "New tab" })

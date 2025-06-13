@@ -3,7 +3,6 @@ return {
   event = "BufReadPre",
   dependencies = {
     { 'nvim-treesitter/nvim-treesitter-textobjects' },
-    { 'sle-c/nvim-hidesig' },
     { 'nvim-treesitter/nvim-treesitter-context' },
     { 'andymass/vim-matchup' },
   },
@@ -81,11 +80,6 @@ return {
       'markdown',
       'vimdoc',
     },
-    hidesig = {
-      enable = true,
-      opacity = 0.75,
-      delay = 200,
-    }
   },
   build = function()
     pcall(vim.cmd, 'TSUpdate')
