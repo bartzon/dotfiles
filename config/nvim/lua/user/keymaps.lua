@@ -6,19 +6,6 @@ for i = 1, 6 do
   bind('n', lhs, rhs, { desc = "Move to window " .. i })
 end
 
-function vim.getVisualSelection()
-  vim.cmd('noau normal! "vy"')
-  local text = vim.fn.getreg('v') or ""
-  vim.fn.setreg('v', {})
-
-  text = string.gsub(text, "\n", "")
-  if #text > 0 then
-    return text
-  else
-    return ''
-  end
-end
-
 bind('n', '<leader>r', ':so ~/.config/nvim/init.lua<CR>', { desc = "Reload config" })
 
 bind('n', '<leader>=', '<C-w>=', { desc = "Reformat panes" })
@@ -30,7 +17,6 @@ bind('n', '<leader>w', ":w<CR>", { desc = "Write file", silent = true })
 bind('n', '<leader>pr', ":!dev open pr<CR>", { desc = "Open PR", silent = true })
 
 bind('n', '<leader>cp', ':let @+=@%<CR>', { desc = 'Copy current file path to clipboard', silent = true })
-
 
 bind('n', 'gt', ':vsplit | lua vim.lsp.buf.definition()<CR>', {})
 bind('n', 'gT', ':tabnew | lua vim.lsp.buf.definition()<CR>', {})
@@ -45,7 +31,8 @@ bind('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', { noremap = true, des
 bind('n', 'K', vim.lsp.buf.hover, { noremap = true, desc = 'Show definition' })
 
 -- Additional LSP keymaps for Neovim 0.10+
-bind('n', '<leader>ih', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled()) end, { desc = 'Toggle inlay hints' })
+bind('n', '<leader>ih', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled()) end,
+  { desc = 'Toggle inlay hints' })
 bind({ 'n', 'x' }, '<leader>cf', function() vim.lsp.buf.format({ async = true }) end, { desc = 'Format buffer' })
 bind('n', '<leader>F', ':FormatOnSaveToggle<CR>', { desc = 'Toggle format on save' })
 
@@ -66,7 +53,6 @@ bind('n', '<esc>', function()
   vim.cmd(":noh")
 end, { silent = true, desc = "Remove Search Highlighting, Dismiss Popups" })
 
-
 bind('n', '<leader>tapi', ':VimuxRunCommand "./bin/tapioca dsl ".bufname("%")<CR>',
   { desc = 'Run tapioca for current file', silent = true })
 
@@ -80,3 +66,26 @@ bind('n', '<leader>cm', function()
     split = 'rightbelow'
   })
 end, { desc = 'Compare file with main branch' })
+
+-- LSP diagnostics
+bind('n', '<leader>li', function()
+  local clients = vim.lsp.get_clients({ bufnr = 0 })
+  if #clients == 0 then
+    vim.notify("No LSP clients attached", vim.log.levels.WARN)
+    return
+  end
+  
+  local lines = { "LSP Clients for buffer " .. vim.api.nvim_get_current_buf() .. ":", "" }
+  for _, client in ipairs(clients) do
+    table.insert(lines, "Client: " .. client.name)
+    table.insert(lines, "  ID: " .. client.id)
+    table.insert(lines, "  Root: " .. (client.root_dir or "N/A"))
+    table.insert(lines, "  Capabilities:")
+    table.insert(lines, "    Definition: " .. tostring(client.supports_method("textDocument/definition")))
+    table.insert(lines, "    References: " .. tostring(client.supports_method("textDocument/references")))
+    table.insert(lines, "    Hover: " .. tostring(client.supports_method("textDocument/hover")))
+    table.insert(lines, "")
+  end
+  
+  vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO)
+end, { desc = 'LSP info for current buffer' })

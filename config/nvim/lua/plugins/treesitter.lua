@@ -9,9 +9,9 @@ return {
   opts = {
     highlight = {
       enable = true,
-      disable = {
-        "ruby",
-      }
+      -- disable = {
+      --   "ruby",
+      -- }
     },
     auto_install = true,
     autopairs = {
@@ -31,11 +31,6 @@ return {
       goto_previous_start = {
         ["[m"] = "@function.outer",
       }
-    },
-    rainbow = {
-      enable = true,
-      extended_mode = true,
-      max_file_lines = 500,
     },
     incremental_selection = {
       enable = true,
@@ -59,10 +54,6 @@ return {
         },
         include_surrounding_whitespace = true,
       },
-    },
-    context_commentstring = {
-      enable = true,
-      enable_autocmd = false,
     },
     ensure_installed = {
       'ruby',

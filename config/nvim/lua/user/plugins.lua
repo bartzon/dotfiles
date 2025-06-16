@@ -26,7 +26,7 @@ lazy.path = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 lazy.opts = {
   install = {
     missing = true,
-    colorscheme = { 'nightly' }
+    colorscheme = { 'gruvbox-material' }
   },
   change_detection = {
     enabled = true,

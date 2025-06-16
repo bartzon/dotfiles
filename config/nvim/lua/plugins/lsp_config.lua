@@ -24,7 +24,13 @@ return {
         -- Resolve cmd if it's a function
         if type(config.cmd) == 'function' then
           local cmd_func = config.cmd
-          config.cmd = cmd_func()
+          local cmd_ok, cmd_result = pcall(cmd_func)
+          if cmd_ok then
+            config.cmd = cmd_result
+          else
+            vim.notify('Failed to resolve cmd for ' .. server_name .. ': ' .. tostring(cmd_result), vim.log.levels.WARN)
+            goto continue
+          end
         end
 
         -- Register the LSP configuration
@@ -32,6 +38,7 @@ return {
       else
         vim.notify('Failed to load LSP config for ' .. server_name, vim.log.levels.ERROR)
       end
+      ::continue::
     end
 
     -- Set up LspAttach autocommand for server-specific configurations
@@ -139,15 +146,22 @@ return {
     end, { desc = 'Toggle format on save' })
 
     -- Enable all configured LSP servers
-    -- Use pcall to handle potential API changes in development versions
-    for _, config_path in ipairs(lsp_configs) do
-      local server_name = vim.fn.fnamemodify(config_path, ':t:r')
-      local ok, err = pcall(vim.lsp.enable, server_name)
-      if not ok then
-        -- Fallback: Set up autocommands to start servers manually
-        vim.api.nvim_create_autocmd('FileType', {
-          pattern = '*',
-          callback = function(args)
+    -- Check if vim.lsp.enable exists (newer Neovim versions)
+    if vim.lsp.enable then
+      for _, config_path in ipairs(lsp_configs) do
+        local server_name = vim.fn.fnamemodify(config_path, ':t:r')
+        local ok, err = pcall(vim.lsp.enable, server_name)
+        if not ok then
+          vim.notify('Failed to enable LSP ' .. server_name .. ': ' .. tostring(err), vim.log.levels.WARN)
+        end
+      end
+    else
+      -- Fallback for older Neovim versions: Set up autocommands to start servers manually
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = '*',
+        callback = function(args)
+          for _, config_path in ipairs(lsp_configs) do
+            local server_name = vim.fn.fnamemodify(config_path, ':t:r')
             local config = vim.lsp.config[server_name]
             if config and vim.tbl_contains(config.filetypes or {}, args.match) then
               local start_config = vim.tbl_deep_extend('force', config, {
@@ -155,16 +169,15 @@ return {
                 root_dir = vim.fs.root(args.buf, config.root_markers or { '.git' })
               })
 
-              -- Resolve cmd if it's still a function
-              if type(start_config.cmd) == 'function' then
-                start_config.cmd = start_config.cmd()
+              -- Check if this server is already running for this buffer
+              local clients = vim.lsp.get_clients({ bufnr = args.buf, name = server_name })
+              if #clients == 0 then
+                vim.lsp.start(start_config)
               end
-
-              vim.lsp.start(start_config)
             end
-          end,
-        })
-      end
+          end
+        end,
+      })
     end
 
     -- Set up diagnostics configuration
