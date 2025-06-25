@@ -19,7 +19,7 @@ return {
       default = { 'lsp', 'path', 'buffer' },
     },
     cmdline = {
-      sources = {},
+      enabled = false,
     },
     completion = {
       documentation = {
