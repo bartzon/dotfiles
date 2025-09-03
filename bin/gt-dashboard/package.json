@@ -1,0 +1,31 @@
+{
+  "name": "gt-dashboard",
+  "version": "1.0.0",
+  "description": "Graphite PR Dashboard",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@types/graphlib": "^2.1.12",
+    "chalk": "^5.4.1",
+    "cli-table3": "^0.6.5",
+    "execa": "^8.0.1",
+    "graphlib": "^2.1.8",
+    "ink": "^6.0.1",
+    "ink-table": "^3.1.0",
+    "open": "^10.2.0",
+    "react": "^19.1.0",
+    "terminal-table": "^0.0.12",
+    "timeago.js": "^4.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/open": "^6.1.0",
+    "@types/react": "^19.1.8",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}

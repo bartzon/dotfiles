@@ -29,6 +29,27 @@ export GPG_TTY
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 [ -f ~/.zsh/functions/fzf-tab/fzf-tab.plugin.zsh ] && source ~/.zsh/functions/fzf-tab/fzf-tab.plugin.zsh
 
+# Fix for fzf history widget
+if type fzf-history-widget > /dev/null; then
+  # Override the fzf-history-widget to fix the height error
+  fzf-history-widget() {
+    local selected
+    setopt localoptions noglobsubst noposixbuiltins pipefail no_aliases noglob nobash_rematch 2> /dev/null
+    selected="$(fc -rl 1 | awk '{ cmd=$0; sub(/^[ \t]*[0-9]+\**[ \t]+/, "", cmd); if (!seen[cmd]++) print $0 }' | \
+      fzf --height 40% --layout=reverse --border -n2..,.. --scheme=history --bind=ctrl-r:toggle-sort --query="${LBUFFER}" +m)"
+    local ret=$?
+    if [ -n "$selected" ]; then
+      if [[ $(awk '{print $1; exit}' <<< "$selected") =~ ^[1-9][0-9]* ]]; then
+        zle vi-fetch-history -n $MATCH
+      else
+        LBUFFER="$selected"
+      fi
+    fi
+    zle reset-prompt
+    return $ret
+  }
+fi
+
 source ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source ~/.bin/forgit/forgit.plugin.zsh
 

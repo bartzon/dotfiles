@@ -81,11 +81,6 @@ return {
       'markdown',
       'vimdoc',
     },
-    hidesig = {
-      enable = true,
-      opacity = 0.75,
-      delay = 200,
-    }
   },
   build = function()
     pcall(vim.cmd, 'TSUpdate')

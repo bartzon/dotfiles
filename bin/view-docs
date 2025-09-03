@@ -1,0 +1,15 @@
+#!/bin/bash
+# Script to view Claude documentation with live reload
+
+echo "Starting Claude documentation viewer..."
+echo "Opening http://localhost:3000 in your browser..."
+echo ""
+echo "Features:"
+echo "  - Live reload when files change"
+echo "  - Search functionality"
+echo "  - Sidebar navigation"
+echo ""
+echo "Press Ctrl+C to stop the server"
+echo ""
+
+docsify serve /Users/bartzonneveld/.claude/doc --port 3000 --open

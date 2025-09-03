@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SESSION_NAME="shopify-services"
+
+# Function to check if tmux session exists
+session_exists() {
+    tmux has-session -t "$SESSION_NAME" 2>/dev/null
+}
+
+# Kill existing session if it exists
+if session_exists; then
+    echo "Killing existing session: $SESSION_NAME"
+    # Send SIGTERM to all processes in the session
+    tmux list-panes -s -t "$SESSION_NAME" -F "#{pane_pid}" 2>/dev/null | xargs -I {} kill -TERM {} 2>/dev/null || true
+    sleep 2
+    # Force kill any remaining processes
+    tmux list-panes -s -t "$SESSION_NAME" -F "#{pane_pid}" 2>/dev/null | xargs -I {} kill -KILL {} 2>/dev/null || true
+    tmux kill-session -t "$SESSION_NAME" 2>/dev/null || true
+fi
+
+# Create new session
+echo "Creating new session: $SESSION_NAME"
+tmux new-session -d -s "$SESSION_NAME" -n "identity"
+
+# Wait for session to be created
+sleep 0.2
+
+# Window: identity
+echo "Setting up identity window..."
+tmux send-keys -t "$SESSION_NAME:identity" "dev cd identity && git pull && dev reset --namespace identity --all && dev up && dev server" C-m
+
+# Window: organizations
+echo "Setting up organizations window..."
+tmux new-window -t "$SESSION_NAME" -n "organizations"
+tmux send-keys -t "$SESSION_NAME:organizations" "dev cd organizations && git pull && touch tmp/caching-dev.txt && dev reset --namespace business-platform --all && PRE_CONTRACT=1 dev up && dev server" C-m
+
+# Window: billing
+echo "Setting up billing window..."
+tmux new-window -t "$SESSION_NAME" -n "billing"
+tmux send-keys -t "$SESSION_NAME:billing" "dev cd billing && git pull && dev reset --namespace billing --all && dev up && dev server" C-m
+
+# Window: shopify
+echo "Setting up shopify window..."
+tmux new-window -t "$SESSION_NAME" -n "shopify"
+# First pane: server
+tmux send-keys -t "$SESSION_NAME:shopify" "dev cd shopify && git pull && dev reset --namespace shopify --all && dev up && dev server" C-m
+
+# Create pane for hedwig enqueuer
+tmux split-window -t "$SESSION_NAME:shopify" -v
+tmux send-keys -t "$SESSION_NAME:shopify.1" "dev cd shopify && dev hedwig enqueuer" C-m
+
+# Create pane for hedwig worker
+tmux split-window -t "$SESSION_NAME:shopify" -v
+tmux send-keys -t "$SESSION_NAME:shopify.2" "dev cd shopify && dev hedwig worker 3" C-m
+
+# Create pane for setup commands
+tmux split-window -t "$SESSION_NAME:shopify" -v
+
+# Setup commands
+tmux send-keys -t "$SESSION_NAME:shopify.3" "dev cd shopify && for key in business-platform-dev-api-key development-shopify-flow-key plus-store-operations-key plus-business-key development-home-key; do bundle exec rails dev:create_apps API_KEY=\$key; done && bundle exec rails business_platform:bootstrap_spin_seed && bundle exec rails business_platform:post_create_spin_seed && echo 'diff --git a/areas/core/shopify/components/apps/framework/app/services/apps/access/module.rb b/areas/core/shopify/components/apps/framework/app/services/apps/access/module.rb
+index 822d3361b76f..d2bacc7eb445 100644
+--- a/areas/core/shopify/components/apps/framework/app/services/apps/access/module.rb
++++ b/areas/core/shopify/components/apps/framework/app/services/apps/access/module.rb
+@@ -12,7 +12,7 @@ module Apps
+       property :required_scopes, accepts: Array
+       property :optional_scopes, accepts: Array, default: -> { [] }
+       property :use_legacy_install_flow, accepts: [true, false], default: false
+-      property :access, accepts: Hash, default: -> { { admin: { embedded_app_direct_api_access: false } } }
++      property :access, accepts: Hash, default: -> { { admin: { embedded_app_direct_api_access: true } } }
+       property :redirect_url_allowlist, accepts: Array, default: -> { [] }
+ 
+       validate :validate_access_scopes' | git apply && bin/rails elasticsearch:index" C-m
+
+# Balance panes in shopify window
+tmux select-layout -t "$SESSION_NAME:shopify" tiled
+
+# Window: admin-web
+echo "Setting up admin-web window..."
+tmux new-window -t "$SESSION_NAME" -n "admin-web"
+tmux send-keys -t "$SESSION_NAME:admin-web" "dev cd admin-web && git pull && dev reset --namespace web --all && dev up && LOCAL_IDENTITY=true dev server" C-m
+
+# Window: pos-channel
+echo "Setting up pos-channel window..."
+tmux new-window -t "$SESSION_NAME" -n "pos-channel"
+tmux send-keys -t "$SESSION_NAME:pos-channel" "dev cd pos-channel && git pull && dev reset --namespace pos-channel --all && dev up && LOCAL_IDENTITY=true dev server local" C-m
+
+# Window: kafka
+echo "Setting up kafka window..."
+tmux new-window -t "$SESSION_NAME" -n "kafka"
+tmux send-keys -t "$SESSION_NAME:kafka" "dev cd shopify && dev kafka_consumer UserManagement::UserRoleDefinitionSyncConsumer" C-m
+
+tmux split-window -t "$SESSION_NAME:kafka" -v
+tmux send-keys -t "$SESSION_NAME:kafka.1" "dev cd shopify && dev kafka_consumer UserManagement::BatchedUserRoleAssignmentsConsumer" C-m
+
+# Balance panes in kafka window
+tmux select-layout -t "$SESSION_NAME:kafka" even-vertical
+
+# Select first window
+tmux select-window -t "$SESSION_NAME:identity"
+
+# Attach to session or switch if already in tmux
+echo "All services are starting up in tmux session: $SESSION_NAME"
+
+if [ -n "${TMUX:-}" ]; then
+    echo "Already in tmux, switching to session..."
+    tmux switch-client -t "$SESSION_NAME"
+else
+    echo "Attaching to session..."
+    tmux attach-session -t "$SESSION_NAME"
+fi

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/gt-dashboard"
+cd "$DIR" && bundle exec ruby gt-dashboard.rb "$@"

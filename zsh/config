@@ -22,9 +22,13 @@ export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
 
 bindkey -v
 
-bindkey '^R' history-incremental-search-backward
+# bindkey '^R' history-incremental-search-backward
 
 export LANG=C
+
+export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
+export FZF_TMUX_HEIGHT="40%"
+export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window down:3:hidden:wrap --bind '?:toggle-preview'"
 
 zsh_add_plugin "zsh-users/zsh-autosuggestions"
 zsh_add_plugin "zsh-users/zsh-syntax-highlighting"
@@ -36,3 +40,8 @@ load-local-conf() {
 }
 add-zsh-hook chpwd load-local-conf
 source ~/.zsh/functions/dev_aliases.zsh
+
+# Fix for fzf history search
+__fzf_defaults() {
+  echo "--height 40% --layout=reverse --border $1 $2"
+}

@@ -49,34 +49,24 @@ return {
     },
     {
       'gd',
-      function() 
-        Snacks.picker.lsp_definitions({
-          filter = {
-            filter = function(item, self)
-              return not (item.file and item.file:match("%.rbi$"))
-            end,
-          },
-        })
-      end,
+      function() Snacks.picker.lsp_definitions() end,
       desc = "LSP Definitions"
     },
     {
       'gr',
-      function() 
-        Snacks.picker.lsp_references({
-          filter = {
-            filter = function(item, self)
-              return not (item.file and item.file:match("%.rbi$"))
-            end,
-          },
-        })
-      end,
+      function() Snacks.picker.lsp_references() end,
       desc = "LSP References"
     },
     {
       "<leader>gb",
       function() Snacks.gitbrowse() end,
       desc = "Git Browse",
+      mode = { "n", "v" }
+    },
+    {
+      "<leader>gB",
+      function() Snacks.gitbrowse({ branch = "main" }) end,
+      desc = "Git Browse (main branch)",
       mode = { "n", "v" }
     },
     {
