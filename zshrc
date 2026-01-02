@@ -1,5 +1,9 @@
 #!/bin/zsh
 
+# Clear any dev alias/function before loading config
+unalias dev 2>/dev/null || true
+unset -f dev 2>/dev/null || true
+
 . ~/.zsh/config
 . ~/.zsh/aliases
 . ~/.zsh/opts
@@ -10,7 +14,6 @@
 #   [[ -f /opt/dev/sh/chruby/chruby.sh ]] && { type chruby >/dev/null 2>&1 || chruby () { source /opt/dev/sh/chruby/chruby.sh; chruby "$@"; } }
 #   [[ -x /opt/homebrew/bin/brew ]] && eval $(/opt/homebrew/bin/brew shellenv)
 #   PATH=/opt/homebrew/sbin:$PATH
-  unalias dev 2>/dev/null || true
   source /opt/dev/dev.sh
 # else
 #   [[ -f /usr/local/share/chruby/chruby.sh ]] && source /usr/local/share/chruby/chruby.sh
@@ -18,7 +21,27 @@
 # fi
 
 # dev wrapper with LaMetric notifications (must be after dev.sh)
-alias dev='~/.bin/dev-wrapper'
+if type dev &>/dev/null; then
+    # Save the original dev function
+    functions[_original_dev]="${functions[dev]}"
+
+    # Create wrapper function
+    dev() {
+        local cmd="${1:-}"
+        if [[ "$cmd" == "up" || "$cmd" == "test" || "$cmd" == "start" ]]; then
+            _original_dev "$@"
+            local exit_code=$?
+            if [[ $exit_code -eq 0 ]]; then
+                ~/.bin/notify_time -i 1004 "dev $cmd ✓" &>/dev/null || true
+            else
+                ~/.bin/notify_time -i 270 "dev $cmd ✗" &>/dev/null || true
+            fi
+            return $exit_code
+        else
+            _original_dev "$@"
+        fi
+    }
+fi
 
 PATH=~/.bin:$PATH
 PATH="/usr/local/opt/ruby/bin:$PATH"

@@ -9,6 +9,7 @@ alias cat='bat'
 alias ls='lsd'
 alias vim='nvim'
 alias vi='nvim'
+alias dev='~/.bin/dev-wrapper'
 
 alias icat="kitten icat"
 
@@ -29,7 +30,7 @@ alias tldrf='tldr --list | fzf --preview "tldr {1} --color=always" --preview-win
 # git
 alias ga='git add'
 alias gai='git add `git ls-files --exclude-standard --modified --others | fzf --bind one:accept --multi --preview="git diff {1} | delta"` $@'
-alias gri='git restore `git ls-files --modified | fzf --bind one:accept --multi --height=40% --preview="git diff {1} | delta"`'
+alias gri='git restore `git ls-files --modified | fzf --bind one:accept --multi --preview="git diff {1} | delta"`'
 alias gbi='gh pr list --author "@me" | fzf --ansi --preview "GH_FORCE_TTY=100% gh pr view {1}" | awk '\''{print $1}'\'' | xargs gh pr checkout'
 alias rmi='rm `git ls-files --others --exclude-standard | fzf --bind one:accept --multi --ansi --preview="bat --color always {1}"`'
 alias gc='git commit -v'
