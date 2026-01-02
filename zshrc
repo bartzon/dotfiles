@@ -10,11 +10,15 @@
 #   [[ -f /opt/dev/sh/chruby/chruby.sh ]] && { type chruby >/dev/null 2>&1 || chruby () { source /opt/dev/sh/chruby/chruby.sh; chruby "$@"; } }
 #   [[ -x /opt/homebrew/bin/brew ]] && eval $(/opt/homebrew/bin/brew shellenv)
 #   PATH=/opt/homebrew/sbin:$PATH
+  unalias dev 2>/dev/null || true
   source /opt/dev/dev.sh
 # else
 #   [[ -f /usr/local/share/chruby/chruby.sh ]] && source /usr/local/share/chruby/chruby.sh
 #   [[ -x /usr/local/bin/brew ]] && eval $(/usr/local/bin/brew shellenv)
 # fi
+
+# dev wrapper with LaMetric notifications (must be after dev.sh)
+alias dev='~/.bin/dev-wrapper'
 
 PATH=~/.bin:$PATH
 PATH="/usr/local/opt/ruby/bin:$PATH"
@@ -57,3 +61,6 @@ source ~/.bin/forgit/forgit.plugin.zsh
 
 # cloudplatform: add Shopify clusters to your local kubernetes config
 export KUBECONFIG=${KUBECONFIG:+$KUBECONFIG:}/Users/bartzonneveld/.kube/config:/Users/bartzonneveld/.kube/config.shopify.cloudplatform
+
+# Added by tec agent
+[[ -x /Users/bartzonneveld/.local/state/tec/profiles/base/current/global/init ]] && eval "$(/Users/bartzonneveld/.local/state/tec/profiles/base/current/global/init zsh)"

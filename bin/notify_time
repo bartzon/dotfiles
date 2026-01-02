@@ -1,0 +1,86 @@
+#!/bin/zsh
+
+set -euo pipefail
+
+SECRETS_FILE="${HOME}/.bin/notify_time.secret"
+
+if [[ ! -f "$SECRETS_FILE" ]]; then
+    echo "Error: Secrets file not found at $SECRETS_FILE" >&2
+    exit 1
+fi
+
+source "$SECRETS_FILE"
+
+if [[ -z "${DEVICE_URL:-}" || -z "${API_KEY:-}" ]]; then
+    echo "Error: DEVICE_URL or API_KEY not set in $SECRETS_FILE" >&2
+    exit 1
+fi
+
+usage() {
+    cat <<EOF
+Usage: notify_time [OPTIONS] <text>
+
+Send a notification to LaMetric Time display.
+
+Arguments:
+    text            The text message to display
+
+Options:
+    -i, --icon ICON Icon ID to display (default: 70801)
+    -h, --help      Show this help message
+
+Examples:
+    notify_time "dev up"
+    notify_time -i 12345 "Build complete"
+    notify_time --icon 8262 "Tests passed"
+EOF
+}
+
+ICON="70801"
+TEXT=""
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        -i|--icon)
+            if [[ -z "${2:-}" ]]; then
+                echo "Error: --icon requires an argument" >&2
+                exit 1
+            fi
+            ICON="$2"
+            shift 2
+            ;;
+        -*)
+            echo "Error: Unknown option: $1" >&2
+            usage >&2
+            exit 1
+            ;;
+        *)
+            TEXT="$1"
+            shift
+            ;;
+    esac
+done
+
+if [[ -z "$TEXT" ]]; then
+    echo "Error: text argument is required" >&2
+    usage >&2
+    exit 1
+fi
+
+curl -X POST \
+    -u "dev:$API_KEY" \
+    -H "Content-Type: application/json" \
+    -d "{\"model\":{\"frames\":[{\"icon\":\"$ICON\",\"text\":\"$TEXT\"}]}}" \
+    "$DEVICE_URL" \
+    2>/dev/null
+
+if [[ $? -eq 0 ]]; then
+    echo "✓ Notification sent: $TEXT" >&2
+else
+    echo "✗ Failed to send notification" >&2
+    exit 1
+fi

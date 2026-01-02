@@ -8,3 +8,4 @@ Session.vim
 .pinned_tests.txt
 .fdignore
 CLAUDE.md
+*.secret

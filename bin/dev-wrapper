@@ -1,0 +1,32 @@
+#!/bin/zsh
+
+set -euo pipefail
+
+REAL_DEV="/opt/dev/bin/dev"
+NOTIFY_TIME="${HOME}/.bin/notify_time"
+
+GREEN_ICON="1004"
+RED_ICON="270"
+
+COMMAND="${1:-}"
+
+should_notify() {
+    [[ "$COMMAND" == "up" || "$COMMAND" == "test" || "$COMMAND" == "start" ]]
+}
+
+if should_notify; then
+    set +e
+    "$REAL_DEV" "$@"
+    EXIT_CODE=$?
+    set -e
+
+    if [[ $EXIT_CODE -eq 0 ]]; then
+        "$NOTIFY_TIME" -i "$GREEN_ICON" "dev $COMMAND ✓" &>/dev/null || true
+    else
+        "$NOTIFY_TIME" -i "$RED_ICON" "dev $COMMAND ✗" &>/dev/null || true
+    fi
+
+    exit $EXIT_CODE
+else
+    exec "$REAL_DEV" "$@"
+fi
